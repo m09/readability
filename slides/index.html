@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    
+    <title>reveal.js - The HTML Presentation Framework</title>
+    
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+    <link rel="stylesheet" href="css/custom.css">
+    
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = 'css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    
+    <!--[if lt IE 9]>
+	<script src="lib/js/html5shiv.js"></script>
+	<![endif]-->
+  </head>
+  
+  <body>
+    
+    <div class="reveal">
+      <div class="slides">
+	<section>
+          <section>
+            <h1><span class="text-success">Readability assessment</span></h1>
+            <div class="text-muted">
+              For <strong class="text-primary">Aizawa Lab</strong>
+              by <strong class="text-primary">Hugo Mougard</strong> on
+              March the 28<sup>th</sup>
+            </div>
+          </section>
+	</section>
+        <section>
+          <h1><span style="color: black;">Overview</span></h1>
+          <ul>
+            <li>Definition of readability</li>
+            <li>Factors of readability</li>
+            <li>Readability formulas</li>
+            <li>Issues with formulas</li>
+            <li>Machine learning and readability</li>
+            <li>Focus on an interesting paper</li>
+            <li>Conclusion</li>
+          </ul>
+        </section>
+        <section>
+          <section data-state="soothe">
+            <h1>What readability is</h1>
+            <p>
+              (Newbold, 2013)
+            </p>
+          </section>
+          <section>
+            <h2>But first, what it is not</h2>
+            <p>Readability is not legibility: the former is only about
+              the text, not the layout nor the appearance.</p>
+          </section>
+          <section>
+            <h2>Definition 1</h2>
+            <blockquote>
+              <p>
+                [Readability is the] ease of reading words and
+                sentences.
+              </p>
+              <footer>Hargis et al., 1998</footer>
+            </blockquote>
+            <aside class="notes">
+              <ul>
+                <li>most basic definition</li>
+                <li>only addresses the mechanical act</li>
+              </ul>
+            </aside>
+          </section>
+          <section>
+            <h2>Definition 2</h2>
+            <blockquote>
+              <p>
+                [Readability is] the quality of a written or printed
+                communication that makes it easy for any given class
+                of persons to understand its meaning, or that induces
+                them to continue reading.
+              </p>
+              <footer>English and English, 1958</footer>
+            </blockquote>
+            <aside class="notes">
+              <ul>
+                <li>incorporates understanding</li>
+                <li>doesn't discriminate classes of persons</li>
+              </ul>
+            </aside>
+          </section>
+          <section>
+            <h2>Definition 3</h2>
+            <blockquote>
+              <p>
+                [Readability is] the degree to which a given class of
+                people find certain reading matter compelling and
+                comprehensible.
+              </p>
+              <footer>McLaughlin, 1969</footer>
+            </blockquote>
+            <aside class="notes">
+              discriminates classes of persons
+            </aside>
+          </section>
+          <section>
+            <h2>Definition 4</h2>
+            <blockquote>
+              <p>
+                [Readability is] the sum total (including all the
+                interactions) of all those elements within a given
+                piece of printed material that affect the success a
+                group of readers have with it. The success is the
+                extent to which they understand it, read it at optimal
+                speed, and find it interesting
+              </p>
+              <footer>Dale and Chall, 1949</footer>
+            </blockquote>
+            <aside class="notes">
+              most complete
+            </aside>
+          </section>
+        </section>
+        <section>
+          <section data-state="mint">
+            <h1>The factors of readability</h1>
+          </section>
+          <section>
+            <h2>Readability factors</h2>
+            <figure>
+              <img src="img/readability-factors1.png" width="700">
+              <figcaption>Reproduced from Oakland and Lane, 2004
+                through Newbold, 2013</figcaption>
+            </figure>
+          </section>
+        </section>
+        <section>
+          <section data-state="sunset">
+            <h1>Readability formulas</h1>
+          </section>
+          <section>
+            <h2>Historical approach to readability</h2>
+            <ul>
+              <li>easy to compute</li>
+              <li>some of them do not require a computer</li>
+              <li>easy to use once computed</li>
+            </ul>
+            <p>Still used today in schools or as bootstrap for other
+            methods.</p>
+          </section>
+          <section>
+            <h2>Idea behind the formulas</h2>
+            <p>Find a way to measure readability by combining
+              different easy-to-compute features.</p>
+            <p>Most frequent features:</p>
+            <ul>
+              <li>average sentence length</li>
+              <li>average word length</li>
+              <li>belonging to a word list</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Quantity of formulas</h2>
+            <p>There are <strong class="text-danger">lots of</strong>
+            formulas. We will only go through the major ones.</p>
+          </section>
+          <section>
+            <h2>Thorndike's 10k simple words list</h2>
+            <p>
+              (Thorndike, 1921) computed the most common words of
+              English by counting the most occurring ones in common
+              text.
+            </p>
+          </section>
+          <section>
+            <h2>First reading formula</h2>
+            <p>
+               (Bertha A. Lively and Sidney L. Pressey, 1923) used
+               Thorndike's list to rate the readability of a book:
+            </p>
+            <ul>
+              <li>to count the number of words not in the book</li>
+              <li>to calculate the median index of the words in the
+                list</li>
+            </ul>
+            <p>It took 3h to apply to a book.</p>
+          </section>
+          <section>
+            <h2>First popular formula:<br>Flesch Reading Ease</h2>
+            <p>
+               (Flesch, 1948), 100 is easy to read, <30 is a little
+               hard to read (for a good reader):
+               <br>
+               <br>
+               $206.835
+               - 1.015 \left(\frac{\text{total words}}{\text{total
+               sentences}}\right)
+               - 84.6 \left(\frac{\text{total syllables}}{\text{total words}}\right)$
+            </p>
+          </section>
+          <section>
+            <h2>Dale–Chall readability formula</h2>
+            <p>
+               (Dale and Chall, 1949):
+               <br>
+               <br>
+               $0.1579 \left(\frac{\text{difficult
+               words}}{\text{words}}
+               \times100 \right)
+               + 0.0496
+               \left(\frac{\text{words}}{\text{sentences}}\right)$
+               <br>
+               <br>
+               Where difficult words are words not present in a list
+               of 763 words (updated to 3k words in 1995).
+            </p>
+          </section>
+          <section>
+            <h2>Gunning fog index</h2>
+            <p>
+               (Gunning, 1952):
+            <br>
+            <br>
+            $0.4 \left[\left(\frac{\text{words}}{\text{sentences}}\right)
+            + 100 \left(\frac{\text{complex
+            words}}{\text{words}}\right)\right]$
+            <br>
+            <br>
+            Where complex words are words of 3+ syllables.
+            </p>
+          </section>
+          <section>
+            <h2>SMOG formula</h2>
+            <p>(McLaughlin, 1969) aims at computing the grade required to read a
+            text:
+            <br>
+            <br>
+            $1.0430\sqrt{\text{complex words} \times
+            \frac{30}{\text{number of sentences}}} + 3.1291$</p>
+          </section>
+          <section>
+            <h2>Flesch–Kincaid Grade Level</h2>
+            <p>(Kincaid et al., 1975) also aims at computing the grade required to read
+            a text:
+            <br>
+            <br>
+            $0.39\left(\frac{\text{total words}}{\text{total
+            sentences}}\right)
+            + 11.8\left(\frac{\text{total syllables}}{\text{total words}}\right)
+            - 15.59$</p>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h1><span style="color: black;">Formulas issues</span></h1>
+            (Bailin and Grafstein, 2001)
+          </section>
+          <section>
+            <h2>Word lists: assumption</h2>
+            <p>A word list can discriminate between easy and difficult
+              vocabulary.</p>
+          </section>
+          <section>
+            <h2>Word lists: issues</h2>
+            <p>
+              Word lists are subject to cultural and personal
+              differences:
+            </p>
+            <ul>
+              <li>age</li>
+              <li>wealth</li>
+              <li>ethnical origins</li>
+              <li>religion</li>
+              <li>political views</li>
+              <li>…</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Word complexity: assumption</h2>
+            <p>The longer the harder.</p>
+          </section>
+          <section>
+            <h2>Word complexity: issues</h2>
+            <p>
+              Affixes may actually help readers to understand a word,
+              while increasing its length.
+              <br>
+              <br>
+              For example: de-construct-ing, anti-conform-ist
+            </p>
+          </section>
+          <section>
+            <h2>Syntactic complexity: assumption</h2>
+            <p>As for word complexity: the longer the harder.</p>
+          </section>
+          <section>
+            <h2>Syntactic complexity: issues (1/3)</h2>
+            <p>Consider the following sentences:</p>
+            <br>
+            <ol>
+              <li>The mouse ate the cheese, and then the rat ate the
+                mouse, and after that, the cat ate the rat and
+                died.</li>
+              <li>The cat that ate the rat that ate the mouse that ate
+                the cheese died.</li>
+            </ol>
+          </section>
+          <section>
+            <h2>Syntactic complexity: issues (2/3)</h2>
+          <ol>
+            <li>The pen which the author whom the editor liked used
+              was new</li>
+            <li>The pen the author the editor liked used was new</li>
+          </ol>
+          </section>
+          <section>
+            <h2>Syntactic complexity: issues (3/3)</h2>
+            <p>Consider the following sentences:</p>
+            <br>
+            <ol>
+              <li>It was late at night, but it was clear.</li>
+              <li>The stars were out and the moon was bright.</li>
+            </ol>
+            <br>
+            <br>
+            And
+            <br>
+            <br>
+            <ol>
+              <li>It was late at night.</li>
+              <li>It was clear.</li>
+              <li>The stars were out.</li>
+              <li>The moon was bright.</li>
+            </ol>
+          </section>
+        </section>
+        <section>
+          <section data-state="mint">
+            <h1>Machine Learning</h1>
+          </section>
+          <section>
+            <h2>The tasks</h2>
+            <style>
+              .table th, .table td {
+              text-align: center !important;
+              }
+            </style>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Classical task</th>
+                  <th>Machine learning task</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Score a text</td>
+                  <td>Regression</td>
+                </tr>
+                <tr>
+                  <td>Sort texts on readability</td>
+                  <td>Regression, classification on pairs of
+                    documents</td>
+                </tr>
+                <tr>
+                  <td>Assign a required grade to a text</td>
+                  <td>Classification with grades as labels</td>
+                </tr>
+                <tr>
+                  <td>Regroup texts of similar readability</td>
+                  <td>Clustering</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section>
+            <h2>A first approach: unigrams model</h2>
+            <p>Collins-Thompson and Callan, 2004:</p>
+            <br>
+            <ol>
+              <li>train an unigram model for each one of the 12 target
+                grades</li>
+              <li>assign the grade whose model is the most likely to
+                have generated the input text</li>
+            </ol>
+            <br>
+            <br>
+            <p>Outperforms all the formulas.</p>
+          </section>
+          <section>
+            <h2>Language model approach refined</h2>
+            <p>Schwarm and Ostendorf, 2005:</p>
+            <br>
+            <ul>
+              <li>bigrams, trigrams. Improves on unigrams.</li>
+              <li>combination of LM and text features by using the
+                perplexity as a feature alongside other features
+                (FKRE, OOV, average parse height, …).</li>
+            </ul>
+            <br>
+            <br>
+            <p>The combination improves on the trigram model.</p>
+          </section>
+          <section>
+            <h2>Complex features</h2>
+            <p>
+              Pitler and Nenkova, 2008:
+            </p>
+            <br>
+            <ul>
+              <li>unigram model</li>
+              <li>lexical cohesion (cosine similiarity averaged over
+                all sentences)</li>
+              <li>syntactic features (as Schwarm and Ostendorf)</li>
+              <li>entity coherence (analyse the subjects / objects of
+                consecutive sentences)</li>
+              <li>language model over discourse relations</li>
+            </ul>
+            <br>
+            <br>
+            <p>→ proves the superiority of discourse relations over
+            average lengths of sentences and
+            words. <strong>But</strong> discourse relations are not
+            yet easily computable.</p>
+          </section>
+          <section>
+            <h2>Sorting texts by readability</h2>
+            <p>
+              Tanaka-Ishii, Tezuka and Terada, 2010:
+            </p>
+            <br>
+            <img src="img/ordering.png" width="400">
+            <br>
+            <ul>
+              <li>word counts in the document and in the corpus as
+                features</li>
+              <li>corpus is easy to create compared to other ML
+                approaches</li>
+              <li>results are very good when evaluated vs regression
+                on the sorting task</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section data-state="cobalt">
+            <h1>Focus on an interesting
+                paper</h1>
+          </section>
+          <section>
+            <h2>Domain-Specific Iterative Readability Computation</h2>
+            <span class="text-muted">by <strong class="text-primary">Jin
+            Zhao</strong> and <strong class="text-primary">Min-Yen
+            Jan</strong> (JCDL'10)</span>
+          </section>
+          <section>
+            <h2>Motivations</h2>
+            <ol>
+              <li>compute domain specific terms difficulties is
+                expensive</li>
+              <li>terms of close difficulty are often found together
+                in documents</li>
+            </ol>
+            <br>
+            <br>
+            <p>→ propose a method to build difficulty scores with as
+              few resources as possible leveraging (2).</p>
+          </section>
+          <section>
+            <h2>Idea</h2>
+            <ul>
+              <li>obtain a list of domain specific terms (the only
+                resource required)</li>
+              <li>construct a bi-partite graph to model the relations
+                between documents and domain-specific terms</li>
+              <li>initialize difficulties with a readability
+                formula</li>
+              <li>iteratively update the difficulties of documents
+                and concepts</li>
+              <li>stop when the delta of the difficulties between two
+                steps is small</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Graph construction</h2>
+            <img src="img/graph.png" width="300">
+          </section>
+        </section>
+        <section>
+          <section data-state="soothe">
+            <h1>Plans</h1>
+          </section>
+          <section>
+            <h2>Some possibilities</h2>
+            <ul>
+              <li>combine efficiently the different state of the art
+                algorithms</li>
+              <li>investigate features to address all the formulas
+                issues during supervised learning</li>
+              <li>use clustering to enhance the unsupervised
+                domain-specific vocabulary difficulty detection</li>
+              <li>think about how to gather corpora efficiently for
+                readability (thus allowing more powerful ML)</li>
+            </ul>
+            <br>
+            <br>
+            <p>More on this after the coming meeting, and I'm open to
+            suggestions!</p>
+          </section>
+        </section>
+        <section data-state="sunset">
+          <h1>Conclusion</h1>
+          <p>We have looked into:</p>
+          <ul>
+            <li>how to define readability (people-dependent,
+              understanding, focus on text)</li>
+            <li>the factors of readability (people-based and
+              text-based)</li>
+            <li>classic formulas and their issues</li>
+            <li>new ML approches</li>
+            <li>an interesting way to infer domain-specific
+              difficulty</li>
+          </ul>
+        </section>
+        <section data-state="mint">
+          <h1>Thank you very much for your
+              attention<br>😊</h1>
+        </section>
+        <section>
+          <section data-state="cobalt">
+            <h1>Do you have any
+                question?</h1>
+          </section>
+        </section>
+      </div>
+    </div>
+    
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.min.js"></script>
+    
+    <script>
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+      controls: false,
+      progress: true,
+      history: true,
+      center: true,
+      slideNumber: true,
+      
+      theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+      transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+      math: {
+      mathjax: 'http://cdn.mathjax.org/mathjax/latest/MathJax.js',
+      config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+      },
+      // Parallax scrolling
+      // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+      // parallaxBackgroundSize: '2100px 900px',
+      
+      // Optional libraries used to extend on reveal.js
+      dependencies: [
+      { src: 'plugin/math/math.js', async: true },
+      { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+      ]
+      });
+      
+    </script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    
+  </body>
+</html>

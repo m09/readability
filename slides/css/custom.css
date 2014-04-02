@@ -1,0 +1,13 @@
+.reveal .slide-number {
+    position: fixed;
+    display: block;
+    right: 15px;
+    bottom: 15px;
+    opacity: 0.8 !important;
+    z-index: 31;
+    font-size: 25px !important;
+}
+
+h1 {
+    color: white !important;
+}
