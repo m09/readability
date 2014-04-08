@@ -15,5 +15,4 @@ public class ZonedDateTimeAdapter extends XmlAdapter<String, ZonedDateTime>{
     public String marshal(ZonedDateTime dateTime) throws Exception {
         return dateTime.format(DateTimeFormatter.ISO_DATE_TIME);
     }
-    
 }

@@ -16,12 +16,16 @@ public class Page {
 
     @XmlAttribute
     private String title;
+
     @XmlTransient
     private int ns = 0;
+
     @XmlAttribute
     private long id;
+
     @XmlTransient
     private boolean redirect = false;
+
     @XmlElement(name = "revision")
     private List<Revision> revisions = new ArrayList<>();
 

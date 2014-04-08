@@ -18,18 +18,22 @@ public class Revision {
     @XmlAttribute
     @XmlJavaTypeAdapter(OptionalLongAdapter.class)
     final private Optional<Long> parentId;
+
     @XmlAttribute
     final private long id;
+
     @XmlAttribute
     @XmlJavaTypeAdapter(ZonedDateTimeAdapter.class)
-    
     final private ZonedDateTime timeStamp;
+
     @XmlAttribute
     @XmlJavaTypeAdapter(BooleanAdapter.class)
     final private Boolean minor;
+
     @XmlAttribute
     @XmlJavaTypeAdapter(OptionalStringAdapter.class)
     final private Optional<String> comment;
+
     @XmlTransient
     final private String text;
 
