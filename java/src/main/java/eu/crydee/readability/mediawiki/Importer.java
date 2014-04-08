@@ -16,13 +16,14 @@ import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.apache.log4j.Logger;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 public class Importer {
 
-    private static final org.apache.log4j.Logger logger
-            = org.apache.log4j.Logger.getLogger(App.class.getCanonicalName());
+    private static final org.apache.log4j.Logger logger = Logger.getLogger(
+            App.class.getCanonicalName());
 
     public static void main(String[] args)
             throws JAXBException, FileNotFoundException, XMLStreamException {
