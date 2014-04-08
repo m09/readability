@@ -17,7 +17,7 @@ public class OptionalLongAdapter extends XmlAdapter<String, Optional<Long>>{
     @Override
     public String marshal(Optional<Long> v) throws Exception {
         if (v.isPresent()) {
-            return String.valueOf(v);
+            return String.valueOf(v.get());
         } else {
             return null;
         }
