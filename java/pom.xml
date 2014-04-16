@@ -29,9 +29,14 @@
     
     <dependencies>
         <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>0.9.11</version>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>uimafit-core</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.3-1101-jdbc41</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
@@ -87,8 +92,8 @@
                 <version>3.1</version>
                 <configuration>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>7</source>
+                    <target>7</target>
                 </configuration>
             </plugin>
             <plugin>
