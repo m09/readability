@@ -1,70 +1,170 @@
 package eu.crydee.readability.mediawiki;
 
-import eu.crydee.readability.App;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentNavigableMap;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 public class Importer {
 
+    @SuppressWarnings("UnusedDeclaration")
     private static final org.apache.log4j.Logger logger = Logger.getLogger(
-            App.class.getCanonicalName());
+            Importer.class.getCanonicalName());
 
     public static void main(String[] args)
             throws JAXBException, FileNotFoundException, XMLStreamException {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        try (PrintWriter pw = new PrintWriter("history.txt")) {
-            DB db = DBMaker.newFileDB(new File("db/simplewiki.db"))
-                    .transactionDisable()
-                    .closeOnJvmShutdown()
-                    .make();
+        Options options = new Options();
+        options.addOption("h", "help", false, "print this message");
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("db-url")
+                .hasArg()
+                .withArgName("jdbc:...")
+                .withDescription("The database to use to retrieve revisions "
+                        + "information. JDBC format.")
+                .create("d"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("username")
+                .hasArg()
+                .withArgName("dbuser")
+                .withDescription("User to use to access the database of "
+                        + "revisions.")
+                .create("u"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("password")
+                .hasArg()
+                .withArgName("pw")
+                .withDescription("Password of the user account to connect to "
+                        + "the database.")
+                .create("p"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("from")
+                .hasArg()
+                .withArgName("i")
+                .withDescription("From which page we should import "
+                        + "(inclusive).")
+                .create("f"));
+        options.addOption(OptionBuilder
+                .isRequired()
+                .withLongOpt("to")
+                .hasArg()
+                .withArgName("i")
+                .withDescription("To which page we should import (exclusive).")
+                .create("t"));
+        CommandLineParser parser = new PosixParser();
+        @SuppressWarnings("UnusedAssignment")
+        CommandLine cmd = null;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException ex) {
+            System.err.println("The CLI args could not be parsed.");
+            System.err.println("The error message was:");
+            System.err.println(" " + ex.getMessage());
+            System.exit(1);
+        }
 
-            ConcurrentNavigableMap<Long, String> revisions
-                    = db.getTreeMap("revisions");
+        final String DB_URL = cmd.getOptionValue('d'),
+                DB_USER = cmd.getOptionValue('u'),
+                DB_PW = cmd.getOptionValue('p');
+        final int FROM = Integer.parseInt(cmd.getOptionValue('f')),
+                TO = Integer.parseInt(cmd.getOptionValue('t'));
+
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        try (Connection connection = DriverManager.getConnection(
+                DB_URL,
+                DB_USER,
+                DB_PW)) {
+            PreparedStatement psRevisionsInfo = connection.prepareStatement(
+                    "INSERT INTO revisions_info "
+                    + "(id, parent_id, comment, minor, page_id, timestamp) "
+                    + "VALUES (?, ?, ?, ?, ?, ?)"),
+                    psPages = connection.prepareStatement(
+                            "INSERT INTO pages "
+                            + "(id, title) "
+                            + "VALUES (?, ?)"),
+                    psRevisions = connection.prepareStatement(
+                            "INSERT INTO revisions "
+                            + "(id, text) "
+                            + "VALUES (?, ?)");
             XMLStreamReader reader = factory.createXMLStreamReader(
-                    new FileInputStream("simplewiki-20140325-pages-meta-history.xml"),
+                    new FileInputStream(
+                            "simplewiki-20140325-pages-meta-history.xml"),
                     "utf8");
-            pw.println("<?xml "
-                    + "version=\"1.0\" "
-                    + "encoding=\"UTF-8\" "
-                    + "standalone=\"yes\""
-                    + "?>");
-            pw.print("<pages>");
             int i = 0;
-            while (goToNextXBeforeY(reader, "page", "mediawiki")) {
+            while (goToNextXBeforeY(reader, "page", "mediawiki")
+                    && i < TO) {
+                if (i < FROM) {
+                    continue;
+                }
                 System.out.print("\r" + i++);
                 Page page = parsePageInfo(reader);
                 if (page.isRedirect() || page.getNs() != 0) {
                     continue;
                 }
+                psPages.setLong(1, page.getId());
+                psPages.setString(2, page.getTitle());
+                psPages.execute();
                 for (Revision revisionInfo : parseRevisions(reader)) {
-                    page.addRevision(revisionInfo);
-                    revisions.put(revisionInfo.getId(), revisionInfo.getText());
+                    psRevisions.setLong(1, revisionInfo.getId());
+                    psRevisions.setString(2, revisionInfo.getText());
+                    psRevisions.execute();
+                    psRevisionsInfo.setLong(1, revisionInfo.getId());
+                    if (revisionInfo.getParentId().isPresent()) {
+                        psRevisionsInfo.setLong(
+                                2,
+                                revisionInfo.getParentId().get());
+                    } else {
+                        psRevisionsInfo.setNull(
+                                2,
+                                Types.BIGINT);
+                    }
+                    if (revisionInfo.getComment().isPresent()) {
+                        psRevisionsInfo.setString(
+                                3,
+                                revisionInfo.getComment().get());
+                    } else {
+                        psRevisionsInfo.setNull(
+                                3,
+                                Types.VARCHAR);
+                    }
+                    psRevisionsInfo.setBoolean(
+                            4,
+                            revisionInfo.isMinor());
+                    psRevisionsInfo.setLong(
+                            5,
+                            page.getId());
+                    psRevisionsInfo.setString(
+                            6,
+                            revisionInfo.getTimeStamp().format(
+                                    DateTimeFormatter.ISO_DATE_TIME));
+                    psRevisionsInfo.execute();
                 }
-                JAXBContext jc = JAXBContext.newInstance(Page.class);
-                Marshaller marshaller = jc.createMarshaller();
-                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                marshaller.marshal(page, pw);
             }
             System.out.println();
-            pw.println("</pages>");
-            db.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.err);
         }
     }
 

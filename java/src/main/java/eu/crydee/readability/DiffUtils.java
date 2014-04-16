@@ -9,24 +9,20 @@ import org.eclipse.jgit.diff.RawTextComparator;
 public class DiffUtils {
 
     public static EditList diffLines(String a, String b) {
+        return diffLines(new RawText(a.getBytes()), new RawText(b.getBytes()));
+    }
+
+    public static EditList diffLines(RawText a, RawText b) {
         DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
                 DiffAlgorithm.SupportedAlgorithm.MYERS);
 
-        EditList editList = da.diff(RawTextComparator.DEFAULT,
-                new RawText(a.getBytes()),
-                new RawText(b.getBytes()));
-        Object o = new Object();
-        return editList;
+        return da.diff(RawTextComparator.DEFAULT, a, b);
     }
 
     public static EditList diffWords(String a, String b) {
-        DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
-                DiffAlgorithm.SupportedAlgorithm.MYERS);
-        String a2 = StringUtils.join(a.split(" "), "\n") + "\n",
-                b2 = StringUtils.join(b.split(" "), "\n") + "\n";
-        EditList editList = da.diff(RawTextComparator.DEFAULT,
-                new RawText(a2.getBytes()),
-                new RawText(b2.getBytes()));
-        return editList;
+        String A = StringUtils.join(a.split(" "), "\n") + "\n",
+                B = StringUtils.join(b.split(" "), "\n") + "\n";
+        return diffLines(
+                new RawText(A.getBytes()), new RawText(B.getBytes()));
     }
 }
