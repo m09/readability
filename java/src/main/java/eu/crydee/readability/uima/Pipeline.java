@@ -1,11 +1,16 @@
 package eu.crydee.readability.uima;
 
-import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
+import eu.crydee.readability.uima.ae.SentenceDiffAE;
+import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
+import eu.crydee.readability.uima.ts.Area;
+import eu.crydee.readability.uima.ts.Sentence;
+import eu.crydee.readability.uima.ts.SentenceDiff;
+import eu.crydee.readability.uima.ts.Token;
 import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
@@ -21,9 +26,16 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 import static org.apache.uima.fit.factory.CollectionReaderFactory.createReaderDescription;
 import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import org.apache.uima.fit.factory.FlowControllerFactory;
+import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.flow.impl.FixedFlowController;
 
@@ -90,14 +102,27 @@ public class Pipeline {
                 "opennlp.uima.TokenType",
                 "eu.crydee.readability.uima.ts.Token");
 
-        AnalysisEngineDescription differ = createEngineDescription(
+        AnalysisEngineDescription sentenceDiffer = createEngineDescription(
                 SentenceDiffAE.class);
+
+        AnalysisEngineDescription wordDiffer = createEngineDescription(
+                WordDiffAE.class);
 
         AnalysisEngineDescription consumer = createEngineDescription(
                 XmiSerializerAE.class,
                 XmiSerializerAE.PARAM_OUT_FOLDER, "out");
 
-        AggregateBuilder builder = new AggregateBuilder();
+        AggregateBuilder builder = new AggregateBuilder(
+                null,
+                TypePrioritiesFactory.createTypePriorities(
+                        SentenceDiff.class,
+                        Area.class,
+                        Token.class),
+                FlowControllerFactory.createFlowControllerDescription(
+                        FixedFlowController.class,
+                        FixedFlowController.PARAM_ACTION_AFTER_CAS_MULTIPLIER,
+                        "drop"));
+        builder.add(filter);
         builder.add(getter);
         builder.add(mw2txtRevised);
         builder.add(mw2txtOriginal, CAS.NAME_DEFAULT_SOFA, "original");
@@ -105,18 +130,11 @@ public class Pipeline {
         builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtRevised");
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(differ);
+        builder.add(sentenceDiffer);
+        builder.add(wordDiffer);
         builder.add(consumer);
 
-        AnalysisEngineDescription aae = createEngineDescription(
-                FlowControllerFactory.createFlowControllerDescription(
-                        FixedFlowController.class,
-                        FixedFlowController.PARAM_ACTION_AFTER_CAS_MULTIPLIER,
-                        "drop"),
-                filter,
-                builder.createAggregateDescription());
-
-        SimplePipeline.runPipeline(crd, aae);
+        SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
 
     static private void parseArguments(String[] args) {

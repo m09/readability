@@ -1,16 +1,45 @@
 package eu.crydee.readability;
 
-public interface Edit {
+public class Edit {
 
-    public int getBeginA();
+    final private int beginA, endA, beginB, endB;
+    final private String textA, textB;
 
-    public int getEndA();
+    public Edit(int beginA,
+            int endA,
+            int beginB,
+            int endB,
+            String textA,
+            String textB) {
+        this.beginA = beginA;
+        this.endA = endA;
+        this.beginB = beginB;
+        this.endB = endB;
+        this.textA = textA;
+        this.textB = textB;
+    }
 
-    public int getBeginB();
+    public int getBeginA() {
+        return beginA;
+    }
 
-    public int getEndB();
+    public int getEndA() {
+        return endA;
+    }
 
-    public String getTextA();
+    public int getBeginB() {
+        return beginB;
+    }
 
-    public String getTextB();
+    public int getEndB() {
+        return endB;
+    }
+
+    public String getTextA() {
+        return textA;
+    }
+
+    public String getTextB() {
+        return textB;
+    }
 }
