@@ -47,5 +47,32 @@
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.Area</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.SentenceDiff</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>original</name>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.Area</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.WordDiff</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>original</name>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.Area</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
     </types>
 </typeSystemDescription>

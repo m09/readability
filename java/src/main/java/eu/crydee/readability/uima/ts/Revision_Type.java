@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu Apr 17 16:05:04 JST 2014 */
+/* First created by JCasGen Thu Apr 17 21:11:44 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu Apr 17 16:05:04 JST 2014
+ * Updated by JCasGen Thu Apr 17 21:11:44 JST 2014
  * @generated */
 public class Revision_Type extends Annotation_Type {
   /** @generated */

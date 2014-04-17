@@ -14,12 +14,12 @@ import org.apache.uima.jcas.tcas.Annotation;
  * Updated by JCasGen Thu Apr 17 21:11:44 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
-public class Token extends Annotation {
+public class WordDiff extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(Token.class);
+  public final static int typeIndexID = JCasRegistry.register(WordDiff.class);
   /** @generated
    * @ordered 
    */
@@ -31,23 +31,23 @@ public class Token extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected Token() {/* intentionally empty block */}
+  protected WordDiff() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public Token(int addr, TOP_Type type) {
+  public WordDiff(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public Token(JCas jcas) {
+  public WordDiff(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public Token(JCas jcas, int begin, int end) {
+  public WordDiff(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
@@ -60,6 +60,24 @@ public class Token extends Annotation {
   @generated modifiable */
   private void readObject() {/*default - does nothing empty block */}
      
-}
+ 
+    
+  //*--------------*
+  //* Feature: original
+
+  /** getter for original - gets 
+   * @generated */
+  public Area getOriginal() {
+    if (WordDiff_Type.featOkTst && ((WordDiff_Type)jcasType).casFeat_original == null)
+      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.WordDiff");
+    return (Area)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((WordDiff_Type)jcasType).casFeatCode_original)));}
+    
+  /** setter for original - sets  
+   * @generated */
+  public void setOriginal(Area v) {
+    if (WordDiff_Type.featOkTst && ((WordDiff_Type)jcasType).casFeat_original == null)
+      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.WordDiff");
+    jcasType.ll_cas.ll_setRefValue(addr, ((WordDiff_Type)jcasType).casFeatCode_original, jcasType.ll_cas.ll_getFSRef(v));}    
+  }
 
     

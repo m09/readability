@@ -1,5 +1,6 @@
 package eu.crydee.readability.uima;
 
+import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
@@ -89,6 +90,9 @@ public class Pipeline {
                 "opennlp.uima.TokenType",
                 "eu.crydee.readability.uima.ts.Token");
 
+        AnalysisEngineDescription differ = createEngineDescription(
+                SentenceDiffAE.class);
+
         AnalysisEngineDescription consumer = createEngineDescription(
                 XmiSerializerAE.class,
                 XmiSerializerAE.PARAM_OUT_FOLDER, "out");
@@ -101,6 +105,7 @@ public class Pipeline {
         builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtRevised");
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+        builder.add(differ);
         builder.add(consumer);
 
         AnalysisEngineDescription aae = createEngineDescription(

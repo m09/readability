@@ -14,12 +14,12 @@ import org.apache.uima.jcas.tcas.Annotation;
  * Updated by JCasGen Thu Apr 17 21:11:44 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
-public class Token extends Annotation {
+public class SentenceDiff extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(Token.class);
+  public final static int typeIndexID = JCasRegistry.register(SentenceDiff.class);
   /** @generated
    * @ordered 
    */
@@ -31,23 +31,23 @@ public class Token extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected Token() {/* intentionally empty block */}
+  protected SentenceDiff() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public Token(int addr, TOP_Type type) {
+  public SentenceDiff(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public Token(JCas jcas) {
+  public SentenceDiff(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public Token(JCas jcas, int begin, int end) {
+  public SentenceDiff(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
@@ -60,6 +60,24 @@ public class Token extends Annotation {
   @generated modifiable */
   private void readObject() {/*default - does nothing empty block */}
      
-}
+ 
+    
+  //*--------------*
+  //* Feature: original
+
+  /** getter for original - gets 
+   * @generated */
+  public Area getOriginal() {
+    if (SentenceDiff_Type.featOkTst && ((SentenceDiff_Type)jcasType).casFeat_original == null)
+      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.SentenceDiff");
+    return (Area)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((SentenceDiff_Type)jcasType).casFeatCode_original)));}
+    
+  /** setter for original - sets  
+   * @generated */
+  public void setOriginal(Area v) {
+    if (SentenceDiff_Type.featOkTst && ((SentenceDiff_Type)jcasType).casFeat_original == null)
+      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.SentenceDiff");
+    jcasType.ll_cas.ll_setRefValue(addr, ((SentenceDiff_Type)jcasType).casFeatCode_original, jcasType.ll_cas.ll_getFSRef(v));}    
+  }
 
     
