@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Wed Apr 16 11:50:40 JST 2014 */
+/* First created by JCasGen Thu Apr 17 16:05:04 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Wed Apr 16 11:50:40 JST 2014
+ * Updated by JCasGen Thu Apr 17 16:05:04 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
 public class Revision extends Annotation {
