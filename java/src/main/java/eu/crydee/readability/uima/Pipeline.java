@@ -7,10 +7,14 @@ import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
-import eu.crydee.readability.uima.ts.Area;
+import eu.crydee.readability.uima.ts.OriginalSentences;
+import eu.crydee.readability.uima.ts.OriginalWords;
+import eu.crydee.readability.uima.ts.RevisedSentences;
+import eu.crydee.readability.uima.ts.RevisedWords;
 import eu.crydee.readability.uima.ts.Sentence;
-import eu.crydee.readability.uima.ts.SentenceDiff;
 import eu.crydee.readability.uima.ts.Token;
+import opennlp.uima.postag.POSModelResourceImpl;
+import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
@@ -25,19 +29,14 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
-import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
-import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
-import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
-import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
-import static org.apache.uima.fit.factory.CollectionReaderFactory.createReaderDescription;
-import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
-import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
-import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
-import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
+import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import org.apache.uima.fit.factory.CollectionReaderFactory;
+import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.flow.impl.FixedFlowController;
+import org.apache.uima.resource.ExternalResourceDescription;
 
 public class Pipeline {
 
@@ -47,76 +46,128 @@ public class Pipeline {
 
     public static void main(String[] args) throws Exception {
         parseArguments(args);
-        CollectionReaderDescription crd = createReaderDescription(
-                RevisionsCR.class,
-                RevisionsCR.PARAM_DB_URL,
-                DB_URL,
-                RevisionsCR.PARAM_DB_USER,
-                DB_USR,
-                RevisionsCR.PARAM_DB_PASSWORD,
-                DB_PW);
 
-        AnalysisEngineDescription filter = createEngineDescription(
-                RevisionsFilterAE.class);
-
-        AnalysisEngineDescription mw2txtRevised = createEngineDescription(
-                MediaWikiConverterAE.class,
-                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                "txtRevised",
-                MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                "htmlRevised");
-
-        AnalysisEngineDescription mw2txtOriginal = createEngineDescription(
-                MediaWikiConverterAE.class,
-                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                "txtOriginal",
-                MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                "htmlOriginal");
-
-        AnalysisEngineDescription getter = createEngineDescription(
-                RevisionsGetterAE.class,
-                RevisionsGetterAE.PARAM_DB_URL,
-                DB_URL,
-                RevisionsGetterAE.PARAM_DB_USER,
-                DB_USR,
-                RevisionsGetterAE.PARAM_DB_PASSWORD,
-                DB_PW);
-
-        AnalysisEngineDescription sentenceDetector = createEngineDescription(
-                SentenceDetector.class,
-                "opennlp.uima.ModelName",
-                createExternalResourceDescription(
-                        SentenceModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-sent.bin"),
-                "opennlp.uima.SentenceType",
-                "eu.crydee.readability.uima.ts.Sentence");
-
-        AnalysisEngineDescription tokenizer = createEngineDescription(
-                Tokenizer.class,
-                "opennlp.uima.ModelName",
-                createExternalResourceDescription(
+        /* Resources descriptions */
+        ExternalResourceDescription tokenModel
+                = ExternalResourceFactory.createExternalResourceDescription(
                         TokenizerModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-token.bin"),
-                "opennlp.uima.SentenceType",
-                "eu.crydee.readability.uima.ts.Sentence",
-                "opennlp.uima.TokenType",
-                "eu.crydee.readability.uima.ts.Token");
+                        "file:opennlp/uima/models/en-token.bin");
 
-        AnalysisEngineDescription sentenceDiffer = createEngineDescription(
-                SentenceDiffAE.class);
+        ExternalResourceDescription sentenceModel
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        SentenceModelResourceImpl.class,
+                        "file:opennlp/uima/models/en-sent.bin");
 
-        AnalysisEngineDescription wordDiffer = createEngineDescription(
-                WordDiffAE.class);
+        ExternalResourceDescription posModel
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        POSModelResourceImpl.class,
+                        "file:opennlp/uima/models/en-pos-maxent.bin");
 
-        AnalysisEngineDescription consumer = createEngineDescription(
-                XmiSerializerAE.class,
-                XmiSerializerAE.PARAM_OUT_FOLDER, "out");
+        CollectionReaderDescription crd
+                = CollectionReaderFactory.createReaderDescription(
+                        RevisionsCR.class,
+                        RevisionsCR.PARAM_DB_URL,
+                        DB_URL,
+                        RevisionsCR.PARAM_DB_USER,
+                        DB_USR,
+                        RevisionsCR.PARAM_DB_PASSWORD,
+                        DB_PW);
 
+        AnalysisEngineDescription filter
+                = AnalysisEngineFactory.createEngineDescription(
+                        RevisionsFilterAE.class);
+
+        AnalysisEngineDescription mw2txtRevised
+                = AnalysisEngineFactory.createEngineDescription(
+                        MediaWikiConverterAE.class,
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
+                        "txtRevised",
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
+                        "htmlRevised");
+
+        AnalysisEngineDescription mw2txtOriginal
+                = AnalysisEngineFactory.createEngineDescription(
+                        MediaWikiConverterAE.class,
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
+                        "txtOriginal",
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
+                        "htmlOriginal");
+
+        AnalysisEngineDescription getter
+                = AnalysisEngineFactory.createEngineDescription(
+                        RevisionsGetterAE.class,
+                        RevisionsGetterAE.PARAM_DB_URL,
+                        DB_URL,
+                        RevisionsGetterAE.PARAM_DB_USER,
+                        DB_USR,
+                        RevisionsGetterAE.PARAM_DB_PASSWORD,
+                        DB_PW);
+
+        AnalysisEngineDescription sentenceDetector
+                = AnalysisEngineFactory.createEngineDescription(
+                        SentenceDetector.class,
+                        "opennlp.uima.ModelName",
+                        sentenceModel,
+                        "opennlp.uima.SentenceType",
+                        "eu.crydee.readability.uima.ts.Sentence");
+
+        AnalysisEngineDescription tokenizer
+                = AnalysisEngineFactory.createEngineDescription(
+                        Tokenizer.class,
+                        "opennlp.uima.ModelName",
+                        tokenModel,
+                        "opennlp.uima.SentenceType",
+                        "eu.crydee.readability.uima.ts.Sentence",
+                        "opennlp.uima.TokenType",
+                        "eu.crydee.readability.uima.ts.Token");
+
+        AnalysisEngineDescription sentenceDiffer
+                = AnalysisEngineFactory.createEngineDescription(
+                        SentenceDiffAE.class);
+
+        AnalysisEngineDescription taggerRevised
+                = AnalysisEngineFactory.createEngineDescription(
+                        POSTagger.class,
+                        "opennlp.uima.ModelName",
+                        posModel,
+                        "opennlp.uima.SentenceType",
+                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        "opennlp.uima.TokenType",
+                        "eu.crydee.readability.uima.ts.Token",
+                        "opennlp.uima.POSFeature",
+                        "POS");
+
+        AnalysisEngineDescription taggerOriginal
+                = AnalysisEngineFactory.createEngineDescription(
+                        POSTagger.class,
+                        "opennlp.uima.ModelName",
+                        posModel,
+                        "opennlp.uima.SentenceType",
+                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        "opennlp.uima.TokenType",
+                        "eu.crydee.readability.uima.ts.Token",
+                        "opennlp.uima.POSFeature",
+                        "POS");
+
+        AnalysisEngineDescription wordDiffer
+                = AnalysisEngineFactory.createEngineDescription(
+                        WordDiffAE.class);
+
+        AnalysisEngineDescription consumer
+                = AnalysisEngineFactory.createEngineDescription(
+                        XmiSerializerAE.class,
+                        XmiSerializerAE.PARAM_OUT_FOLDER, "out");
+
+        /* The type priority is important especially to retrieve tokens. The
+         rest of the order is not accurate but it does not matter.*/
         AggregateBuilder builder = new AggregateBuilder(
                 null,
                 TypePrioritiesFactory.createTypePriorities(
-                        SentenceDiff.class,
-                        Area.class,
+                        OriginalSentences.class,
+                        RevisedSentences.class,
+                        OriginalWords.class,
+                        RevisedWords.class,
+                        Sentence.class,
                         Token.class),
                 FlowControllerFactory.createFlowControllerDescription(
                         FixedFlowController.class,
@@ -131,6 +182,8 @@ public class Pipeline {
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtRevised");
         builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
         builder.add(sentenceDiffer);
+        builder.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, "txtRevised");
+        builder.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
         builder.add(wordDiffer);
         builder.add(consumer);
 

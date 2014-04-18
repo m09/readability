@@ -2,8 +2,8 @@ package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.Diff;
 import eu.crydee.readability.Edit;
-import eu.crydee.readability.uima.ts.Area;
-import eu.crydee.readability.uima.ts.SentenceDiff;
+import eu.crydee.readability.uima.ts.OriginalSentences;
+import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.Sentence;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +50,17 @@ public class SentenceDiffAE extends JCasAnnotator_ImplBase {
                     toA = original.get(lineEdit.getEndA() - 1).getEnd(),
                     fromB = revised.get(lineEdit.getBeginB()).getBegin(),
                     toB = revised.get(lineEdit.getEndB() - 1).getEnd();
-            Area area = new Area(originalView, fromA, toA);
-            area.addToIndexes();
-            SentenceDiff diff = new SentenceDiff(revisedView, fromB, toB);
-            diff.setOriginal(area);
-            diff.addToIndexes();
+            OriginalSentences originalSentences = new OriginalSentences(
+                    originalView,
+                    fromA,
+                    toA);
+            originalSentences.addToIndexes();
+            RevisedSentences revisedSentences = new RevisedSentences(
+                    revisedView,
+                    fromB,
+                    toB);
+            revisedSentences.setOriginalSentences(originalSentences);
+            revisedSentences.addToIndexes();
         }
     }
 }

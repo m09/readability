@@ -2,10 +2,10 @@ package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.Diff;
 import eu.crydee.readability.Edit;
-import eu.crydee.readability.uima.ts.Area;
-import eu.crydee.readability.uima.ts.SentenceDiff;
+import eu.crydee.readability.uima.ts.OriginalWords;
+import eu.crydee.readability.uima.ts.RevisedSentences;
+import eu.crydee.readability.uima.ts.RevisedWords;
 import eu.crydee.readability.uima.ts.Token;
-import eu.crydee.readability.uima.ts.WordDiff;
 import java.util.List;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
@@ -24,13 +24,13 @@ public class WordDiffAE extends JCasAnnotator_ImplBase {
         } catch (CASException ex) {
             throw new AnalysisEngineProcessException(ex);
         }
-        for (SentenceDiff sentence : JCasUtil.select(
+        for (RevisedSentences revisedSentences : JCasUtil.select(
                 revisedView,
-                SentenceDiff.class)) {
+                RevisedSentences.class)) {
             List<Token> revised = JCasUtil.selectCovered(
                     revisedView,
                     Token.class,
-                    sentence);
+                    revisedSentences);
             StringBuilder revisedText = new StringBuilder();
             for (Token token : revised) {
                 revisedText.append(token.getCoveredText()
@@ -40,7 +40,7 @@ public class WordDiffAE extends JCasAnnotator_ImplBase {
             List<Token> original = JCasUtil.selectCovered(
                     originalView,
                     Token.class,
-                    sentence.getOriginal());
+                    revisedSentences.getOriginalSentences());
             StringBuilder originalText = new StringBuilder();
             for (Token token : original) {
                 originalText.append(token.getCoveredText()
@@ -51,15 +51,17 @@ public class WordDiffAE extends JCasAnnotator_ImplBase {
                     originalText.toString(),
                     revisedText.toString());
             for (Edit lineEdit : edits.getLineEdits()) {
-                int fromA = original.get(lineEdit.getBeginA()).getBegin(),
-                        toA = original.get(lineEdit.getEndA() - 1).getEnd(),
-                        fromB = revised.get(lineEdit.getBeginB()).getBegin(),
-                        toB = revised.get(lineEdit.getEndB() - 1).getEnd();
-                Area area = new Area(originalView, fromA, toA);
-                area.addToIndexes();
-                WordDiff diff = new WordDiff(revisedView, fromB, toB);
-                diff.setOriginal(area);
-                diff.addToIndexes();
+                OriginalWords originalWords = new OriginalWords(
+                        originalView,
+                        original.get(lineEdit.getBeginA()).getBegin(),
+                        original.get(lineEdit.getEndA() - 1).getEnd());
+                originalWords.addToIndexes();
+                RevisedWords revisedWords = new RevisedWords(
+                        revisedView,
+                        revised.get(lineEdit.getBeginB()).getBegin(),
+                        revised.get(lineEdit.getEndB() - 1).getEnd());
+                revisedWords.setOriginalWords(originalWords);
+                revisedWords.addToIndexes();
             }
         }
     }

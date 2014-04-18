@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu Apr 17 21:11:44 JST 2014 */
+/* First created by JCasGen Fri Apr 18 14:15:03 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -9,10 +9,12 @@ import org.apache.uima.cas.impl.FSGenerator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.impl.FeatureImpl;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu Apr 17 21:11:44 JST 2014
+ * Updated by JCasGen Fri Apr 18 14:15:03 JST 2014
  * @generated */
 public class Token_Type extends Annotation_Type {
   /** @generated */
@@ -41,6 +43,24 @@ public class Token_Type extends Annotation_Type {
      @modifiable */
   @SuppressWarnings ("hiding")
   public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Token");
+ 
+  /** @generated */
+  final Feature casFeat_POS;
+  /** @generated */
+  final int     casFeatCode_POS;
+  /** @generated */ 
+  public String getPOS(int addr) {
+        if (featOkTst && casFeat_POS == null)
+      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
+    return ll_cas.ll_getStringValue(addr, casFeatCode_POS);
+  }
+  /** @generated */    
+  public void setPOS(int addr, String v) {
+        if (featOkTst && casFeat_POS == null)
+      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
+    ll_cas.ll_setStringValue(addr, casFeatCode_POS, v);}
+    
+  
 
 
 
@@ -49,6 +69,10 @@ public class Token_Type extends Annotation_Type {
   public Token_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
+
+ 
+    casFeat_POS = jcas.getRequiredFeatureDE(casType, "POS", "uima.cas.String", featOkTst);
+    casFeatCode_POS  = (null == casFeat_POS) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_POS).getCode();
 
   }
 }

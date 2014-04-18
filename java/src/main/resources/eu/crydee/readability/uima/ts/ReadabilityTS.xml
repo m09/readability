@@ -46,31 +46,42 @@
             <name>eu.crydee.readability.uima.ts.Token</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.Area</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.SentenceDiff</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
                 <featureDescription>
-                    <name>original</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.Area</rangeTypeName>
+                    <name>POS</name>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
                 </featureDescription>
             </features>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.WordDiff</name>
+            <name>eu.crydee.readability.uima.ts.OriginalSentences</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.OriginalWords</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RevisedSentences</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
                 <featureDescription>
-                    <name>original</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.Area</rangeTypeName>
+                    <name>originalSentences</name>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.OriginalSentences</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RevisedWords</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>originalWords</name>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.OriginalWords</rangeTypeName>
                 </featureDescription>
             </features>
         </typeDescription>
