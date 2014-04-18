@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Fri Apr 18 14:15:03 JST 2014 */
+/* First created by JCasGen Fri Apr 18 14:35:54 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri Apr 18 14:15:03 JST 2014
+ * Updated by JCasGen Fri Apr 18 14:35:54 JST 2014
  * @generated */
 public class Revision_Type extends Annotation_Type {
   /** @generated */
@@ -81,24 +81,6 @@ public class Revision_Type extends Annotation_Type {
   
  
   /** @generated */
-  final Feature casFeat_comment;
-  /** @generated */
-  final int     casFeatCode_comment;
-  /** @generated */ 
-  public String getComment(int addr) {
-        if (featOkTst && casFeat_comment == null)
-      jcas.throwFeatMissing("comment", "eu.crydee.readability.uima.ts.Revision");
-    return ll_cas.ll_getStringValue(addr, casFeatCode_comment);
-  }
-  /** @generated */    
-  public void setComment(int addr, String v) {
-        if (featOkTst && casFeat_comment == null)
-      jcas.throwFeatMissing("comment", "eu.crydee.readability.uima.ts.Revision");
-    ll_cas.ll_setStringValue(addr, casFeatCode_comment, v);}
-    
-  
- 
-  /** @generated */
   final Feature casFeat_minor;
   /** @generated */
   final int     casFeatCode_minor;
@@ -149,10 +131,6 @@ public class Revision_Type extends Annotation_Type {
  
     casFeat_parentId = jcas.getRequiredFeatureDE(casType, "parentId", "uima.cas.Long", featOkTst);
     casFeatCode_parentId  = (null == casFeat_parentId) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_parentId).getCode();
-
- 
-    casFeat_comment = jcas.getRequiredFeatureDE(casType, "comment", "uima.cas.String", featOkTst);
-    casFeatCode_comment  = (null == casFeat_comment) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_comment).getCode();
 
  
     casFeat_minor = jcas.getRequiredFeatureDE(casType, "minor", "uima.cas.Boolean", featOkTst);

@@ -75,10 +75,17 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
             if (!cursor.next()) {
                 throw new UIMA_IllegalStateException();
             }
-            Revision revision = new Revision(jcas, 0, 1);
+            String comment = cursor.getString("comment");
+            if (comment == null) {
+                comment = "";
+            }
+            jcas.setDocumentText(comment);
+            Revision revision = new Revision(
+                    jcas,
+                    0,
+                    jcas.getDocumentText().length());
             revision.setId(cursor.getLong("id"));
             revision.setParentId(cursor.getLong("parent_id"));
-            revision.setComment(cursor.getString("comment"));
             revision.setMinor(cursor.getBoolean("minor"));
             revision.setTimestamp(cursor.getString("timestamp"));
             revision.addToIndexes();

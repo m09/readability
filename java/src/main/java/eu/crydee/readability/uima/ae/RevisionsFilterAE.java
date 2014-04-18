@@ -28,10 +28,10 @@ public class RevisionsFilterAE extends JCasMultiplier_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        Revision revision = JCasUtil.selectSingle(jcas, Revision.class);
-        if (revision.getComment() != null
-                && validComments.contains(revision.getComment())
-                && revision.getParentId() != 0) {
+        if (!jcas.getDocumentText().isEmpty()
+                && validComments.contains(jcas.getDocumentText())
+                && JCasUtil.selectSingle(jcas, Revision.class).getParentId()
+                != 0) {
             current = jcas;
         } else {
             current = null;

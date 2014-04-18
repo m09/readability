@@ -175,7 +175,7 @@ public class Pipeline {
                         "drop"));
         builder.add(filter);
         builder.add(getter);
-        builder.add(mw2txtRevised);
+        builder.add(mw2txtRevised, CAS.NAME_DEFAULT_SOFA, "revised");
         builder.add(mw2txtOriginal, CAS.NAME_DEFAULT_SOFA, "original");
         builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtRevised");
         builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtOriginal");

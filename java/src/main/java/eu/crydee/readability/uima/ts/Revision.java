@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Fri Apr 18 14:15:03 JST 2014 */
+/* First created by JCasGen Fri Apr 18 14:35:54 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Fri Apr 18 14:15:03 JST 2014
+ * Updated by JCasGen Fri Apr 18 14:35:54 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
 public class Revision extends Annotation {
@@ -96,24 +96,6 @@ public class Revision extends Annotation {
     if (Revision_Type.featOkTst && ((Revision_Type)jcasType).casFeat_parentId == null)
       jcasType.jcas.throwFeatMissing("parentId", "eu.crydee.readability.uima.ts.Revision");
     jcasType.ll_cas.ll_setLongValue(addr, ((Revision_Type)jcasType).casFeatCode_parentId, v);}    
-   
-    
-  //*--------------*
-  //* Feature: comment
-
-  /** getter for comment - gets 
-   * @generated */
-  public String getComment() {
-    if (Revision_Type.featOkTst && ((Revision_Type)jcasType).casFeat_comment == null)
-      jcasType.jcas.throwFeatMissing("comment", "eu.crydee.readability.uima.ts.Revision");
-    return jcasType.ll_cas.ll_getStringValue(addr, ((Revision_Type)jcasType).casFeatCode_comment);}
-    
-  /** setter for comment - sets  
-   * @generated */
-  public void setComment(String v) {
-    if (Revision_Type.featOkTst && ((Revision_Type)jcasType).casFeat_comment == null)
-      jcasType.jcas.throwFeatMissing("comment", "eu.crydee.readability.uima.ts.Revision");
-    jcasType.ll_cas.ll_setStringValue(addr, ((Revision_Type)jcasType).casFeatCode_comment, v);}    
    
     
   //*--------------*

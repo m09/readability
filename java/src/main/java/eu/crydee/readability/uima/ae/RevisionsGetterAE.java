@@ -75,14 +75,17 @@ public class RevisionsGetterAE extends JCasAnnotator_ImplBase {
             ResultSet rs = ps.executeQuery();
             JCas original = ViewCreatorAnnotator.createViewSafely(
                     jcas,
-                    "original");
+                    "original"),
+                    revised = ViewCreatorAnnotator.createViewSafely(
+                            jcas,
+                            "revised");
             boolean revisedF = false, originalF = false;
             for (int i = 0; i < 2; i++) {
                 if (!rs.next()) {
                     throw new AnalysisEngineProcessException();
                 }
                 if (rs.getLong("id") == revision.getId()) {
-                    jcas.setDocumentText(rs.getString("text"));
+                    revised.setDocumentText(rs.getString("text"));
                     revisedF = true;
                 } else if (rs.getLong("id") == revision.getParentId()) {
                     original.setDocumentText(rs.getString("text"));
