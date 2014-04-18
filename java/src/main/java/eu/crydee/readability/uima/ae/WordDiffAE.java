@@ -1,7 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.Diff;
-import eu.crydee.readability.Edit;
+import eu.crydee.readability.DiffUtils;
 import eu.crydee.readability.uima.ts.OriginalWords;
 import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.RevisedWords;
@@ -12,6 +11,8 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.jgit.diff.Edit;
+import org.eclipse.jgit.diff.EditList;
 
 public class WordDiffAE extends JCasAnnotator_ImplBase {
 
@@ -50,21 +51,23 @@ public class WordDiffAE extends JCasAnnotator_ImplBase {
                         .replaceAll("\n", "\u0000"))
                         .append("\n");
             }
-            Diff edits = new Diff(
+            EditList editList = DiffUtils.diffLines(
                     originalText.toString(),
                     revisedText.toString());
-            for (Edit lineEdit : edits.getLineEdits()) {
-                OriginalWords originalWords = new OriginalWords(
-                        originalView,
-                        original.get(lineEdit.getBeginA()).getBegin(),
-                        original.get(lineEdit.getEndA() - 1).getEnd());
-                originalWords.addToIndexes();
-                RevisedWords revisedWords = new RevisedWords(
-                        revisedView,
-                        revised.get(lineEdit.getBeginB()).getBegin(),
-                        revised.get(lineEdit.getEndB() - 1).getEnd());
-                revisedWords.setOriginalWords(originalWords);
-                revisedWords.addToIndexes();
+            for (Edit edit : editList) {
+                if (edit.getType().equals(Edit.Type.REPLACE)) {
+                    OriginalWords originalWords = new OriginalWords(
+                            originalView,
+                            original.get(edit.getBeginA()).getBegin(),
+                            original.get(edit.getEndA() - 1).getEnd());
+                    originalWords.addToIndexes();
+                    RevisedWords revisedWords = new RevisedWords(
+                            revisedView,
+                            revised.get(edit.getBeginB()).getBegin(),
+                            revised.get(edit.getEndB() - 1).getEnd());
+                    revisedWords.setOriginalWords(originalWords);
+                    revisedWords.addToIndexes();
+                }
             }
         }
     }
