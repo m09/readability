@@ -15,12 +15,15 @@ import org.apache.uima.jcas.JCas;
 
 public class WordDiffAE extends JCasAnnotator_ImplBase {
 
+    final static public String ORIGINAL_VIEW = "ORIGINAL_VIEW";
+    final static public String REVISED_VIEW = "REVISED_VIEW";
+
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         JCas revisedView = null, originalView = null;
         try {
-            revisedView = jcas.getView("txtRevised");
-            originalView = jcas.getView("txtOriginal");
+            originalView = jcas.getView(ORIGINAL_VIEW);
+            revisedView = jcas.getView(REVISED_VIEW);
         } catch (CASException ex) {
             throw new AnalysisEngineProcessException(ex);
         }

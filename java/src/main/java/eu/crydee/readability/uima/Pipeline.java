@@ -175,16 +175,28 @@ public class Pipeline {
                         "drop"));
         builder.add(filter);
         builder.add(getter);
-        builder.add(mw2txtRevised, CAS.NAME_DEFAULT_SOFA, "revised");
-        builder.add(mw2txtOriginal, CAS.NAME_DEFAULT_SOFA, "original");
-        builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(tokenizer, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(sentenceDiffer);
-        builder.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(wordDiffer);
+        builder.add(mw2txtRevised,
+                CAS.NAME_DEFAULT_SOFA, "revised");
+        builder.add(mw2txtOriginal,
+                CAS.NAME_DEFAULT_SOFA, "original");
+        builder.add(sentenceDetector,
+                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+        builder.add(sentenceDetector,
+                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+        builder.add(tokenizer,
+                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+        builder.add(tokenizer,
+                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+        builder.add(sentenceDiffer,
+                SentenceDiffAE.ORIGINAL_VIEW, "txtOriginal",
+                SentenceDiffAE.REVISED_VIEW, "txtRevised");
+        builder.add(taggerRevised,
+                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+        builder.add(taggerOriginal,
+                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+        builder.add(wordDiffer,
+                WordDiffAE.ORIGINAL_VIEW, "txtOriginal",
+                WordDiffAE.REVISED_VIEW, "txtRevised");
         builder.add(consumer);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
