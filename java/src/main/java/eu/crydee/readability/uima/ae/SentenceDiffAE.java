@@ -1,6 +1,5 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.DiffUtils;
 import eu.crydee.readability.uima.ts.OriginalSentences;
 import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.Sentence;
@@ -11,13 +10,18 @@ import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.eclipse.jgit.diff.DiffAlgorithm;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.EditList;
+import org.eclipse.jgit.diff.RawText;
+import org.eclipse.jgit.diff.RawTextComparator;
 
 public class SentenceDiffAE extends JCasAnnotator_ImplBase {
 
     final static public String ORIGINAL_VIEW = "ORIGINAL_VIEW";
     final static public String REVISED_VIEW = "REVISED_VIEW";
+    final private DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
+            DiffAlgorithm.SupportedAlgorithm.MYERS);
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
@@ -46,9 +50,10 @@ public class SentenceDiffAE extends JCasAnnotator_ImplBase {
                     .replaceAll("\n", "\u0000"))
                     .append('\n');
         }
-        EditList editList = DiffUtils.diffLines(
-                originalText.toString(),
-                revisedText.toString());
+        EditList editList = da.diff(
+                RawTextComparator.DEFAULT,
+                new RawText(originalText.toString().getBytes()),
+                new RawText(revisedText.toString().getBytes()));
         for (Edit edit : editList) {
             if (edit.getType().equals(Edit.Type.REPLACE)) {
                 int fromA = original.get(edit.getBeginA()).getBegin(),
