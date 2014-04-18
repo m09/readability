@@ -115,7 +115,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathLayoutType>repository</classpathLayoutType>
-                            <classpathPrefix>${user.home}/.m2/repository/</classpathPrefix>
+                            <classpathPrefix>${settings.localRepository}</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>
