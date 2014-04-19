@@ -10,8 +10,8 @@ import org.jsoup.select.NodeVisitor;
 /**
  * HTML to plain-text. Based on the example by Jonathan Hedley in Jsoup.
  *
- * @author Jonathan Hedley <jonathan@hedley.net>
- * @author Hugo Mougard <mog@crydee.eu>
+ * @author Jonathan Hedley (jonathan@hedley.net)
+ * @author Hugo Mougard (mog@crydee.eu)
  */
 public class HtmlToPlainText {
 
