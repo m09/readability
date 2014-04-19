@@ -2,3 +2,8 @@
 dbpedia*
 papers/
 target/
+out/
+uima.log
+db.sql
+dump.xml
+dependency-reduced-pom.xml
