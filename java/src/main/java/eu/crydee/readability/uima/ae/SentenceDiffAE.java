@@ -105,12 +105,12 @@ public class SentenceDiffAE extends CasAnnotator_ImplBase {
                 new RawText(revisedText));
         for (Edit edit : editList) {
             if (edit.getType().equals(Edit.Type.REPLACE)) {
-                AnnotationFS originalSentences = originalView.getCas()
+                final AnnotationFS originalSentences = originalView.getCas()
                         .createAnnotation(
                                 originalSentencesTypeT,
                                 original.get(edit.getBeginA()).getBegin(),
-                                original.get(edit.getEndA() - 1).getEnd());
-                AnnotationFS revisedSentences = revisedView.getCas()
+                                original.get(edit.getEndA() - 1).getEnd()),
+                        revisedSentences = revisedView.getCas()
                         .createAnnotation(
                                 revisedSentencesTypeT,
                                 revised.get(edit.getBeginB()).getBegin(),

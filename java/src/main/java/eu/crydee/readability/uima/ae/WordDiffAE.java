@@ -54,9 +54,6 @@ public class WordDiffAE extends SentenceDiffAE {
             mandatory = true)
     private String originalWordsFeature;
 
-    final private DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
-            DiffAlgorithm.SupportedAlgorithm.MYERS);
-
     protected Type tokenTypeT = null,
             revisedWordsTypeT = null,
             originalWordsTypeT = null;
@@ -99,18 +96,20 @@ public class WordDiffAE extends SentenceDiffAE {
                                     originalSentencesFeatureF));
             final byte[] revisedText = getBytes(revised),
                     originalText = getBytes(original);
-            EditList editList = da.diff(
+            final DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
+                    DiffAlgorithm.SupportedAlgorithm.MYERS);
+            final EditList editList = da.diff(
                     RawTextComparator.DEFAULT,
                     new RawText(originalText),
                     new RawText(revisedText));
             for (Edit edit : editList) {
                 if (edit.getType().equals(Edit.Type.REPLACE)) {
-                    AnnotationFS originalWords = originalView.getCas()
+                    final AnnotationFS originalWords = originalView.getCas()
                             .createAnnotation(
                                     originalWordsTypeT,
                                     original.get(edit.getBeginA()).getBegin(),
-                                    original.get(edit.getEndA() - 1).getEnd());
-                    AnnotationFS revisedWords = revisedView.getCas()
+                                    original.get(edit.getEndA() - 1).getEnd()),
+                            revisedWords = revisedView.getCas()
                             .createAnnotation(
                                     revisedWordsTypeT,
                                     revised.get(edit.getBeginB()).getBegin(),
