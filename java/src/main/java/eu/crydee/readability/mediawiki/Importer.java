@@ -110,15 +110,15 @@ public class Importer {
                             + "VALUES (?, ?)");
             XMLStreamReader reader = factory.createXMLStreamReader(
                     new FileInputStream(
-                            "simplewiki-20140325-pages-meta-history.xml"),
+                            "dump.xml"),
                     "utf8");
             int i = 0;
             while (goToNextXBeforeY(reader, "page", "mediawiki")
                     && i < TO) {
-                if (i < FROM) {
+                if (i++ < FROM) {
                     continue;
                 }
-                System.out.print("\r" + i++);
+                System.out.print("\r" + i);
                 Page page = parsePageInfo(reader);
                 if (page.isRedirect() || page.getNs() != 0) {
                     continue;
