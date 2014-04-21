@@ -1,13 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.ts.OriginalWords;
-import eu.crydee.readability.uima.ts.RevisedSentences;
-import eu.crydee.readability.uima.ts.RevisedWords;
-import eu.crydee.readability.uima.ts.Token;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -17,7 +10,6 @@ import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.CasUtil;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.jgit.diff.DiffAlgorithm;
 import org.eclipse.jgit.diff.Edit;
@@ -133,21 +125,6 @@ public class WordDiffAE extends SentenceDiffAE {
                     revisedView.addFsToIndexes(revisedWords);
                 }
             }
-        }
-    }
-
-    private byte[] getBytes(List<AnnotationFS> annotations)
-            throws AnalysisEngineProcessException {
-        final StringBuilder originalText = new StringBuilder();
-        for (AnnotationFS annotation : annotations) {
-            originalText.append(annotation.getCoveredText()
-                    .replaceAll("\n", "\u0000"))
-                    .append("\n");
-        }
-        try {
-            return originalText.toString().getBytes("UTF8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new AnalysisEngineProcessException(ex);
         }
     }
 }

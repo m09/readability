@@ -1,5 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -80,53 +81,40 @@ public class SentenceDiffAE extends CasAnnotator_ImplBase {
 
     @Override
     public void process(CAS cas) throws AnalysisEngineProcessException {
-        JCas jcas;
+        final JCas jcas, revisedView, originalView;
         try {
             jcas = cas.getJCas();
-        } catch (CASException ex) {
-            throw new AnalysisEngineProcessException(ex);
-        }
-        final JCas revisedView, originalView;
-        try {
             originalView = jcas.getView(ORIGINAL_VIEW);
             revisedView = jcas.getView(REVISED_VIEW);
         } catch (CASException ex) {
             throw new AnalysisEngineProcessException(ex);
         }
-        final List<AnnotationFS> revised = new ArrayList<>(CasUtil.select(
-                revisedView.getCas(),
-                sentenceTypeT));
-        StringBuilder revisedText = new StringBuilder();
-        for (AnnotationFS sentence : revised) {
-            revisedText.append(sentence.getCoveredText()
-                    .replaceAll("\n", "\u0000"))
-                    .append('\n');
-        }
         final List<AnnotationFS> original = new ArrayList<>(CasUtil.select(
                 originalView.getCas(),
-                sentenceTypeT));
-        final StringBuilder originalText = new StringBuilder();
-        for (AnnotationFS sentence : original) {
-            originalText.append(sentence.getCoveredText()
-                    .replaceAll("\n", "\u0000"))
-                    .append('\n');
-        }
+                sentenceTypeT)),
+                revised = new ArrayList<>(CasUtil.select(
+                                revisedView.getCas(),
+                                sentenceTypeT));
+        final byte[] originalText = getBytes(original),
+                revisedText = getBytes(revised);
         final DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
                 DiffAlgorithm.SupportedAlgorithm.MYERS);
         final EditList editList = da.diff(
                 RawTextComparator.DEFAULT,
-                new RawText(originalText.toString().getBytes()),
-                new RawText(revisedText.toString().getBytes()));
+                new RawText(originalText),
+                new RawText(revisedText));
         for (Edit edit : editList) {
             if (edit.getType().equals(Edit.Type.REPLACE)) {
-                final int fromA = original.get(edit.getBeginA()).getBegin(),
-                        toA = original.get(edit.getEndA() - 1).getEnd(),
-                        fromB = revised.get(edit.getBeginB()).getBegin(),
-                        toB = revised.get(edit.getEndB() - 1).getEnd();
                 AnnotationFS originalSentences = originalView.getCas()
-                        .createAnnotation(originalSentencesTypeT, fromA, toA);
+                        .createAnnotation(
+                                originalSentencesTypeT,
+                                original.get(edit.getBeginA()).getBegin(),
+                                original.get(edit.getEndA() - 1).getEnd());
                 AnnotationFS revisedSentences = revisedView.getCas()
-                        .createAnnotation(revisedSentencesTypeT, fromB, toB);
+                        .createAnnotation(
+                                revisedSentencesTypeT,
+                                revised.get(edit.getBeginB()).getBegin(),
+                                revised.get(edit.getEndB() - 1).getEnd());
                 originalSentences.setFeatureValue(
                         revisedSentencesFeatureF,
                         revisedSentences);
@@ -136,6 +124,21 @@ public class SentenceDiffAE extends CasAnnotator_ImplBase {
                 originalView.addFsToIndexes(originalSentences);
                 revisedView.addFsToIndexes(revisedSentences);
             }
+        }
+    }
+
+    protected byte[] getBytes(List<AnnotationFS> annotations)
+            throws AnalysisEngineProcessException {
+        final StringBuilder annotationsText = new StringBuilder();
+        for (AnnotationFS annotation : annotations) {
+            annotationsText.append(annotation.getCoveredText()
+                    .replaceAll("\n", "\u0000"))
+                    .append("\n");
+        }
+        try {
+            return annotationsText.toString().getBytes("UTF8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new AnalysisEngineProcessException(ex);
         }
     }
 }
