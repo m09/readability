@@ -89,7 +89,14 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
             revision.setMinor(cursor.getBoolean("minor"));
             revision.setTimestamp(cursor.getString("timestamp"));
             revision.addToIndexes();
-            i++;
+            if (++i % 10000 == 0) {
+                UIMAFramework.getLogger(RevisionsCR.class).log(
+                        Level.INFO,
+                        "processing revision n°"
+                        + i
+                        + ": id is "
+                        + cursor.getLong("id"));
+            }
         } catch (SQLException ex) {
             UIMAFramework.getLogger(RevisionsCR.class).log(
                     Level.SEVERE,
