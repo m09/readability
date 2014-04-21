@@ -123,7 +123,17 @@ public class Pipeline {
 
         AnalysisEngineDescription sentenceDiffer
                 = AnalysisEngineFactory.createEngineDescription(
-                        SentenceDiffAE.class);
+                        SentenceDiffAE.class,
+                        SentenceDiffAE.PARAM_SENTENCE_TYPE,
+                        "eu.crydee.readability.uima.ts.Sentence",
+                        SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
+                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE,
+                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
+                        "originalSentences",
+                        SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
+                        "revisedSentences");
 
         AnalysisEngineDescription taggerRevised
                 = AnalysisEngineFactory.createEngineDescription(

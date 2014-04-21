@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Fri Apr 18 14:35:54 JST 2014 */
+/* First created by JCasGen Mon Apr 21 14:52:22 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -9,10 +9,12 @@ import org.apache.uima.cas.impl.FSGenerator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.impl.FeatureImpl;
+import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri Apr 18 14:35:54 JST 2014
+ * Updated by JCasGen Mon Apr 21 14:52:22 JST 2014
  * @generated */
 public class OriginalSentences_Type extends Annotation_Type {
   /** @generated */
@@ -41,6 +43,24 @@ public class OriginalSentences_Type extends Annotation_Type {
      @modifiable */
   @SuppressWarnings ("hiding")
   public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.OriginalSentences");
+ 
+  /** @generated */
+  final Feature casFeat_revisedSentences;
+  /** @generated */
+  final int     casFeatCode_revisedSentences;
+  /** @generated */ 
+  public int getRevisedSentences(int addr) {
+        if (featOkTst && casFeat_revisedSentences == null)
+      jcas.throwFeatMissing("revisedSentences", "eu.crydee.readability.uima.ts.OriginalSentences");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_revisedSentences);
+  }
+  /** @generated */    
+  public void setRevisedSentences(int addr, int v) {
+        if (featOkTst && casFeat_revisedSentences == null)
+      jcas.throwFeatMissing("revisedSentences", "eu.crydee.readability.uima.ts.OriginalSentences");
+    ll_cas.ll_setRefValue(addr, casFeatCode_revisedSentences, v);}
+    
+  
 
 
 
@@ -49,6 +69,10 @@ public class OriginalSentences_Type extends Annotation_Type {
   public OriginalSentences_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
+
+ 
+    casFeat_revisedSentences = jcas.getRequiredFeatureDE(casType, "revisedSentences", "eu.crydee.readability.uima.ts.RevisedSentences", featOkTst);
+    casFeatCode_revisedSentences  = (null == casFeat_revisedSentences) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_revisedSentences).getCode();
 
   }
 }

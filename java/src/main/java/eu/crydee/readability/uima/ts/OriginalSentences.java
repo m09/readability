@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Fri Apr 18 14:35:54 JST 2014 */
+/* First created by JCasGen Mon Apr 21 14:52:22 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Fri Apr 18 14:35:54 JST 2014
+ * Updated by JCasGen Mon Apr 21 14:52:22 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
 public class OriginalSentences extends Annotation {
@@ -60,6 +60,24 @@ public class OriginalSentences extends Annotation {
   @generated modifiable */
   private void readObject() {/*default - does nothing empty block */}
      
-}
+ 
+    
+  //*--------------*
+  //* Feature: revisedSentences
+
+  /** getter for revisedSentences - gets 
+   * @generated */
+  public RevisedSentences getRevisedSentences() {
+    if (OriginalSentences_Type.featOkTst && ((OriginalSentences_Type)jcasType).casFeat_revisedSentences == null)
+      jcasType.jcas.throwFeatMissing("revisedSentences", "eu.crydee.readability.uima.ts.OriginalSentences");
+    return (RevisedSentences)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((OriginalSentences_Type)jcasType).casFeatCode_revisedSentences)));}
+    
+  /** setter for revisedSentences - sets  
+   * @generated */
+  public void setRevisedSentences(RevisedSentences v) {
+    if (OriginalSentences_Type.featOkTst && ((OriginalSentences_Type)jcasType).casFeat_revisedSentences == null)
+      jcasType.jcas.throwFeatMissing("revisedSentences", "eu.crydee.readability.uima.ts.OriginalSentences");
+    jcasType.ll_cas.ll_setRefValue(addr, ((OriginalSentences_Type)jcasType).casFeatCode_revisedSentences, jcasType.ll_cas.ll_getFSRef(v));}    
+  }
 
     
