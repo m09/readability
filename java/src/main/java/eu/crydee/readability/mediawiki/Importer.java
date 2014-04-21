@@ -71,7 +71,7 @@ public class Importer {
                 .withLongOpt("to")
                 .hasArg()
                 .withArgName("i")
-                .withDescription("To which page we should import (exclusive).")
+                .withDescription("To which page we should import (inclusive).")
                 .create("t"));
         CommandLineParser parser = new PosixParser();
         @SuppressWarnings("UnusedAssignment")
