@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Mon Apr 21 14:52:22 JST 2014 */
+/* First created by JCasGen Mon Apr 21 15:34:02 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Mon Apr 21 14:52:22 JST 2014
+ * Updated by JCasGen Mon Apr 21 15:34:02 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
 public class Token extends Annotation {

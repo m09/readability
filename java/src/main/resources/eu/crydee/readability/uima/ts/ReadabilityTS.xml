@@ -63,6 +63,12 @@
             <name>eu.crydee.readability.uima.ts.OriginalWords</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>revisedWords</name>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.RevisedWords</rangeTypeName>
+                </featureDescription>
+            </features>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.RevisedSentences</name>

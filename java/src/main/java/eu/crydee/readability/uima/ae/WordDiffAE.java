@@ -4,10 +4,19 @@ import eu.crydee.readability.uima.ts.OriginalWords;
 import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.RevisedWords;
 import eu.crydee.readability.uima.ts.Token;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
-import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
+import org.apache.uima.cas.Feature;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.TypeSystem;
+import org.apache.uima.cas.text.AnnotationFS;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
+import org.apache.uima.fit.util.CasUtil;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.eclipse.jgit.diff.DiffAlgorithm;
@@ -16,64 +25,129 @@ import org.eclipse.jgit.diff.EditList;
 import org.eclipse.jgit.diff.RawText;
 import org.eclipse.jgit.diff.RawTextComparator;
 
-public class WordDiffAE extends JCasAnnotator_ImplBase {
+public class WordDiffAE extends SentenceDiffAE {
 
-    final static public String ORIGINAL_VIEW = "ORIGINAL_VIEW";
-    final static public String REVISED_VIEW = "REVISED_VIEW";
+    public static final String PARAM_TOKEN_TYPE
+            = "TOKEN_TYPE";
+    @ConfigurationParameter(
+            name = PARAM_TOKEN_TYPE,
+            mandatory = true)
+    private String tokenType;
+
+    public static final String PARAM_REVISED_WORDS_TYPE
+            = "REVISED_WORDS_TYPE";
+    @ConfigurationParameter(
+            name = PARAM_REVISED_WORDS_TYPE,
+            mandatory = true)
+    private String revisedWordsType;
+
+    public static final String PARAM_REVISED_WORDS_FEATURE
+            = "REVISED_WORDS_FEATURE";
+    @ConfigurationParameter(
+            name = PARAM_REVISED_WORDS_FEATURE,
+            mandatory = true)
+    private String revisedWordsFeature;
+
+    public static final String PARAM_ORIGINAL_WORDS_TYPE
+            = "ORIGINAL_WORDS_TYPE";
+    @ConfigurationParameter(
+            name = PARAM_ORIGINAL_WORDS_TYPE,
+            mandatory = true)
+    private String originalWordsType;
+
+    public static final String PARAM_ORIGINAL_WORDS_FEATURE
+            = "ORIGINAL_WORDS_FEATURE";
+    @ConfigurationParameter(
+            name = PARAM_ORIGINAL_WORDS_FEATURE,
+            mandatory = true)
+    private String originalWordsFeature;
+
     final private DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
             DiffAlgorithm.SupportedAlgorithm.MYERS);
 
+    protected Type tokenTypeT = null,
+            revisedWordsTypeT = null,
+            originalWordsTypeT = null;
+    protected Feature revisedWordsFeatureF = null,
+            originalWordsFeatureF = null;
+
     @Override
-    public void process(JCas jcas) throws AnalysisEngineProcessException {
-        JCas revisedView = null, originalView = null;
+    public void typeSystemInit(TypeSystem aTypeSystem) throws AnalysisEngineProcessException {
+        super.typeSystemInit(aTypeSystem);
+        tokenTypeT = aTypeSystem.getType(tokenType);
+        revisedWordsTypeT = aTypeSystem.getType(revisedWordsType);
+        originalWordsTypeT = aTypeSystem.getType(originalWordsType);
+        revisedWordsFeatureF = originalWordsTypeT.getFeatureByBaseName(
+                revisedWordsFeature);
+        originalWordsFeatureF = revisedWordsTypeT.getFeatureByBaseName(
+                originalWordsFeature);
+    }
+
+    @Override
+    public void process(CAS cas) throws AnalysisEngineProcessException {
+        final JCas jcas, revisedView, originalView;
         try {
+            jcas = cas.getJCas();
             originalView = jcas.getView(ORIGINAL_VIEW);
             revisedView = jcas.getView(REVISED_VIEW);
         } catch (CASException ex) {
             throw new AnalysisEngineProcessException(ex);
         }
-        for (RevisedSentences revisedSentences : JCasUtil.select(
-                revisedView,
-                RevisedSentences.class)) {
-            List<Token> revised = JCasUtil.selectCovered(
-                    revisedView,
-                    Token.class,
-                    revisedSentences);
-            StringBuilder revisedText = new StringBuilder();
-            for (Token token : revised) {
-                revisedText.append(token.getCoveredText()
-                        .replaceAll("\n", "\u0000"))
-                        .append("\n");
-            }
-            List<Token> original = JCasUtil.selectCovered(
-                    originalView,
-                    Token.class,
-                    revisedSentences.getOriginalSentences());
-            StringBuilder originalText = new StringBuilder();
-            for (Token token : original) {
-                originalText.append(token.getCoveredText()
-                        .replaceAll("\n", "\u0000"))
-                        .append("\n");
-            }
+        for (AnnotationFS revisedSentences : CasUtil.select(
+                revisedView.getCas(),
+                revisedSentencesTypeT)) {
+            final List<AnnotationFS> revised = CasUtil.selectCovered(
+                    revisedView.getCas(),
+                    tokenTypeT,
+                    revisedSentences),
+                    original = CasUtil.selectCovered(
+                            originalView.getCas(),
+                            tokenTypeT,
+                            (AnnotationFS) revisedSentences.getFeatureValue(
+                                    originalSentencesFeatureF));
+            final byte[] revisedText = getBytes(revised),
+                    originalText = getBytes(original);
             EditList editList = da.diff(
                     RawTextComparator.DEFAULT,
-                    new RawText(originalText.toString().getBytes()),
-                    new RawText(revisedText.toString().getBytes()));
+                    new RawText(originalText),
+                    new RawText(revisedText));
             for (Edit edit : editList) {
                 if (edit.getType().equals(Edit.Type.REPLACE)) {
-                    OriginalWords originalWords = new OriginalWords(
-                            originalView,
-                            original.get(edit.getBeginA()).getBegin(),
-                            original.get(edit.getEndA() - 1).getEnd());
-                    originalWords.addToIndexes();
-                    RevisedWords revisedWords = new RevisedWords(
-                            revisedView,
-                            revised.get(edit.getBeginB()).getBegin(),
-                            revised.get(edit.getEndB() - 1).getEnd());
-                    revisedWords.setOriginalWords(originalWords);
-                    revisedWords.addToIndexes();
+                    AnnotationFS originalWords = originalView.getCas()
+                            .createAnnotation(
+                                    originalWordsTypeT,
+                                    original.get(edit.getBeginA()).getBegin(),
+                                    original.get(edit.getEndA() - 1).getEnd());
+                    AnnotationFS revisedWords = revisedView.getCas()
+                            .createAnnotation(
+                                    revisedWordsTypeT,
+                                    revised.get(edit.getBeginB()).getBegin(),
+                                    revised.get(edit.getEndB() - 1).getEnd());
+                    originalWords.setFeatureValue(
+                            revisedWordsFeatureF,
+                            revisedWords);
+                    revisedWords.setFeatureValue(
+                            originalWordsFeatureF,
+                            originalWords);
+                    originalView.addFsToIndexes(originalWords);
+                    revisedView.addFsToIndexes(revisedWords);
                 }
             }
+        }
+    }
+
+    private byte[] getBytes(List<AnnotationFS> annotations)
+            throws AnalysisEngineProcessException {
+        final StringBuilder originalText = new StringBuilder();
+        for (AnnotationFS annotation : annotations) {
+            originalText.append(annotation.getCoveredText()
+                    .replaceAll("\n", "\u0000"))
+                    .append("\n");
+        }
+        try {
+            return originalText.toString().getBytes("UTF8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new AnalysisEngineProcessException(ex);
         }
     }
 }

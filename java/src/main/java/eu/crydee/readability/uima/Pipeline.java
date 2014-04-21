@@ -161,7 +161,27 @@ public class Pipeline {
 
         AnalysisEngineDescription wordDiffer
                 = AnalysisEngineFactory.createEngineDescription(
-                        WordDiffAE.class);
+                        WordDiffAE.class,
+                        WordDiffAE.PARAM_SENTENCE_TYPE,
+                        "eu.crydee.readability.uima.ts.Sentence",
+                        WordDiffAE.PARAM_TOKEN_TYPE,
+                        "eu.crydee.readability.uima.ts.Token",
+                        WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
+                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        WordDiffAE.PARAM_REVISED_SENTENCES_TYPE,
+                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE,
+                        "eu.crydee.readability.uima.ts.OriginalWords",
+                        WordDiffAE.PARAM_REVISED_WORDS_TYPE,
+                        "eu.crydee.readability.uima.ts.RevisedWords",
+                        WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
+                        "originalSentences",
+                        WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
+                        "revisedSentences",
+                        WordDiffAE.PARAM_ORIGINAL_WORDS_FEATURE,
+                        "originalWords",
+                        WordDiffAE.PARAM_REVISED_WORDS_FEATURE,
+                        "revisedWords");
 
         AnalysisEngineDescription consumer
                 = AnalysisEngineFactory.createEngineDescription(

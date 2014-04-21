@@ -59,10 +59,10 @@ public class SentenceDiffAE extends CasAnnotator_ImplBase {
     final static public String ORIGINAL_VIEW = "ORIGINAL_VIEW";
     final static public String REVISED_VIEW = "REVISED_VIEW";
 
-    private Type sentenceTypeT = null,
+    protected Type sentenceTypeT = null,
             revisedSentencesTypeT = null,
             originalSentencesTypeT = null;
-    private Feature revisedSentencesFeatureF = null,
+    protected Feature revisedSentencesFeatureF = null,
             originalSentencesFeatureF = null;
 
     @Override
