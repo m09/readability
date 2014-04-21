@@ -17,7 +17,8 @@ public class RevisionsFilterAE extends JCasMultiplier_ImplBase {
     private JCas current = null;
 
     @Override
-    public void initialize(UimaContext context) throws ResourceInitializationException {
+    public void initialize(UimaContext context)
+            throws ResourceInitializationException {
         super.initialize(context);
         validComments.add("simplify");
         validComments.add("simplifying");
