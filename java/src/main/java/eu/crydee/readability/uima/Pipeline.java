@@ -1,12 +1,14 @@
 package eu.crydee.readability.uima;
 
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
+import eu.crydee.readability.uima.ae.ResourceWriterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
 import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
+import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.OriginalSentences;
 import eu.crydee.readability.uima.ts.OriginalWords;
 import eu.crydee.readability.uima.ts.RevisedSentences;
@@ -72,6 +74,10 @@ public class Pipeline {
                         DB_USR,
                         RevisionsCR.PARAM_DB_PASSWORD,
                         DB_PW);
+        ExternalResourceDescription dict
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        ReadabilityDict_Impl.class,
+                        "");
 
         AnalysisEngineDescription filter
                 = AnalysisEngineFactory.createEngineDescription(
@@ -187,6 +193,13 @@ public class Pipeline {
                 = AnalysisEngineFactory.createEngineDescription(
                         XmiSerializerAE.class,
                         XmiSerializerAE.PARAM_OUT_FOLDER, "out");
+        AnalysisEngineDescription consumerResource
+                = AnalysisEngineFactory.createEngineDescription(
+                        ResourceWriterAE.class,
+                        ResourceWriterAE.PARAM_OUT_PS,
+                        "dict.xml",
+                        ResourceWriterAE.RES_KEY,
+                        dict);
 
         /* The type priority is important especially to retrieve tokens. The
          rest of the order is not accurate but it does not matter.*/
@@ -228,6 +241,9 @@ public class Pipeline {
                 WordDiffAE.ORIGINAL_VIEW, "txtOriginal",
                 WordDiffAE.REVISED_VIEW, "txtRevised");
         builder.add(consumer);
+        builder.add(consumerResource,
+                ResourceWriterAE.ORIGINAL_VIEW, "txtOriginal",
+                ResourceWriterAE.REVISED_VIEW, "txtRevised");
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
