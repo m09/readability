@@ -1,40 +1,20 @@
 package eu.crydee.readability.mediawiki;
 
-import eu.crydee.readability.mediawiki.xmladapters.BooleanAdapter;
-import eu.crydee.readability.mediawiki.xmladapters.ZonedDateTimeAdapter;
-import eu.crydee.readability.mediawiki.xmladapters.OptionalStringAdapter;
-import eu.crydee.readability.mediawiki.xmladapters.OptionalLongAdapter;
 import java.time.ZonedDateTime;
 import java.util.Optional;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Revision {
 
-    @XmlAttribute
-    @XmlJavaTypeAdapter(OptionalLongAdapter.class)
     final private Optional<Long> parentId;
 
-    @XmlAttribute
     final private long id;
 
-    @XmlAttribute
-    @XmlJavaTypeAdapter(ZonedDateTimeAdapter.class)
     final private ZonedDateTime timeStamp;
 
-    @XmlAttribute
-    @XmlJavaTypeAdapter(BooleanAdapter.class)
     final private Boolean minor;
 
-    @XmlAttribute
-    @XmlJavaTypeAdapter(OptionalStringAdapter.class)
     final private Optional<String> comment;
 
-    @XmlTransient
     final private String text;
 
     public Revision(

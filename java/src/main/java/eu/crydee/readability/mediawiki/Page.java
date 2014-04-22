@@ -3,30 +3,17 @@ package eu.crydee.readability.mediawiki;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-@XmlRootElement(name = "page")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Page {
 
-    @XmlAttribute
     private String title;
 
-    @XmlTransient
     private int ns = 0;
 
-    @XmlAttribute
     private long id;
 
-    @XmlTransient
     private boolean redirect = false;
 
-    @XmlElement(name = "revision")
     private List<Revision> revisions = new ArrayList<>();
 
     public Page() {
