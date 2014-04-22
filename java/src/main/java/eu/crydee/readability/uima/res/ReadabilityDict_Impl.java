@@ -7,15 +7,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.SharedResourceObject;
 
-@XmlRootElement(name = "dict")
 public class ReadabilityDict_Impl
         implements SharedResourceObject, ReadabilityDict {
 
@@ -23,14 +23,41 @@ public class ReadabilityDict_Impl
 
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
+        XMLStreamReader xsr = null;
         try (InputStream is = dr.getInputStream()) {
+            xsr = XMLInputFactory.newInstance()
+                    .createXMLStreamReader(is, "UTF8");
+            while (xsr.hasNext()) {
+                int code = xsr.next();
+                if (xsr.next() == XMLStreamReader.START_ELEMENT) {
+                    switch (xsr.getLocalName()) {
+                        case "original":
+//                            parseRevision(xsr);
+                            break;
+                        case "revised":
+                            break;
+                    }
+                }
+            }
         } catch (NullPointerException ex) {
             // nothing to load, go on
-        } catch (IOException ex) {
+        } catch (IOException | XMLStreamException ex) {
             throw new ResourceInitializationException(ex);
+        } finally {
+            if (xsr != null) {
+                try {
+                    xsr.close();
+                } catch (XMLStreamException ex) {
+                    throw new ResourceInitializationException(ex);
+                }
+            }
         }
     }
 
+//    private Revision parseRevision(XMLStreamReader xsr) {
+//        
+//    }
+//
     @Override
     public void save(PrintStream ps) throws XMLStreamException {
         XMLStreamWriter xsw = XMLOutputFactory.newInstance()

@@ -1,5 +1,6 @@
 package eu.crydee.readability.mediawiki;
 
+import eu.crydee.readability.misc.XMLUtils;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -113,7 +114,7 @@ public class Importer {
                             "dump.xml"),
                     "utf8");
             int i = 0;
-            while (goToNextXBeforeY(reader, "page", "mediawiki")
+            while (XMLUtils.goToNextXBeforeY(reader, "page", "mediawiki")
                     && i < TO) {
                 if (i++ < FROM) {
                     continue;
@@ -173,32 +174,32 @@ public class Importer {
         List<Revision> result = new ArrayList<>();
         while (reader.getEventType() == XMLStreamReader.START_ELEMENT
                 && reader.getName().getLocalPart().equals("revision")) {
-            goToNextXBeforeY(reader, "id", "revision");
+            XMLUtils.goToNextXBeforeY(reader, "id", "revision");
             final long id = Long.parseLong(reader.getElementText());
             final Optional<Long> parentId;
-            if (nextTag(reader).get().equals("parentid")) {
+            if (XMLUtils.nextTag(reader).get().equals("parentid")) {
                 parentId = Optional.of(Long.parseLong(reader.getElementText()));
-                goToNextXBeforeY(reader, "timestamp", "revision");
+                XMLUtils.goToNextXBeforeY(reader, "timestamp", "revision");
             } else {
                 parentId = Optional.empty();
             }
             final ZonedDateTime timeStamp
                     = ZonedDateTime.parse(reader.getElementText());
-            String tag = nextTag(reader).get();
+            String tag = XMLUtils.nextTag(reader).get();
             while (!tag.equals("minor")
                     && !tag.equals("comment")
                     && !tag.equals("text")) {
-                tag = nextTag(reader).get();
+                tag = XMLUtils.nextTag(reader).get();
             }
             final boolean minor = tag.equals("minor");
             if (minor) {
-                tag = nextTag(reader).get();
+                tag = XMLUtils.nextTag(reader).get();
             }
             final Optional<String> comment = tag.equals("comment")
                     ? Optional.of(reader.getElementText())
                     : Optional.empty();
             if (comment.isPresent()) {
-                nextTag(reader);
+                XMLUtils.nextTag(reader);
             }
             final String text = reader.getElementText();
             result.add(new Revision(
@@ -208,7 +209,7 @@ public class Importer {
                     minor,
                     comment,
                     text));
-            goToNextXBeforeY(reader, "revision", "page");
+            XMLUtils.goToNextXBeforeY(reader, "revision", "page");
         }
         return result;
     }
@@ -216,54 +217,16 @@ public class Importer {
     static private Page parsePageInfo(XMLStreamReader reader)
             throws XMLStreamException {
         Page result = new Page();
-        nextTag(reader);
+        XMLUtils.nextTag(reader);
         result.setTitle(reader.getElementText());
-        nextTag(reader);
+        XMLUtils.nextTag(reader);
         result.setNs(Integer.parseInt(reader.getElementText()));
-        nextTag(reader);
+        XMLUtils.nextTag(reader);
         result.setId(Long.parseLong(reader.getElementText()));
-        result.setRedirect(nextTag(reader).get().equals("redirect"));
+        result.setRedirect(XMLUtils.nextTag(reader).get().equals("redirect"));
         if (result.isRedirect()) {
-            nextTag(reader);
+            XMLUtils.nextTag(reader);
         }
         return result;
-    }
-
-    static private boolean goToNextXBeforeY(
-            XMLStreamReader reader,
-            String X,
-            String Y)
-            throws XMLStreamException {
-        while (reader.hasNext()) {
-            int code = reader.next();
-            if (code == XMLStreamReader.END_ELEMENT
-                    && reader.getLocalName().equals(Y)) {
-                return false;
-            }
-            if (code == XMLStreamReader.START_ELEMENT
-                    && reader.getLocalName().equals(X)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @SuppressWarnings("empty-statement")
-    static private Optional<String> nextTag(
-            XMLStreamReader reader)
-            throws XMLStreamException {
-        while (reader.hasNext()
-                && reader.next() != XMLStreamReader.START_ELEMENT);
-        if (reader.getEventType() == XMLStreamReader.END_DOCUMENT) {
-            return Optional.empty();
-        } else {
-            return Optional.of(getTag(reader));
-        }
-    }
-
-    static private String getTag(
-            XMLStreamReader reader)
-            throws XMLStreamException {
-        return reader.getName().getLocalPart();
     }
 }
