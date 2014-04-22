@@ -72,6 +72,7 @@ public class Pipeline {
                         ReadabilityDict_Impl.class,
                         "");
 
+        /* Collection reader */
         CollectionReaderDescription crd;
         if (LIMIT.isPresent()) {
             crd = CollectionReaderFactory.createReaderDescription(
@@ -95,6 +96,7 @@ public class Pipeline {
                     DB_PW);
         }
 
+        /* Analysis engines */
         AnalysisEngineDescription filter
                 = AnalysisEngineFactory.createEngineDescription(
                         RevisionsFilterAE.class);
@@ -205,10 +207,12 @@ public class Pipeline {
                         WordDiffAE.PARAM_REVISED_WORDS_FEATURE,
                         "revisedWords");
 
-        AnalysisEngineDescription consumer
+        AnalysisEngineDescription consumerXmi
                 = AnalysisEngineFactory.createEngineDescription(
                         XmiSerializerAE.class,
-                        XmiSerializerAE.PARAM_OUT_FOLDER, "out");
+                        XmiSerializerAE.PARAM_OUT_FOLDER,
+                        "out");
+
         AnalysisEngineDescription consumerResource
                 = AnalysisEngineFactory.createEngineDescription(
                         ResourceWriterAE.class,
@@ -256,7 +260,7 @@ public class Pipeline {
         builder.add(wordDiffer,
                 WordDiffAE.ORIGINAL_VIEW, "txtOriginal",
                 WordDiffAE.REVISED_VIEW, "txtRevised");
-        builder.add(consumer);
+        builder.add(consumerXmi);
         builder.add(consumerResource,
                 ResourceWriterAE.ORIGINAL_VIEW, "txtOriginal",
                 ResourceWriterAE.REVISED_VIEW, "txtRevised");
