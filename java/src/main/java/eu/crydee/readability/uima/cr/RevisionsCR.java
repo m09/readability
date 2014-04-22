@@ -33,6 +33,10 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
     @ConfigurationParameter(name = PARAM_DB_PASSWORD, mandatory = true)
     private String dbPassword;
 
+    public static final String PARAM_LIMIT = "LIMIT";
+    @ConfigurationParameter(name = PARAM_LIMIT, mandatory = false)
+    private Integer limit;
+
     private Connection connection = null;
     private ResultSet cursor = null;
     private int i = 0;
@@ -46,8 +50,11 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
                     dbUrl,
                     dbUser,
                     dbPassword);
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT * FROM revisions_info");
+            String query = "SELECT * FROM revisions_info";
+            if (limit != null) {
+                query += " LIMIT " + limit;
+            }
+            PreparedStatement ps = connection.prepareStatement(query);
             cursor = ps.executeQuery();
         } catch (SQLException ex) {
             throw new ResourceInitializationException(ex);

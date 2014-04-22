@@ -15,6 +15,7 @@ import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.RevisedWords;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
+import java.util.Optional;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
@@ -45,6 +46,7 @@ public class Pipeline {
     static private String DB_URL = null,
             DB_USR = null,
             DB_PW = null;
+    static private Optional<Integer> LIMIT = Optional.empty();
 
     public static void main(String[] args) throws Exception {
         parseArguments(args);
@@ -65,19 +67,33 @@ public class Pipeline {
                         POSModelResourceImpl.class,
                         "file:opennlp/uima/models/en-pos-maxent.bin");
 
-        CollectionReaderDescription crd
-                = CollectionReaderFactory.createReaderDescription(
-                        RevisionsCR.class,
-                        RevisionsCR.PARAM_DB_URL,
-                        DB_URL,
-                        RevisionsCR.PARAM_DB_USER,
-                        DB_USR,
-                        RevisionsCR.PARAM_DB_PASSWORD,
-                        DB_PW);
         ExternalResourceDescription dict
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
                         "");
+
+        CollectionReaderDescription crd;
+        if (LIMIT.isPresent()) {
+            crd = CollectionReaderFactory.createReaderDescription(
+                    RevisionsCR.class,
+                    RevisionsCR.PARAM_DB_URL,
+                    DB_URL,
+                    RevisionsCR.PARAM_DB_USER,
+                    DB_USR,
+                    RevisionsCR.PARAM_DB_PASSWORD,
+                    DB_PW,
+                    RevisionsCR.PARAM_LIMIT,
+                    LIMIT.get());
+        } else {
+            crd = CollectionReaderFactory.createReaderDescription(
+                    RevisionsCR.class,
+                    RevisionsCR.PARAM_DB_URL,
+                    DB_URL,
+                    RevisionsCR.PARAM_DB_USER,
+                    DB_USR,
+                    RevisionsCR.PARAM_DB_PASSWORD,
+                    DB_PW);
+        }
 
         AnalysisEngineDescription filter
                 = AnalysisEngineFactory.createEngineDescription(
@@ -275,6 +291,13 @@ public class Pipeline {
                 .withDescription("Password of the user account to connect to "
                         + "the database.")
                 .create("p"));
+        options.addOption(OptionBuilder
+                .withLongOpt("limit")
+                .hasArg()
+                .withArgName("n")
+                .withDescription("How many revisions to use. No limit means "
+                        + "all the revisions available.")
+                .create('l'));
         CommandLineParser parser = new PosixParser();
         @SuppressWarnings("UnusedAssignment")
         CommandLine cmd = null;
@@ -291,5 +314,9 @@ public class Pipeline {
         DB_URL = cmd.getOptionValue('d');
         DB_USR = cmd.getOptionValue('u');
         DB_PW = cmd.getOptionValue('p');
+
+        if (cmd.hasOption('l')) {
+            LIMIT = Optional.of(Integer.parseInt(cmd.getOptionValue('l')));
+        }
     }
 }
