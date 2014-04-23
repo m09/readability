@@ -41,7 +41,7 @@ import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.flow.impl.FixedFlowController;
 import org.apache.uima.resource.ExternalResourceDescription;
 
-public class Pipeline {
+public class DictCreationPipeline {
 
     static private String DB_URL = null,
             DB_USR = null,
