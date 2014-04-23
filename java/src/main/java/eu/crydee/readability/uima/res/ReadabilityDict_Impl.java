@@ -1,10 +1,13 @@
 package eu.crydee.readability.uima.res;
 
+import eu.crydee.readability.misc.XMLUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.xml.stream.XMLInputFactory;
@@ -28,14 +31,14 @@ public class ReadabilityDict_Impl
             xsr = XMLInputFactory.newInstance()
                     .createXMLStreamReader(is, "UTF8");
             while (xsr.hasNext()) {
-                int code = xsr.next();
-                if (xsr.next() == XMLStreamReader.START_ELEMENT) {
-                    switch (xsr.getLocalName()) {
-                        case "original":
-//                            parseRevision(xsr);
-                            break;
-                        case "revised":
-                            break;
+                xsr.next();
+                String name = xsr.getLocalName();
+                if (xsr.isStartElement()
+                        && name.equals("original")) {
+                    Revision rev = parseRevision(xsr);
+                    XMLUtils.nextTag(xsr);
+                    while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
+                        add(rev, parseRevision(xsr));
                     }
                 }
             }
@@ -54,10 +57,23 @@ public class ReadabilityDict_Impl
         }
     }
 
-//    private Revision parseRevision(XMLStreamReader xsr) {
-//        
-//    }
-//
+    private Revision parseRevision(XMLStreamReader xsr)
+            throws XMLStreamException {
+        XMLUtils.nextTag(xsr);
+        String originalText = xsr.getElementText();
+        XMLUtils.nextTag(xsr);
+        List<String> tokens = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "token", "token-list")) {
+            tokens.add(xsr.getElementText());
+        }
+        XMLUtils.nextTag(xsr);
+        List<String> pos = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
+            pos.add(xsr.getElementText());
+        }
+        return new Revision(originalText, tokens, pos);
+    }
+
     @Override
     public void save(PrintStream ps) throws XMLStreamException {
         XMLStreamWriter xsw = XMLOutputFactory.newInstance()
