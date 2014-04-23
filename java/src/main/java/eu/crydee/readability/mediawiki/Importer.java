@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -34,17 +35,15 @@ public class Importer {
     public static void main(String[] args)
             throws JAXBException, FileNotFoundException, XMLStreamException {
         Options options = new Options();
-        options.addOption("h", "help", false, "print this message");
+        options.addOption("h", "help", false, "Print this message.");
         options.addOption(OptionBuilder
-                .isRequired()
                 .withLongOpt("db-url")
                 .hasArg()
                 .withArgName("jdbc:...")
-                .withDescription("The database to use to retrieve revisions "
+                .withDescription("The database to use to store revisions "
                         + "information. JDBC format.")
                 .create("d"));
         options.addOption(OptionBuilder
-                .isRequired()
                 .withLongOpt("username")
                 .hasArg()
                 .withArgName("dbuser")
@@ -52,7 +51,6 @@ public class Importer {
                         + "revisions.")
                 .create("u"));
         options.addOption(OptionBuilder
-                .isRequired()
                 .withLongOpt("password")
                 .hasArg()
                 .withArgName("pw")
@@ -60,7 +58,13 @@ public class Importer {
                         + "the database.")
                 .create("p"));
         options.addOption(OptionBuilder
-                .isRequired()
+                .withLongOpt("batch-size")
+                .hasArg()
+                .withArgName("revisions")
+                .withDescription("Number of revisions to group before sending "
+                        + "them to the database.")
+                .create("b"));
+        options.addOption(OptionBuilder
                 .withLongOpt("from")
                 .hasArg()
                 .withArgName("i")
@@ -68,7 +72,6 @@ public class Importer {
                         + "(inclusive).")
                 .create("f"));
         options.addOption(OptionBuilder
-                .isRequired()
                 .withLongOpt("to")
                 .hasArg()
                 .withArgName("i")
@@ -79,6 +82,21 @@ public class Importer {
         CommandLine cmd = null;
         try {
             cmd = parser.parse(options, args);
+            if (cmd.hasOption('h')) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("importer", options);
+                System.exit(0);
+            } else {
+                if (!cmd.hasOption('d')
+                        || !cmd.hasOption('u')
+                        || !cmd.hasOption('p')
+                        || !cmd.hasOption('b')) {
+                    throw new ParseException("Argument missing among the "
+                            + "required arguments d, u, p and b.\n"
+                            + "Please use -h to learn more about the expected "
+                            + "arguments.");
+                }
+            }
         } catch (ParseException ex) {
             System.err.println("The CLI args could not be parsed.");
             System.err.println("The error message was:");
@@ -89,8 +107,19 @@ public class Importer {
         final String DB_URL = cmd.getOptionValue('d'),
                 DB_USER = cmd.getOptionValue('u'),
                 DB_PW = cmd.getOptionValue('p');
-        final int FROM = Integer.parseInt(cmd.getOptionValue('f')),
-                TO = Integer.parseInt(cmd.getOptionValue('t'));
+        final int FROM;
+        if (cmd.hasOption('f')) {
+            FROM = Integer.parseInt(cmd.getOptionValue('f'));
+        } else {
+            FROM = 0;
+        }
+        final int TO;
+        if (cmd.hasOption('t')) {
+            TO = Integer.parseInt(cmd.getOptionValue('t'));
+        } else {
+            TO = Integer.MAX_VALUE;
+        }
+        final int BATCH_SIZE = Integer.parseInt(cmd.getOptionValue('b'));
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try (Connection connection = DriverManager.getConnection(
@@ -98,22 +127,14 @@ public class Importer {
                 DB_USER,
                 DB_PW)) {
             PreparedStatement psRevisionsInfo = connection.prepareStatement(
-                    "INSERT INTO revisions_info "
-                    + "(id, parent_id, comment, minor, page_id, timestamp) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)"),
-                    psPages = connection.prepareStatement(
-                            "INSERT INTO pages "
-                            + "(id, title) "
-                            + "VALUES (?, ?)"),
-                    psRevisions = connection.prepareStatement(
-                            "INSERT INTO revisions "
-                            + "(id, text) "
-                            + "VALUES (?, ?)");
+                    "INSERT INTO rev "
+                    + "(id, parent_id, comment, minor, timestamp, text) "
+                    + "VALUES (?, ?, ?, ?, ?, ?)");
             XMLStreamReader reader = factory.createXMLStreamReader(
                     new FileInputStream(
                             "dump.xml"),
                     "utf8");
-            int i = 0;
+            int i = 0, k = 0;
             while (XMLUtils.goToNextXBeforeY(reader, "page", "mediawiki")
                     && i < TO) {
                 if (i++ < FROM) {
@@ -124,13 +145,7 @@ public class Importer {
                 if (page.isRedirect() || page.getNs() != 0) {
                     continue;
                 }
-                psPages.setLong(1, page.getId());
-                psPages.setString(2, page.getTitle());
-                psPages.execute();
                 for (Revision revisionInfo : parseRevisions(reader)) {
-                    psRevisions.setLong(1, revisionInfo.getId());
-                    psRevisions.setString(2, revisionInfo.getText());
-                    psRevisions.execute();
                     psRevisionsInfo.setLong(1, revisionInfo.getId());
                     if (revisionInfo.getParentId().isPresent()) {
                         psRevisionsInfo.setLong(
@@ -153,16 +168,18 @@ public class Importer {
                     psRevisionsInfo.setBoolean(
                             4,
                             revisionInfo.isMinor());
-                    psRevisionsInfo.setLong(
-                            5,
-                            page.getId());
                     psRevisionsInfo.setString(
-                            6,
+                            5,
                             revisionInfo.getTimeStamp().format(
                                     DateTimeFormatter.ISO_DATE_TIME));
-                    psRevisionsInfo.execute();
+                    psRevisionsInfo.setString(6, revisionInfo.getText());
+                    psRevisionsInfo.addBatch();
+                    if (++k % BATCH_SIZE == 0) {
+                        psRevisionsInfo.executeBatch();
+                    }
                 }
             }
+            psRevisionsInfo.executeBatch();
             System.out.println();
         } catch (SQLException ex) {
             ex.printStackTrace(System.err);
