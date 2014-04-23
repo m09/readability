@@ -45,7 +45,7 @@ public class RevisionsGetterAE extends JCasAnnotator_ImplBase {
                     dbPassword);
             ps = connection.prepareStatement(
                     "SELECT id, text "
-                    + "FROM revisions "
+                    + "FROM rev "
                     + "WHERE id = ? OR id = ?");
         } catch (SQLException ex) {
             throw new ResourceInitializationException(ex);

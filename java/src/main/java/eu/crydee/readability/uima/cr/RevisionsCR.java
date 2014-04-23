@@ -50,7 +50,8 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
                     dbUrl,
                     dbUser,
                     dbPassword);
-            String query = "SELECT * FROM revisions_info";
+            String query = "SELECT id, parent_id, comment, minor, timestamp "
+                    + "FROM rev";
             if (limit != null) {
                 query += " LIMIT " + limit;
             }
