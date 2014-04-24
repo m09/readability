@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UIMA_IllegalStateException;
 import org.apache.uima.UimaContext;
@@ -16,10 +17,14 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
+import org.apache.uima.util.Logger;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 
 public class RevisionsCR extends JCasCollectionReader_ImplBase {
+
+    private static final Logger logger = UIMAFramework.getLogger(
+            RevisionsCR.class);
 
     public static final String PARAM_DB_URL = "REVISIONSCR_DB_URL";
     @ConfigurationParameter(name = PARAM_DB_URL, mandatory = true)
@@ -54,9 +59,18 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
                     + "FROM rev";
             if (limit != null) {
                 query += " LIMIT " + limit;
+                logger.log(
+                        Level.INFO,
+                        "limit on the revisions to fetch set to: " + limit);
+            } else {
+                logger.log(
+                        Level.INFO,
+                        "limit on the revisions to fetch not set");
             }
-            PreparedStatement ps = connection.prepareStatement(query);
-            cursor = ps.executeQuery();
+            connection.setAutoCommit(false);
+            Statement s = connection.createStatement();
+            s.setFetchSize(50);
+            cursor = s.executeQuery(query);
         } catch (SQLException ex) {
             throw new ResourceInitializationException(ex);
         }
@@ -66,9 +80,10 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
     public void destroy() {
         super.destroy();
         try {
+            cursor.close();
             connection.close();
         } catch (SQLException ex) {
-            UIMAFramework.getLogger(RevisionsCR.class).log(
+            logger.log(
                     Level.SEVERE,
                     "couldn't close the connection to the database");
             ex.printStackTrace(System.err);
@@ -98,7 +113,7 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
             revision.setTimestamp(cursor.getString("timestamp"));
             revision.addToIndexes();
             if (++i % 10000 == 0) {
-                UIMAFramework.getLogger(RevisionsCR.class).log(
+                logger.log(
                         Level.INFO,
                         "processing revision n°"
                         + i
@@ -106,7 +121,7 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
                         + cursor.getLong("id"));
             }
         } catch (SQLException ex) {
-            UIMAFramework.getLogger(RevisionsCR.class).log(
+            logger.log(
                     Level.SEVERE,
                     "couldn't access the database to retrieve the "
                     + "next revision");
@@ -121,10 +136,10 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
             return cursor.isBeforeFirst()
                     || (cursor.getRow() != 0 && !cursor.isLast());
         } catch (SQLException ex) {
-            UIMAFramework.getLogger(RevisionsCR.class).log(
+            logger.log(
                     Level.SEVERE,
-                    "couldn't access the database to determine if "
-                    + "more results are available");
+                    "couldn't access the database to determine if more results "
+                    + "are available");
             throw new CollectionException(ex);
         }
     }
