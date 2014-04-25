@@ -236,32 +236,48 @@ public class DictCreationPipeline {
                         FixedFlowController.class,
                         FixedFlowController.PARAM_ACTION_AFTER_CAS_MULTIPLIER,
                         "drop"));
-        builder.add(filter);
-        builder.add(getter);
-        builder.add(mw2txtRevised,
+
+        builder.add("filter", filter);
+
+        builder.add("getter", getter);
+
+        builder.add("mediawiki-importer-revised", mw2txtRevised,
                 CAS.NAME_DEFAULT_SOFA, "revised");
-        builder.add(mw2txtOriginal,
+
+        builder.add("mediawiki-importer-original", mw2txtOriginal,
                 CAS.NAME_DEFAULT_SOFA, "original");
-        builder.add(sentenceDetector,
+
+        builder.add("sentence-detector-revised", sentenceDetector,
                 CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(sentenceDetector,
+
+        builder.add("sentence-detector-original", sentenceDetector,
                 CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(tokenizer,
+
+        builder.add("tokenizer-revised", tokenizer,
                 CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(tokenizer,
+
+        builder.add("tokenizer-original", tokenizer,
                 CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(sentenceDiffer,
+
+        builder.add("sentence-differ", sentenceDiffer,
                 SentenceDiffAE.ORIGINAL_VIEW, "txtOriginal",
                 SentenceDiffAE.REVISED_VIEW, "txtRevised");
-        builder.add(taggerRevised,
+
+        builder.add("first-xmi-consumer", consumerXmi);
+
+        builder.add("tagger-revised", taggerRevised,
                 CAS.NAME_DEFAULT_SOFA, "txtRevised");
-        builder.add(taggerOriginal,
+
+        builder.add("tagger-original", taggerOriginal,
                 CAS.NAME_DEFAULT_SOFA, "txtOriginal");
-        builder.add(wordDiffer,
+
+        builder.add("word-differ", wordDiffer,
                 WordDiffAE.ORIGINAL_VIEW, "txtOriginal",
                 WordDiffAE.REVISED_VIEW, "txtRevised");
-        builder.add(consumerXmi);
-        builder.add(consumerResource,
+
+        builder.add("second-xmi-consumer", consumerXmi);
+
+        builder.add("resource-consumer", consumerResource,
                 ResourceWriterAE.ORIGINAL_VIEW, "txtOriginal",
                 ResourceWriterAE.REVISED_VIEW, "txtRevised");
 
