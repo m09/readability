@@ -68,7 +68,7 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
             }
             connection.setAutoCommit(false);
             Statement s = connection.createStatement();
-            s.setFetchSize(50);
+            s.setFetchSize(5000);
             cursor = s.executeQuery(query);
         } catch (SQLException ex) {
             throw new ResourceInitializationException(ex);
