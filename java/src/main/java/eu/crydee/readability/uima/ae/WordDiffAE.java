@@ -1,6 +1,9 @@
 package eu.crydee.readability.uima.ae;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -82,18 +85,18 @@ public class WordDiffAE extends SentenceDiffAE {
         } catch (CASException ex) {
             throw new AnalysisEngineProcessException(ex);
         }
-        for (AnnotationFS revisedSentences : CasUtil.select(
-                revisedView.getCas(),
-                revisedSentencesTypeT)) {
-            final List<AnnotationFS> revised = CasUtil.selectCovered(
-                    revisedView.getCas(),
-                    tokenTypeT,
-                    revisedSentences),
-                    original = CasUtil.selectCovered(
-                            originalView.getCas(),
-                            tokenTypeT,
-                            (AnnotationFS) revisedSentences.getFeatureValue(
-                                    originalSentencesFeatureF));
+        Map<AnnotationFS, Collection<AnnotationFS>> indexOriginal
+                = CasUtil.indexCovered(cas, tokenTypeT, revisedSentencesTypeT),
+                indexRevised
+                = CasUtil.indexCovered(cas, tokenTypeT, originalSentencesTypeT);
+        for (AnnotationFS revisedSentences : indexRevised.keySet()) {
+            final List<AnnotationFS> revised
+                    = new ArrayList<>(indexRevised.get(revisedSentences)),
+                    original
+                    = new ArrayList<>(indexOriginal.get(
+                                    (AnnotationFS) revisedSentences
+                                    .getFeatureValue(
+                                            originalSentencesFeatureF)));
             final byte[] revisedText = getBytes(revised),
                     originalText = getBytes(original);
             final DiffAlgorithm da = DiffAlgorithm.getAlgorithm(
