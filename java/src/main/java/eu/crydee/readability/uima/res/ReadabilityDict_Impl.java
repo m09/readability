@@ -100,12 +100,12 @@ public class ReadabilityDict_Impl
     private void saveRevision(XMLStreamWriter xsw, Revision revision)
             throws XMLStreamException {
         xsw.writeStartElement("text");
-        xsw.writeCData(revision.getText());
+        xsw.writeCharacters(revision.getText());
         xsw.writeEndElement();
         xsw.writeStartElement("token-list");
         for (String token : revision.getTokens()) {
             xsw.writeStartElement("token");
-            xsw.writeCData(token);
+            xsw.writeCharacters(token);
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
