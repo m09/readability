@@ -1,5 +1,6 @@
 package eu.crydee.readability.uima;
 
+import eu.crydee.readability.uima.ae.MapperAE;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
@@ -40,7 +41,7 @@ public class DictUsagePipeline {
         ExternalResourceDescription dict
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        "dict.xml");
+                        "file:dict.xml");
 
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(
@@ -72,6 +73,12 @@ public class DictUsagePipeline {
                         "opennlp.uima.POSFeature",
                         "POS");
 
+        AnalysisEngineDescription mapper
+                = AnalysisEngineFactory.createEngineDescription(
+                        MapperAE.class,
+                        MapperAE.RES_KEY,
+                        dict);
+
         AggregateBuilder builder = new AggregateBuilder(
                 null,
                 TypePrioritiesFactory.createTypePriorities(
@@ -81,6 +88,7 @@ public class DictUsagePipeline {
         builder.add(sentenceDetector);
         builder.add(tokenizer);
         builder.add(tagger);
+        builder.add(mapper);
 
         AnalysisEngine ae = builder.createAggregate();
 
