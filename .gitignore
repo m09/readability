@@ -7,5 +7,5 @@ uima.log
 db.sql
 dump.xml
 dependency-reduced-pom.xml
-dict-indented.xml
+indented.xml
 dict.xml
