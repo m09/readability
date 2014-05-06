@@ -3,6 +3,7 @@ package eu.crydee.readability.uima.ae;
 import eu.crydee.readability.uima.ts.Revision;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.AbstractCas;
@@ -15,6 +16,7 @@ public class RevisionsFilterAE extends JCasMultiplier_ImplBase {
 
     final private Set<String> validComments = new HashSet<>();
     private JCas current = null;
+    final private Pattern category = Pattern.compile("/\\*.*?\\*/ ");
 
     @Override
     public void initialize(UimaContext context)
@@ -29,8 +31,9 @@ public class RevisionsFilterAE extends JCasMultiplier_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        if (!jcas.getDocumentText().isEmpty()
-                && validComments.contains(jcas.getDocumentText())
+        String text = jcas.getDocumentText();
+        text = category.matcher(text).replaceFirst("");
+        if (validComments.contains(text)
                 && JCasUtil.selectSingle(jcas, Revision.class).getParentId()
                 != 0) {
             current = jcas;
