@@ -15,12 +15,18 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.SharedResourceObject;
+import org.apache.uima.util.Level;
+import org.apache.uima.util.Logger;
 
 public class ReadabilityDict_Impl
         implements SharedResourceObject, ReadabilityDict {
+
+    final static private Logger logger = UIMAFramework.getLogger(
+            ReadabilityDict_Impl.class);
 
     final private Map<Revision, Map<Revision, Integer>> dict = new HashMap<>();
 
@@ -30,20 +36,20 @@ public class ReadabilityDict_Impl
         try (InputStream is = dr.getInputStream()) {
             xsr = XMLInputFactory.newInstance()
                     .createXMLStreamReader(is, "UTF8");
-            while (xsr.hasNext()) {
-                xsr.next();
-                String name = xsr.getLocalName();
-                if (xsr.isStartElement()
-                        && name.equals("original")) {
-                    Revision rev = parseRevision(xsr);
-                    XMLUtils.nextTag(xsr);
-                    while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
-                        add(rev, parseRevision(xsr));
-                    }
+            int mappings = 0;
+            while (XMLUtils.goToNextXBeforeY(xsr, "original", "dict")) {
+                Revision rev = parseRevision(xsr);
+                while (XMLUtils.goToNextXBeforeY(
+                        xsr,
+                        "revised",
+                        "revised-list")) {
+                    add(rev, parseRevision(xsr));
+                    mappings++;
                 }
             }
+            logger.log(Level.INFO, "loaded " + mappings + " revisions");
         } catch (NullPointerException ex) {
-            // nothing to load, go on
+            logger.log(Level.INFO, "no file to load");
         } catch (IOException | XMLStreamException ex) {
             throw new ResourceInitializationException(ex);
         } finally {
