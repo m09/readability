@@ -40,13 +40,11 @@ object Application extends Controller {
       val arr = suggestion.getRevised.toArray
       Json.obj(
         "original" -> suggestion.getOriginal,
-        "revised"  -> Json.arr(
-          arr.map( fs =>
-            Json.obj(
-              "text"   -> fs.getStringValue(featTxt),
-              "tokens" -> fs.getFeatureValue(featTok).asInstanceOf[StringArray],
-              "pos"    -> fs.getFeatureValue(featPos).asInstanceOf[StringArray]
-            )
+        "revised"  -> arr.map( fs =>
+          Json.obj(
+            "text"   -> fs.getStringValue(featTxt),
+            "tokens" -> fs.getFeatureValue(featTok).asInstanceOf[StringArray],
+            "pos"    -> fs.getFeatureValue(featPos).asInstanceOf[StringArray]
           )
         )
       )
