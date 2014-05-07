@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>_Really_ basic demo</title>
+  </head>
+  <body>
+    <p>Enter some text:</p>
+    <textarea id="input" style="width: 800px; height: 400px;"></textarea>
+    <br>
+    <button id="submit" type="button">Annotate</button>
+    <div id="result">
+    </div>
+    <script src="assets/javascripts/jquery-1.9.0.min.js"></script>
+    <script type="text/javascript">
+      $( document ).ready(function() {
+          $('#submit').click(function() {
+              jQuery.ajax({
+                  type: 'POST',
+                  url: 'http://localhost:9000/',
+                  contentType: 'text/plain; charset=UTF-8',
+                  data: $('#input').value
+              }).done(function(data) {
+                  $('#result').text(JSON.stringify(data));
+              });
+          });
+      });
+    </script>
+  </body>
+</html>
