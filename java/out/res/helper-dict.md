@@ -19,3 +19,8 @@ Filter out the long revisions (edit longer than original)
 ---------------------------------------------------------
 
     xsltproc -o filtered.xml filter-long-revised.xsl dict.xml
+
+See which terms have the most translations
+------------------------------------------
+
+    xsltproc scripts/top.xsl dict.xml | less
