@@ -101,7 +101,7 @@ public class DictUsagePipeline {
         AnalysisEngine ae = builder.createAggregate();
 
         JCas jcas = ae.newJCas();
-        jcas.setDocumentText("Hello there! How do you do?");
+        jcas.setDocumentText("Hello there, and how do you do?");
 
         ae.process(jcas);
     }
