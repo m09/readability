@@ -27,7 +27,7 @@ public class DictUsagePipeline {
     public static void main(String[] args)
             throws ResourceInitializationException,
             AnalysisEngineProcessException {
-        AnalysisEngine ae = buildAe("file:out/res/dict.xml");
+        AnalysisEngine ae = buildAe("file:out/res/dict.xml", true);
 
         JCas jcas = ae.newJCas();
         jcas.setDocumentText("Hello there, and how do you do?");
@@ -35,7 +35,7 @@ public class DictUsagePipeline {
         ae.process(jcas);
     }
 
-    public static AnalysisEngine buildAe(String fileURI)
+    public static AnalysisEngine buildAe(String fileURI, boolean serialize)
             throws ResourceInitializationException {
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
@@ -94,11 +94,13 @@ public class DictUsagePipeline {
                         MapperAE.RES_KEY,
                         dict);
 
-        AnalysisEngineDescription consumerXmi
-                = AnalysisEngineFactory.createEngineDescription(
-                        XmiSerializerUsageAE.class,
-                        XmiSerializerUsageAE.PARAM_OUT_FOLDER,
-                        "out/cas-usage");
+        AnalysisEngineDescription consumerXmi = null;
+        if (serialize) {
+            consumerXmi = AnalysisEngineFactory.createEngineDescription(
+                    XmiSerializerUsageAE.class,
+                    XmiSerializerUsageAE.PARAM_OUT_FOLDER,
+                    "out/cas-usage");
+        }
 
         AggregateBuilder builder = new AggregateBuilder(
                 null,
@@ -110,7 +112,9 @@ public class DictUsagePipeline {
         builder.add(tokenizer);
         builder.add(tagger);
         builder.add(mapper);
-        builder.add(consumerXmi);
+        if (serialize) {
+            builder.add(consumerXmi);
+        }
 
         return builder.createAggregate();
     }
