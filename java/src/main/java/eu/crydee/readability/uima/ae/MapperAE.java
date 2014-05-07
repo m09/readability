@@ -25,19 +25,20 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 
 public class MapperAE extends JCasAnnotator_ImplBase {
-    
+
     final static public String RES_KEY = "RES_KEY";
     @ExternalResource(key = RES_KEY)
     private ReadabilityDict dict;
-    
+
     final private SetMultimap<Tokens, Pair<Revision, Integer>> byTokens
             = HashMultimap.create();
-    
+
     final private SetMultimap<POSs, Pair<Revision, Integer>> byPOS
             = HashMultimap.create();
-    
+
     @Override
-    public void initialize(UimaContext context) throws ResourceInitializationException {
+    public void initialize(UimaContext context)
+            throws ResourceInitializationException {
         super.initialize(context);
         for (Revision original : dict.keySet()) {
             POSs pos = original.getPOS();
@@ -52,7 +53,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             }
         }
     }
-    
+
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         List<Token> tokens
@@ -63,30 +64,25 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 POSsText = tokens.stream()
                 .map(t -> t.getPOS())
                 .collect(Collectors.toList());
+        String[] tokensArray = tokensText.toArray(new String[0]),
+                POSsArray = POSsText.toArray(new String[0]);
         String text = jcas.getDocumentText();
         for (Tokens suggestionTokens : byTokens.keySet()) {
+            int width = suggestionTokens.size();
             for (Integer i : getSublistIndices(tokensText, suggestionTokens)) {
                 int begin = tokens.get(i).getBegin(),
-                        end = tokens.get(i + suggestionTokens.size()).getEnd();
+                        end = tokens.get(i + width - 1).getEnd();
                 Suggestion suggestion = new Suggestion(jcas, begin, end);
                 eu.crydee.readability.uima.ts.Revision original
                         = new eu.crydee.readability.uima.ts.Revision(
                                 jcas,
                                 begin,
                                 end);
-                StringArray sa = new StringArray(jcas, suggestionTokens.size());
-                sa.copyFromArray(
-                        tokensText.toArray(new String[tokensText.size()]),
-                        i,
-                        0,
-                        suggestionTokens.size());
+                StringArray sa = new StringArray(jcas, width);
+                sa.copyFromArray(tokensArray, i, 0, width);
                 original.setTokens(sa);
-                sa = new StringArray(jcas, suggestionTokens.size());
-                sa.copyFromArray(
-                        POSsText.toArray(new String[POSsText.size()]),
-                        i,
-                        0,
-                        suggestionTokens.size());
+                sa = new StringArray(jcas, width);
+                sa.copyFromArray(POSsArray, i, 0, width);
                 original.setPos(sa);
                 original.setText(text.substring(begin, end));
                 suggestion.setOriginal(original);
@@ -95,28 +91,28 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 FSArray revisedArray = new FSArray(jcas, revisedSet.size());
                 int s = 0;
                 for (Pair<Revision, Integer> pair : revisedSet) {
+                    Revision rev = pair.getKey();
+                    int revisedWidth = rev.getTokens().size();
                     eu.crydee.readability.uima.ts.Revision revised
                             = new eu.crydee.readability.uima.ts.Revision(
                                     jcas,
                                     begin,
                                     end);
-                    sa = new StringArray(jcas, suggestionTokens.size());
+                    sa = new StringArray(jcas, revisedWidth);
                     sa.copyFromArray(
-                            pair.getKey().getPOS().toArray(
-                                    new String[POSsText.size()]),
-                            i,
+                            rev.getPOS().toArray(new String[0]),
                             0,
-                            suggestionTokens.size());
+                            0,
+                            revisedWidth);
                     revised.setPos(sa);
-                    sa = new StringArray(jcas, suggestionTokens.size());
+                    sa = new StringArray(jcas, revisedWidth);
                     sa.copyFromArray(
-                            pair.getKey().getTokens().toArray(
-                                    new String[POSsText.size()]),
-                            i,
+                            rev.getTokens().toArray(new String[0]),
                             0,
-                            suggestionTokens.size());
+                            0,
+                            revisedWidth);
                     revised.setTokens(sa);
-                    revised.setText(pair.getKey().getText());
+                    revised.setText(rev.getText());
                     revisedArray.set(s++, revised);
                 }
                 suggestion.setRevised(revisedArray);
@@ -124,7 +120,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             }
         }
     }
-    
+
     private List<Integer> getSublistIndices(
             List<String> source,
             Tokens target) {
