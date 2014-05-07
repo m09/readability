@@ -3,6 +3,7 @@ dbpedia*
 papers/
 target/
 cas/
+cas-usage/
 processed/
 uima.log
 db.sql
