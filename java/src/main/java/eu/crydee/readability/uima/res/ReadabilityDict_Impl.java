@@ -43,7 +43,7 @@ public class ReadabilityDict_Impl
                         xsr,
                         "revised",
                         "revised-list")) {
-                    add(rev, parseRevision(xsr));
+                    addRevised(xsr, rev);
                     mappings++;
                 }
             }
@@ -61,6 +61,12 @@ public class ReadabilityDict_Impl
                 }
             }
         }
+    }
+
+    private void addRevised(XMLStreamReader xsr, Revision rev)
+            throws XMLStreamException {
+        Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
+        add(rev, parseRevision(xsr), count);
     }
 
     private Revision parseRevision(XMLStreamReader xsr)
@@ -90,8 +96,10 @@ public class ReadabilityDict_Impl
             xsw.writeStartElement("original");
             saveRevision(xsw, original);
             xsw.writeStartElement("revised-list");
-            for (Revision revised : dict.get(original).keySet()) {
+            Map<Revision, Integer> revisedMap = dict.get(original);
+            for (Revision revised : revisedMap.keySet()) {
                 xsw.writeStartElement("revised");
+                xsw.writeAttribute("count", revisedMap.get(revised).toString());
                 saveRevision(xsw, revised);
                 xsw.writeEndElement();
             }
@@ -125,13 +133,18 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public void add(Revision original, Revision revised) {
+    public void add(Revision original, Revision revised, Integer count) {
         Map<Revision, Integer> revisions = dict.get(original);
         if (revisions == null) {
             revisions = new HashMap<>();
             dict.put(original, revisions);
         }
-        revisions.put(revised, revisions.getOrDefault(revised, 0) + 1);
+        revisions.put(revised, revisions.getOrDefault(revised, 0) + count);
+    }
+
+    @Override
+    public void add(Revision original, Revision revised) {
+        add(original, revised, 1);
     }
 
     @Override

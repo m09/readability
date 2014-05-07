@@ -57,6 +57,8 @@ public interface ReadabilityDict {
 
     public void add(Revision original, Revision revised);
 
+    public void add(Revision original, Revision revised, Integer count);
+
     public Optional<Map<Revision, Integer>> getRevisions(Revision original);
 
     public void save(PrintStream ps) throws Exception;
