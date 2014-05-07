@@ -18,7 +18,6 @@
     <xsl:value-of select="count( revised-list/revised )"/>
     <xsl:text>	</xsl:text>
     <xsl:value-of select="text/text()"/>
-    <xsl:text>
-</xsl:text>
+    <xsl:text>&#xa;</xsl:text>
   </xsl:template>
 </xsl:stylesheet>
