@@ -9,14 +9,15 @@
       <xsl:apply-templates select="dict/original">
         <xsl:sort select="count( revised-list/revised )"
                   order="descending"
+                  data-type="number"
                   />
       </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="original">
-    <xsl:value-of select="text/text()"/>
-    <xsl:text>	</xsl:text>
     <xsl:value-of select="count( revised-list/revised )"/>
+    <xsl:text>	</xsl:text>
+    <xsl:value-of select="text/text()"/>
     <xsl:text>
 </xsl:text>
   </xsl:template>

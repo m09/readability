@@ -10,6 +10,7 @@
       <xsl:apply-templates select="dict/original">
         <xsl:sort select="count( revised-list/revised )"
                   order="descending"
+                  data-type="number"
                   />
       </xsl:apply-templates>
     </dict>
