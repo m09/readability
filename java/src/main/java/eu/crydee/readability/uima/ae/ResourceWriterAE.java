@@ -1,5 +1,8 @@
 package eu.crydee.readability.uima.ae;
 
+import eu.crydee.readability.uima.model.POSs;
+import eu.crydee.readability.uima.model.Revision;
+import eu.crydee.readability.uima.model.Tokens;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.ts.OriginalWords;
 import eu.crydee.readability.uima.ts.RevisedWords;
@@ -54,14 +57,14 @@ public class ResourceWriterAE extends JCasAnnotator_ImplBase {
                 originalPOS.add(token.getPOS());
             }
             dict.add(
-                    new ReadabilityDict.Revision(
+                    new Revision(
                             ow.getCoveredText(),
-                            originalTokens,
-                            originalPOS),
-                    new ReadabilityDict.Revision(
+                            new Tokens(originalTokens),
+                            new POSs(originalPOS)),
+                    new Revision(
                             rw.getCoveredText(),
-                            revisedTokens,
-                            revisedPOS));
+                            new Tokens(revisedTokens),
+                            new POSs(revisedPOS)));
         }
     }
 

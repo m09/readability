@@ -1,6 +1,9 @@
 package eu.crydee.readability.uima.res;
 
 import eu.crydee.readability.misc.XMLUtils;
+import eu.crydee.readability.uima.model.POSs;
+import eu.crydee.readability.uima.model.Revision;
+import eu.crydee.readability.uima.model.Tokens;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -83,7 +86,10 @@ public class ReadabilityDict_Impl
         while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
             pos.add(xsr.getElementText());
         }
-        return new Revision(originalText, tokens, pos);
+        return new Revision(
+                originalText,
+                new Tokens(tokens),
+                new POSs(pos));
     }
 
     @Override
