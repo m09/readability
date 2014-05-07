@@ -97,7 +97,7 @@ public class ReadabilityDict_Impl
     public void save(PrintStream ps) throws XMLStreamException {
         XMLStreamWriter xsw = XMLOutputFactory.newInstance()
                 .createXMLStreamWriter(ps, "UTF8");
-        xsw.writeStartDocument();
+        xsw.writeStartDocument("utf-8", "1.0");
         xsw.writeStartElement("dict");
         for (Revision original : dict.keySet()) {
             xsw.writeStartElement("original");
