@@ -14,7 +14,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.TypeSystemUtil;
 import org.xml.sax.SAXException;
 
-public class XmiSerializerAE extends JCasAnnotator_ImplBase {
+public class XmiSerializerCreationAE extends JCasAnnotator_ImplBase {
 
     final public static String PARAM_OUT_FOLDER = "PARAM_OUT_FOLDER";
     @ConfigurationParameter(name = PARAM_OUT_FOLDER, mandatory = true)

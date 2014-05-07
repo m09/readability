@@ -6,7 +6,7 @@ import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
 import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.WordDiffAE;
-import eu.crydee.readability.uima.ae.XmiSerializerAE;
+import eu.crydee.readability.uima.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.OriginalSentences;
@@ -209,8 +209,8 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription consumerXmi
                 = AnalysisEngineFactory.createEngineDescription(
-                        XmiSerializerAE.class,
-                        XmiSerializerAE.PARAM_OUT_FOLDER,
+                        XmiSerializerCreationAE.class,
+                        XmiSerializerCreationAE.PARAM_OUT_FOLDER,
                         "out/cas");
 
         AnalysisEngineDescription consumerResource

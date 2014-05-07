@@ -1,6 +1,7 @@
 package eu.crydee.readability.uima;
 
 import eu.crydee.readability.uima.ae.MapperAE;
+import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
@@ -79,6 +80,12 @@ public class DictUsagePipeline {
                         MapperAE.RES_KEY,
                         dict);
 
+        AnalysisEngineDescription consumerXmi
+                = AnalysisEngineFactory.createEngineDescription(
+                        XmiSerializerUsageAE.class,
+                        XmiSerializerUsageAE.PARAM_OUT_FOLDER,
+                        "out/cas-usage");
+
         AggregateBuilder builder = new AggregateBuilder(
                 null,
                 TypePrioritiesFactory.createTypePriorities(
@@ -89,6 +96,7 @@ public class DictUsagePipeline {
         builder.add(tokenizer);
         builder.add(tagger);
         builder.add(mapper);
+        builder.add(consumerXmi);
 
         AnalysisEngine ae = builder.createAggregate();
 
