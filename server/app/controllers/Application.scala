@@ -59,12 +59,11 @@ object Application extends Controller {
 
   def annotate = Action(parse.text) { request =>
     val jcas = ae.newJCas()
-    jcas.setDocumentText("Hello there, and how do you do?")
+    jcas.setDocumentText(request.body)
     ae.process(jcas)
     val suggestions : scala.collection.Iterable[Suggestion] = JCasUtil.select(
       jcas,
       classOf[Suggestion])
-    Console println suggestions
     Ok(Json.toJson(suggestions))
   }
 }

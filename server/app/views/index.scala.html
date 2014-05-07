@@ -12,18 +12,35 @@
     </div>
     <script src="assets/javascripts/jquery-1.9.0.min.js"></script>
     <script type="text/javascript">
-      $( document ).ready(function() {
-          $('#submit').click(function() {
-              jQuery.ajax({
-                  type: 'POST',
-                  url: 'http://localhost:9000/',
-                  contentType: 'text/plain; charset=UTF-8',
-                  data: $('#input').value
-              }).done(function(data) {
-                  $('#result').text(JSON.stringify(data));
-              });
-          });
-      });
+      (function() {
+       $( document ).ready(function() {
+           var input = $('#input');
+           var output = $('#result');
+           $('#submit').click(function() {
+               jQuery.ajax({
+                   type: 'POST',
+                   url: 'http://localhost:9000/',
+                   contentType: 'text/plain; charset=UTF-8',
+                   data: input.val()
+               }).done(function(data) {
+                   var html = "<ul>"
+                   data.map(function(o) {
+                       html += "<li>" +
+                           o.original.text + ":" +
+                           "<br>" +
+                           "<ul>";
+                       o.revised[0].map(function(q) {
+                           html += "<li>" + q.text + "</li>"
+                       });
+                       html += "</ul>" +
+                           "</li>";
+                   });
+                   html += "</ul>"
+                   output.html(html);
+               });
+           });
+       });
+      })();
     </script>
   </body>
 </html>
