@@ -41,7 +41,7 @@ public class DictUsagePipeline {
         ExternalResourceDescription dict
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        "file:dict.xml");
+                        "file:out/res/dict.xml");
 
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(

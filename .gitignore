@@ -2,7 +2,7 @@
 dbpedia*
 papers/
 target/
-out/
+out/cas/
 uima.log
 db.sql
 dump.xml

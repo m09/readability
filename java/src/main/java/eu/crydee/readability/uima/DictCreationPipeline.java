@@ -211,13 +211,13 @@ public class DictCreationPipeline {
                 = AnalysisEngineFactory.createEngineDescription(
                         XmiSerializerAE.class,
                         XmiSerializerAE.PARAM_OUT_FOLDER,
-                        "out");
+                        "out/cas");
 
         AnalysisEngineDescription consumerResource
                 = AnalysisEngineFactory.createEngineDescription(
                         ResourceWriterAE.class,
                         ResourceWriterAE.PARAM_OUT_PS,
-                        "dict.xml",
+                        "out/res/dict.xml",
                         ResourceWriterAE.RES_KEY,
                         dict);
 

@@ -109,7 +109,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>out</directory>
+                            <directory>out/cas</directory>
                             <includes>
                                 <include>*.xml</include>
                                 <include>*.xmi</include>
