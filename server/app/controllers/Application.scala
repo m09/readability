@@ -24,8 +24,8 @@ case object Filtered extends Dict
 
 object Application extends Controller {
 
-  private val aeNormal = DictUsagePipeline buildAe "file:dict.xml"
-  private val aeFiltered = DictUsagePipeline buildAe "file:filtered.xml"
+  private val aeNormal = DictUsagePipeline buildAe("file:dict.xml", false)
+  private val aeFiltered = DictUsagePipeline buildAe("file:filtered.xml", false)
   private val typeRev = CasUtil.getType(aeNormal.newCAS, classOf[Revision])
   private val featTxt = typeRev.getFeatureByBaseName("text")
   private val featTok = typeRev.getFeatureByBaseName("tokens")
