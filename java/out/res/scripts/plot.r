@@ -1,4 +1,4 @@
-f.resultsN <- "processed/normal-count.tsv"
+f.resultsN <- "processed/dict-count.tsv"
 f.resultsF <- "processed/filtered-count.tsv"
 f.graphics <- "processed/plot.pdf"
 
