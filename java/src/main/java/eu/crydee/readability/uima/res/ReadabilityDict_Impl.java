@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -160,5 +161,10 @@ public class ReadabilityDict_Impl
             return Optional.empty();
         }
         return Optional.of(Collections.unmodifiableMap(revisions));
+    }
+
+    @Override
+    public Set<Revision> keySet() {
+        return Collections.unmodifiableSet(dict.keySet());
     }
 }
