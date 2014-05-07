@@ -7,6 +7,9 @@
     <p>Enter some text:</p>
     <textarea id="input"></textarea>
     <br>
+    <input checked type="radio" name="dict" value="normal">Normal
+    <input type="radio" name="dict" value="filtered">Filtered
+    <br>
     <button id="submit" type="button">Annotate</button>
     <div id="result">
     </div>
@@ -20,8 +23,11 @@
                jQuery.ajax({
                    type: 'POST',
                    url: 'http://localhost:9000/',
-                   contentType: 'text/plain; charset=UTF-8',
-                   data: input.val()
+                   contentType: 'application/json; charset=UTF-8',
+                   data: JSON.stringify({
+                       data: input.val(),
+                       dict: $("input:radio[name='dict']:checked").val()
+                   })
                }).done(function(data) {
                    var html = "<ul>"
                    data.map(function(o) {
