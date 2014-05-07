@@ -14,3 +14,8 @@ Retrieve all the terms that have more than one translation
 
     xmllint dict-indented.xml \
         --xpath "/dict/original[count(revised-list/revised)>1]"
+
+Filter out the long revisions (edit longer than original)
+---------------------------------------------------------
+
+    xsltproc -o filtered.xml filter-long-revised.xsl dict.xml
