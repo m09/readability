@@ -13,16 +13,30 @@ import opennlp.uima.tokenize.Tokenizer;
 import opennlp.uima.tokenize.TokenizerModelResourceImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ExternalResourceDescription;
+import org.apache.uima.resource.ResourceInitializationException;
 
 public class DictUsagePipeline {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)
+            throws ResourceInitializationException,
+            AnalysisEngineProcessException {
+        AnalysisEngine ae = buildAe("file:out/res/dict.xml");
+
+        JCas jcas = ae.newJCas();
+        jcas.setDocumentText("Hello there, and how do you do?");
+
+        ae.process(jcas);
+    }
+
+    public static AnalysisEngine buildAe(String fileURI)
+            throws ResourceInitializationException {
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
@@ -42,7 +56,7 @@ public class DictUsagePipeline {
         ExternalResourceDescription dict
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        "file:out/res/dict.xml");
+                        fileURI);
 
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(
@@ -98,11 +112,6 @@ public class DictUsagePipeline {
         builder.add(mapper);
         builder.add(consumerXmi);
 
-        AnalysisEngine ae = builder.createAggregate();
-
-        JCas jcas = ae.newJCas();
-        jcas.setDocumentText("Hello there, and how do you do?");
-
-        ae.process(jcas);
+        return builder.createAggregate();
     }
 }
