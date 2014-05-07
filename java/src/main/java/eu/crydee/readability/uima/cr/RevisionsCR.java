@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.cr;
 
-import eu.crydee.readability.uima.ts.Revision;
+import eu.crydee.readability.uima.ts.RevisionInfo;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -102,15 +102,15 @@ public class RevisionsCR extends JCasCollectionReader_ImplBase {
                 comment = "";
             }
             jcas.setDocumentText(comment);
-            Revision revision = new Revision(
+            RevisionInfo revisionInfo = new RevisionInfo(
                     jcas,
                     0,
                     jcas.getDocumentText().length());
-            revision.setId(cursor.getLong("id"));
-            revision.setParentId(cursor.getLong("parent_id"));
-            revision.setMinor(cursor.getBoolean("minor"));
-            revision.setTimestamp(cursor.getString("timestamp"));
-            revision.addToIndexes();
+            revisionInfo.setId(cursor.getLong("id"));
+            revisionInfo.setParentId(cursor.getLong("parent_id"));
+            revisionInfo.setMinor(cursor.getBoolean("minor"));
+            revisionInfo.setTimestamp(cursor.getString("timestamp"));
+            revisionInfo.addToIndexes();
             if (++i % 10000 == 0) {
                 logger.log(
                         Level.INFO,

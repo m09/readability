@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.ts.Revision;
+import eu.crydee.readability.uima.ts.RevisionInfo;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -68,10 +68,11 @@ public class RevisionsGetterAE extends JCasAnnotator_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        Revision revision = JCasUtil.selectSingle(jcas, Revision.class);
+        RevisionInfo revisionInfo
+                = JCasUtil.selectSingle(jcas, RevisionInfo.class);
         try {
-            ps.setLong(1, revision.getId());
-            ps.setLong(2, revision.getParentId());
+            ps.setLong(1, revisionInfo.getId());
+            ps.setLong(2, revisionInfo.getParentId());
             ResultSet rs = ps.executeQuery();
             JCas original = ViewCreatorAnnotator.createViewSafely(
                     jcas,
@@ -84,10 +85,10 @@ public class RevisionsGetterAE extends JCasAnnotator_ImplBase {
                 if (!rs.next()) {
                     throw new AnalysisEngineProcessException();
                 }
-                if (rs.getLong("id") == revision.getId()) {
+                if (rs.getLong("id") == revisionInfo.getId()) {
                     revised.setDocumentText(rs.getString("text"));
                     revisedF = true;
-                } else if (rs.getLong("id") == revision.getParentId()) {
+                } else if (rs.getLong("id") == revisionInfo.getParentId()) {
                     original.setDocumentText(rs.getString("text"));
                     originalF = true;
                 }

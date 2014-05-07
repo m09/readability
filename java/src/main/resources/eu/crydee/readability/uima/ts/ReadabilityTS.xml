@@ -6,7 +6,7 @@
     <vendor/>
     <types>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.Revision</name>
+            <name>eu.crydee.readability.uima.ts.RevisionInfo</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>

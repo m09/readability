@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.ts.Revision;
+import eu.crydee.readability.uima.ts.RevisionInfo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,12 +24,13 @@ public class XmiSerializerAE extends JCasAnnotator_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        Revision revision = JCasUtil.selectSingle(jcas, Revision.class);
+        RevisionInfo revisionInfo
+                = JCasUtil.selectSingle(jcas, RevisionInfo.class);
         if (!tsWritten) {
             writeTs(jcas);
         }
         try (OutputStream os = new FileOutputStream(
-                new File(outputFolder, revision.getId() + ".xmi"))) {
+                new File(outputFolder, revisionInfo.getId() + ".xmi"))) {
             XmiCasSerializer.serialize(jcas.getCas(), os);
         } catch (IOException | SAXException ex) {
             throw new AnalysisEngineProcessException(ex);

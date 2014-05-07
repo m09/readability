@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.ts.Revision;
+import eu.crydee.readability.uima.ts.RevisionInfo;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -34,7 +34,7 @@ public class RevisionsFilterAE extends JCasMultiplier_ImplBase {
         String text = jcas.getDocumentText();
         text = category.matcher(text).replaceFirst("");
         if (validComments.contains(text)
-                && JCasUtil.selectSingle(jcas, Revision.class).getParentId()
+                && JCasUtil.selectSingle(jcas, RevisionInfo.class).getParentId()
                 != 0) {
             current = jcas;
         } else {
