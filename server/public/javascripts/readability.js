@@ -3,8 +3,14 @@ var Annotator = React.createClass({
     getInitialState: function() {
         return {
             data: {
-                normal: [],
-                filtered: []
+                normal: {
+                    text: "",
+                    annotations: []
+                },
+                filtered: {
+                    text: "",
+                    annotations: []
+                }
             },
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",
@@ -14,9 +20,6 @@ var Annotator = React.createClass({
             },
             currentTab: "input"
         };
-    },
-    componentDidMount: function() {
-        jQuery('#input').tab('show');
     },
     handleSubmit: function(dict) {
         var text = jQuery(this.refs.inputText.getDOMNode()).text();
@@ -88,7 +91,7 @@ var InputPane = React.createClass({
 
 var OutputPane = React.createClass({
     render: function() {
-        var mappingNodes = this.props.data.map(function (mapping) {
+        var mappingNodes = this.props.data.annotations.map(function (mapping) {
             return <Mapping mapping={mapping}></Mapping>;
         });
         return (
