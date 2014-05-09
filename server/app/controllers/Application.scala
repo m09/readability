@@ -1,13 +1,13 @@
 package controllers
 
 import eu.crydee.readability.uima.DictUsagePipeline
-import eu.crydee.readability.uima.ts.Revision
+import eu.crydee.readability.uima.ts.Revised
 import eu.crydee.readability.uima.ts.Suggestion
+import eu.crydee.readability.uima.ts.Token
 import org.apache.uima.analysis_engine.AnalysisEngine
 import org.apache.uima.cas.FeatureStructure
 import org.apache.uima.fit.util.CasUtil
 import org.apache.uima.fit.util.JCasUtil
-import org.apache.uima.jcas.cas.FSArray
 import org.apache.uima.jcas.cas.StringArray
 import org.apache.uima.jcas.JCas
 import play.api._
@@ -26,10 +26,14 @@ object Application extends Controller {
 
   private val aeNormal = DictUsagePipeline buildAe("file:dict.xml", false)
   private val aeFiltered = DictUsagePipeline buildAe("file:filtered.xml", false)
-  private val typeRev = CasUtil.getType(aeNormal.newCAS, classOf[Revision])
-  private val featTxt = typeRev.getFeatureByBaseName("text")
-  private val featTok = typeRev.getFeatureByBaseName("tokens")
-  private val featPos = typeRev.getFeatureByBaseName("pos")
+  private val typeTok = CasUtil.getType(aeNormal.newCAS, classOf[Token])
+  private val featTokBeg = typeTok.getFeatureByBaseName("begin")
+  private val featTokEnd = typeTok.getFeatureByBaseName("end")
+  private val featTokPos = typeTok.getFeatureByBaseName("POS")
+  private val typeRev = CasUtil.getType(aeNormal.newCAS, classOf[Revised])
+  private val featRevTxt = typeRev.getFeatureByBaseName("text")
+  private val featRevTok = typeRev.getFeatureByBaseName("tokens")
+  private val featRevPos = typeRev.getFeatureByBaseName("pos")
 
   implicit val inputReads: Reads[Input] = (
     (JsPath \ "data").read[String] and
@@ -45,20 +49,19 @@ object Application extends Controller {
       Json.obj(
         "original" -> Json.obj(
           "text"   -> suggestion.getOriginal.getText,
-          "tokens" -> suggestion.getOriginal.getTokens.toArray.map( t =>
+          "tokens" -> suggestion.getOriginal.getTokens.toArray.map( fs =>
             Json.obj(
-              "text" -> t.getCoveredText,
-              "begin" -> t.getBegin,
-              "end" -> t.getEnd
+              "pos" -> fs.getStringValue(featTokPos),
+              "begin" -> fs.getIntValue(featTokBeg),
+              "end" -> fs.getIntValue(featTokEnd)
             )
-          ),
-          "pos"    -> suggestion.getOriginal.getPos.toArray
+          )
         ),
         "revised"  -> arr.map( fs =>
           Json.obj(
-            "text"   -> fs.getStringValue(featTxt),
-            "tokens" -> fs.getFeatureValue(featTok).asInstanceOf[StringArray].toArray,
-            "pos"    -> fs.getFeatureValue(featPos).asInstanceOf[StringArray].toArray
+            "text"   -> fs.getStringValue(featRevTxt),
+            "tokens" -> fs.getFeatureValue(featRevTok).asInstanceOf[StringArray].toArray,
+            "pos"    -> fs.getFeatureValue(featRevPos).asInstanceOf[StringArray].toArray
           )
         )
       )
@@ -77,7 +80,12 @@ object Application extends Controller {
         val suggestions : scala.collection.Iterable[Suggestion] = JCasUtil.select(
           jcas,
           classOf[Suggestion])
-      Ok(Json.toJson(suggestions))
+      Ok(
+          Json.obj(
+            "text" -> jcas.getDocumentText,
+            "annotations" -> Json.toJson(suggestions)
+          )
+        )
     }
     request.body.validate[Input].map {
       case input => {
