@@ -1,52 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
     <title>_Really_ basic demo</title>
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet"
+          href="@routes.Assets.at("stylesheets/main.css")">
   </head>
   <body>
-    <p>Enter some text:</p>
-    <textarea id="input"></textarea>
-    <br>
-    <input checked type="radio" name="dict" value="normal">Normal
-    <input type="radio" name="dict" value="filtered">Filtered
-    <br>
-    <button id="submit" type="button">Annotate</button>
-    <div id="result">
-    </div>
+    <section id="annotator"></section>
     <script src="assets/javascripts/jquery-1.9.0.min.js"></script>
-    <script type="text/javascript">
-      (function() {
-       $( document ).ready(function() {
-           var input = $('#input');
-           var output = $('#result');
-           $('#submit').click(function() {
-               jQuery.ajax({
-                   type: 'POST',
-                   url: 'http://localhost:9000/',
-                   contentType: 'application/json; charset=UTF-8',
-                   data: JSON.stringify({
-                       data: input.val(),
-                       dict: $("input:radio[name='dict']:checked").val()
-                   })
-               }).done(function(data) {
-                   var html = "<ul>"
-                   data.map(function(o) {
-                       html += "<li>" +
-                           o.original.text + ":" +
-                           "<br>" +
-                           "<ul>";
-                       o.revised.map(function(q) {
-                           html += "<li>" + q.text + "</li>"
-                       });
-                       html += "</ul>" +
-                           "</li>";
-                   });
-                   html += "</ul>"
-                   output.html(html);
-               });
-           });
-       });
-      })();
-    </script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="assets/javascripts/react.js"></script>
+    <script src="assets/javascripts/JSXTransformer.js"></script>
+    <script type="text/jsx"
+            src="assets/javascripts/readability.js"></script>
   </body>
 </html>

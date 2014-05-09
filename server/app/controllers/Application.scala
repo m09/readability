@@ -45,7 +45,13 @@ object Application extends Controller {
       Json.obj(
         "original" -> Json.obj(
           "text"   -> suggestion.getOriginal.getText,
-          "tokens" -> suggestion.getOriginal.getTokens.toArray,
+          "tokens" -> suggestion.getOriginal.getTokens.toArray.map( t =>
+            Json.obj(
+              "text" -> t.getCoveredText,
+              "begin" -> t.getBegin,
+              "end" -> t.getEnd
+            )
+          ),
           "pos"    -> suggestion.getOriginal.getPos.toArray
         ),
         "revised"  -> arr.map( fs =>
