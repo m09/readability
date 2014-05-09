@@ -2,7 +2,7 @@ package eu.crydee.readability.uima.res;
 
 import eu.crydee.readability.misc.XMLUtils;
 import eu.crydee.readability.uima.model.POSs;
-import eu.crydee.readability.uima.model.Revision;
+import eu.crydee.readability.uima.model.Revised;
 import eu.crydee.readability.uima.model.Tokens;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class ReadabilityDict_Impl
     final static private Logger logger = UIMAFramework.getLogger(
             ReadabilityDict_Impl.class);
 
-    final private Map<Revision, Map<Revision, Integer>> dict = new HashMap<>();
+    final private Map<Revised, Map<Revised, Integer>> dict = new HashMap<>();
 
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
@@ -42,7 +42,7 @@ public class ReadabilityDict_Impl
                     .createXMLStreamReader(is, "UTF8");
             int mappings = 0;
             while (XMLUtils.goToNextXBeforeY(xsr, "original", "dict")) {
-                Revision rev = parseRevision(xsr);
+                Revised rev = parseRevision(xsr);
                 while (XMLUtils.goToNextXBeforeY(
                         xsr,
                         "revised",
@@ -67,13 +67,13 @@ public class ReadabilityDict_Impl
         }
     }
 
-    private void addRevised(XMLStreamReader xsr, Revision rev)
+    private void addRevised(XMLStreamReader xsr, Revised rev)
             throws XMLStreamException {
         Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
         add(rev, parseRevision(xsr), count);
     }
 
-    private Revision parseRevision(XMLStreamReader xsr)
+    private Revised parseRevision(XMLStreamReader xsr)
             throws XMLStreamException {
         XMLUtils.nextTag(xsr);
         String originalText = xsr.getElementText();
@@ -87,7 +87,7 @@ public class ReadabilityDict_Impl
         while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
             pos.add(xsr.getElementText());
         }
-        return new Revision(
+        return new Revised(
                 originalText,
                 new Tokens(tokens),
                 new POSs(pos));
@@ -99,12 +99,12 @@ public class ReadabilityDict_Impl
                 .createXMLStreamWriter(ps, "UTF8");
         xsw.writeStartDocument("utf-8", "1.0");
         xsw.writeStartElement("dict");
-        for (Revision original : dict.keySet()) {
+        for (Revised original : dict.keySet()) {
             xsw.writeStartElement("original");
             saveRevision(xsw, original);
             xsw.writeStartElement("revised-list");
-            Map<Revision, Integer> revisedMap = dict.get(original);
-            for (Revision revised : revisedMap.keySet()) {
+            Map<Revised, Integer> revisedMap = dict.get(original);
+            for (Revised revised : revisedMap.keySet()) {
                 xsw.writeStartElement("revised");
                 xsw.writeAttribute("count", revisedMap.get(revised).toString());
                 saveRevision(xsw, revised);
@@ -118,7 +118,7 @@ public class ReadabilityDict_Impl
         xsw.close();
     }
 
-    private void saveRevision(XMLStreamWriter xsw, Revision revision)
+    private void saveRevision(XMLStreamWriter xsw, Revised revision)
             throws XMLStreamException {
         xsw.writeStartElement("text");
         xsw.writeCharacters(revision.getText());
@@ -140,8 +140,8 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public void add(Revision original, Revision revised, Integer count) {
-        Map<Revision, Integer> revisions = dict.get(original);
+    public void add(Revised original, Revised revised, Integer count) {
+        Map<Revised, Integer> revisions = dict.get(original);
         if (revisions == null) {
             revisions = new HashMap<>();
             dict.put(original, revisions);
@@ -150,13 +150,13 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public void add(Revision original, Revision revised) {
+    public void add(Revised original, Revised revised) {
         add(original, revised, 1);
     }
 
     @Override
-    public Optional<Map<Revision, Integer>> getRevisions(Revision original) {
-        Map<Revision, Integer> revisions = dict.get(original);
+    public Optional<Map<Revised, Integer>> getRevisions(Revised original) {
+        Map<Revised, Integer> revisions = dict.get(original);
         if (dict == null) {
             return Optional.empty();
         }
@@ -164,7 +164,7 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public Set<Revision> keySet() {
+    public Set<Revised> keySet() {
         return Collections.unmodifiableSet(dict.keySet());
     }
 }

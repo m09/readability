@@ -1,39 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
-    <name>Common Types</name>
+    <name>Dict usage types</name>
     <description/>
     <version>1.0</version>
     <vendor/>
     <types>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RevisionInfo</name>
+            <name>eu.crydee.readability.uima.ts.Original</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
                 <featureDescription>
-                    <name>id</name>
-                    <description/>
-                    <rangeTypeName>uima.cas.Long</rangeTypeName>
-                </featureDescription>
-                <featureDescription>
-                    <name>parentId</name>
-                    <description/>
-                    <rangeTypeName>uima.cas.Long</rangeTypeName>
-                </featureDescription>
-                <featureDescription>
-                    <name>minor</name>
-                    <description/>
-                    <rangeTypeName>uima.cas.Boolean</rangeTypeName>
-                </featureDescription>
-                <featureDescription>
-                    <name>timestamp</name>
+                    <name>text</name>
                     <description/>
                     <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>tokens</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                    <elementType>eu.crydee.readability.uima.ts.Token</elementType>
                 </featureDescription>
             </features>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.Revision</name>
+            <name>eu.crydee.readability.uima.ts.Revised</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
@@ -62,13 +53,13 @@
                 <featureDescription>
                     <name>original</name>
                     <description/>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.Revision</rangeTypeName>
+                    <rangeTypeName>eu.crydee.readability.uima.ts.Original</rangeTypeName>
                 </featureDescription>
                 <featureDescription>
                     <name>revised</name>
                     <description/>
                     <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                    <elementType>eu.crydee.readability.uima.ts.Revision</elementType>
+                    <elementType>eu.crydee.readability.uima.ts.Revised</elementType>
                 </featureDescription>
             </features>
         </typeDescription>
@@ -85,50 +76,6 @@
                 <featureDescription>
                     <name>POS</name>
                     <rangeTypeName>uima.cas.String</rangeTypeName>
-                </featureDescription>
-            </features>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.OriginalSentences</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <features>
-                <featureDescription>
-                    <name>revisedSentences</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.RevisedSentences</rangeTypeName>
-                </featureDescription>
-            </features>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.OriginalWords</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <features>
-                <featureDescription>
-                    <name>revisedWords</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.RevisedWords</rangeTypeName>
-                </featureDescription>
-            </features>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RevisedSentences</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <features>
-                <featureDescription>
-                    <name>originalSentences</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.OriginalSentences</rangeTypeName>
-                </featureDescription>
-            </features>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RevisedWords</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <features>
-                <featureDescription>
-                    <name>originalWords</name>
-                    <rangeTypeName>eu.crydee.readability.uima.ts.OriginalWords</rangeTypeName>
                 </featureDescription>
             </features>
         </typeDescription>

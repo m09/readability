@@ -3,7 +3,7 @@ package eu.crydee.readability.uima.ae;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import eu.crydee.readability.uima.model.POSs;
-import eu.crydee.readability.uima.model.Revision;
+import eu.crydee.readability.uima.model.Revised;
 import eu.crydee.readability.uima.model.Tokens;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.ts.Suggestion;
@@ -30,23 +30,23 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     @ExternalResource(key = RES_KEY)
     private ReadabilityDict dict;
 
-    final private SetMultimap<Tokens, Pair<Revision, Integer>> byTokens
+    final private SetMultimap<Tokens, Pair<Revised, Integer>> byTokens
             = HashMultimap.create();
 
-    final private SetMultimap<POSs, Pair<Revision, Integer>> byPOS
+    final private SetMultimap<POSs, Pair<Revised, Integer>> byPOS
             = HashMultimap.create();
 
     @Override
     public void initialize(UimaContext context)
             throws ResourceInitializationException {
         super.initialize(context);
-        for (Revision original : dict.keySet()) {
+        for (Revised original : dict.keySet()) {
             POSs pos = original.getPOS();
             Tokens tokens = original.getTokens();
-            Map<Revision, Integer> revisedMap
+            Map<Revised, Integer> revisedMap
                     = dict.getRevisions(original).get();
-            for (Revision revised : revisedMap.keySet()) {
-                Pair<Revision, Integer> pair
+            for (Revised revised : revisedMap.keySet()) {
+                Pair<Revised, Integer> pair
                         = Pair.of(revised, revisedMap.get(revised));
                 byTokens.put(tokens, pair);
                 byPOS.put(pos, pair);
@@ -64,8 +64,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 POSsText = tokens.stream()
                 .map(t -> t.getPOS())
                 .collect(Collectors.toList());
-        String[] tokensArray = tokensText.toArray(new String[0]),
-                POSsArray = POSsText.toArray(new String[0]);
+        Token[] tokensArray = tokens.toArray(new Token[0]);
         String text = jcas.getDocumentText();
         for (Tokens suggestionTokens : byTokens.keySet()) {
             int width = suggestionTokens.size();
@@ -73,32 +72,29 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 int begin = tokens.get(i).getBegin(),
                         end = tokens.get(i + width - 1).getEnd();
                 Suggestion suggestion = new Suggestion(jcas, begin, end);
-                eu.crydee.readability.uima.ts.Revision original
-                        = new eu.crydee.readability.uima.ts.Revision(
+                eu.crydee.readability.uima.ts.Original original
+                        = new eu.crydee.readability.uima.ts.Original(
                                 jcas,
                                 begin,
                                 end);
-                StringArray sa = new StringArray(jcas, width);
-                sa.copyFromArray(tokensArray, i, 0, width);
-                original.setTokens(sa);
-                sa = new StringArray(jcas, width);
-                sa.copyFromArray(POSsArray, i, 0, width);
-                original.setPos(sa);
+                FSArray fsa = new FSArray(jcas, width);
+                fsa.copyFromArray(tokensArray, i, 0, width);
+                original.setTokens(fsa);
                 original.setText(text.substring(begin, end));
                 suggestion.setOriginal(original);
-                Set<Pair<Revision, Integer>> revisedSet
+                Set<Pair<Revised, Integer>> revisedSet
                         = byTokens.get(suggestionTokens);
                 FSArray revisedArray = new FSArray(jcas, revisedSet.size());
                 int s = 0;
-                for (Pair<Revision, Integer> pair : revisedSet) {
-                    Revision rev = pair.getKey();
+                for (Pair<Revised, Integer> pair : revisedSet) {
+                    Revised rev = pair.getKey();
                     int revisedWidth = rev.getTokens().size();
-                    eu.crydee.readability.uima.ts.Revision revised
-                            = new eu.crydee.readability.uima.ts.Revision(
+                    eu.crydee.readability.uima.ts.Revised revised
+                            = new eu.crydee.readability.uima.ts.Revised(
                                     jcas,
                                     begin,
                                     end);
-                    sa = new StringArray(jcas, revisedWidth);
+                    StringArray sa = new StringArray(jcas, revisedWidth);
                     sa.copyFromArray(
                             rev.getPOS().toArray(new String[0]),
                             0,

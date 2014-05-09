@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Wed May 07 20:09:24 JST 2014 */
+/* First created by JCasGen Fri May 09 16:51:46 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -12,7 +12,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Wed May 07 20:09:24 JST 2014
+ * Updated by JCasGen Fri May 09 16:51:46 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
  * @generated */
 public class Suggestion extends Annotation {
@@ -68,14 +68,14 @@ public class Suggestion extends Annotation {
 
   /** getter for original - gets 
    * @generated */
-  public Revision getOriginal() {
+  public Original getOriginal() {
     if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_original == null)
       jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.Suggestion");
-    return (Revision)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_original)));}
+    return (Original)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_original)));}
     
   /** setter for original - sets  
    * @generated */
-  public void setOriginal(Revision v) {
+  public void setOriginal(Original v) {
     if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_original == null)
       jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.Suggestion");
     jcasType.ll_cas.ll_setRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_original, jcasType.ll_cas.ll_getFSRef(v));}    
@@ -100,15 +100,15 @@ public class Suggestion extends Annotation {
     
   /** indexed getter for revised - gets an indexed value - 
    * @generated */
-  public Revision getRevised(int i) {
+  public Revised getRevised(int i) {
     if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
       jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i);
-    return (Revision)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i)));}
+    return (Revised)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i)));}
 
   /** indexed setter for revised - sets an indexed value - 
    * @generated */
-  public void setRevised(int i, Revision v) { 
+  public void setRevised(int i, Revised v) { 
     if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
       jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i);

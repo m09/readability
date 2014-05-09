@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Wed May 07 20:09:24 JST 2014 */
+/* First created by JCasGen Fri May 09 16:51:46 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Wed May 07 20:09:24 JST 2014
+ * Updated by JCasGen Fri May 09 16:51:46 JST 2014
  * @generated */
 public class Suggestion_Type extends Annotation_Type {
   /** @generated */
@@ -108,7 +108,7 @@ public class Suggestion_Type extends Annotation_Type {
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
-    casFeat_original = jcas.getRequiredFeatureDE(casType, "original", "eu.crydee.readability.uima.ts.Revision", featOkTst);
+    casFeat_original = jcas.getRequiredFeatureDE(casType, "original", "eu.crydee.readability.uima.ts.Original", featOkTst);
     casFeatCode_original  = (null == casFeat_original) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_original).getCode();
 
  
