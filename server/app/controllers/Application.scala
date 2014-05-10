@@ -31,6 +31,7 @@ object Application extends Controller {
   private val featTokEnd = typeTok.getFeatureByBaseName("end")
   private val featTokPos = typeTok.getFeatureByBaseName("POS")
   private val typeRev = CasUtil.getType(aeNormal.newCAS, classOf[Revised])
+  private val featRevCnt = typeRev.getFeatureByBaseName("count")
   private val featRevTxt = typeRev.getFeatureByBaseName("text")
   private val featRevTok = typeRev.getFeatureByBaseName("tokens")
   private val featRevPos = typeRev.getFeatureByBaseName("pos")
@@ -47,21 +48,22 @@ object Application extends Controller {
     def writes(suggestion: Suggestion): JsValue = {
       val arr = suggestion.getRevised.toArray
       Json.obj(
-        "original" -> Json.obj(
-          "text"   -> suggestion.getOriginal.getText,
-          "tokens" -> suggestion.getOriginal.getTokens.toArray.map( fs =>
+        "original"    -> Json.obj(
+          "text"      -> suggestion.getOriginal.getText,
+          "tokens"    -> suggestion.getOriginal.getTokens.toArray.map( fs =>
             Json.obj(
-              "pos" -> fs.getStringValue(featTokPos),
-              "begin" -> fs.getIntValue(featTokBeg),
-              "end" -> fs.getIntValue(featTokEnd)
+              "pos"   -> fs.getStringValue(featTokPos),
+              "begin" -> fs.getIntValue   (featTokBeg),
+              "end"   -> fs.getIntValue   (featTokEnd)
             )
           )
         ),
         "revised"  -> arr.map( fs =>
           Json.obj(
-            "text"   -> fs.getStringValue(featRevTxt),
-            "tokens" -> fs.getFeatureValue(featRevTok).asInstanceOf[StringArray].toArray,
-            "pos"    -> fs.getFeatureValue(featRevPos).asInstanceOf[StringArray].toArray
+            "text"    -> fs.getStringValue (featRevTxt),
+            "tokens"  -> fs.getFeatureValue(featRevTok).asInstanceOf[StringArray].toArray,
+            "pos"     -> fs.getFeatureValue(featRevPos).asInstanceOf[StringArray].toArray,
+            "count"   -> fs.getIntValue    (featRevCnt)
           )
         )
       )

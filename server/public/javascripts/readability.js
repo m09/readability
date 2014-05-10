@@ -104,8 +104,15 @@ var OutputPane = React.createClass({
 
 var Mapping = React.createClass({
     render: function() {
-        var revisionNodes = this.props.mapping.revised.map(function (revision) {
-            return <li>{revision.text}</li>;
+        var sortedRevisions = _.sortBy(this.props.mapping.revised, function(r) {
+                return -r.count;
+            });
+        var revisionNodes = sortedRevisions.map(function (revision) {
+            return (
+                    <li>{revision.text}
+                    <span className="badge pull-right">{revision.count}</span>
+                    </li>
+            );
         });
         return (
                 <li>{this.props.mapping.original.text}:
