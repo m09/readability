@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Fri May 09 16:51:46 JST 2014 */
+/* First created by JCasGen Sun May 11 01:49:52 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri May 09 16:51:46 JST 2014
+ * Updated by JCasGen Sun May 11 01:49:52 JST 2014
  * @generated */
 public class Revised_Type extends Annotation_Type {
   /** @generated */
@@ -135,6 +135,24 @@ public class Revised_Type extends Annotation_Type {
     ll_cas.ll_setStringArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i, v);
   }
  
+ 
+  /** @generated */
+  final Feature casFeat_count;
+  /** @generated */
+  final int     casFeatCode_count;
+  /** @generated */ 
+  public int getCount(int addr) {
+        if (featOkTst && casFeat_count == null)
+      jcas.throwFeatMissing("count", "eu.crydee.readability.uima.ts.Revised");
+    return ll_cas.ll_getIntValue(addr, casFeatCode_count);
+  }
+  /** @generated */    
+  public void setCount(int addr, int v) {
+        if (featOkTst && casFeat_count == null)
+      jcas.throwFeatMissing("count", "eu.crydee.readability.uima.ts.Revised");
+    ll_cas.ll_setIntValue(addr, casFeatCode_count, v);}
+    
+  
 
 
 
@@ -155,6 +173,10 @@ public class Revised_Type extends Annotation_Type {
  
     casFeat_pos = jcas.getRequiredFeatureDE(casType, "pos", "uima.cas.StringArray", featOkTst);
     casFeatCode_pos  = (null == casFeat_pos) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_pos).getCode();
+
+ 
+    casFeat_count = jcas.getRequiredFeatureDE(casType, "count", "uima.cas.Integer", featOkTst);
+    casFeatCode_count  = (null == casFeat_count) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_count).getCode();
 
   }
 }

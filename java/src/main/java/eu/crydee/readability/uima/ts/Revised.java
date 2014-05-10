@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Fri May 09 16:51:46 JST 2014 */
+/* First created by JCasGen Sun May 11 01:49:52 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -12,8 +12,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Fri May 09 16:51:46 JST 2014
- * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/ReadabilityTS.xml
+ * Updated by JCasGen Sun May 11 01:49:52 JST 2014
+ * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Revised extends Annotation {
   /** @generated
@@ -147,6 +147,24 @@ public class Revised extends Annotation {
       jcasType.jcas.throwFeatMissing("pos", "eu.crydee.readability.uima.ts.Revised");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Revised_Type)jcasType).casFeatCode_pos), i);
     jcasType.ll_cas.ll_setStringArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Revised_Type)jcasType).casFeatCode_pos), i, v);}
+   
+    
+  //*--------------*
+  //* Feature: count
+
+  /** getter for count - gets 
+   * @generated */
+  public int getCount() {
+    if (Revised_Type.featOkTst && ((Revised_Type)jcasType).casFeat_count == null)
+      jcasType.jcas.throwFeatMissing("count", "eu.crydee.readability.uima.ts.Revised");
+    return jcasType.ll_cas.ll_getIntValue(addr, ((Revised_Type)jcasType).casFeatCode_count);}
+    
+  /** setter for count - sets  
+   * @generated */
+  public void setCount(int v) {
+    if (Revised_Type.featOkTst && ((Revised_Type)jcasType).casFeat_count == null)
+      jcasType.jcas.throwFeatMissing("count", "eu.crydee.readability.uima.ts.Revised");
+    jcasType.ll_cas.ll_setIntValue(addr, ((Revised_Type)jcasType).casFeatCode_count, v);}    
   }
 
     

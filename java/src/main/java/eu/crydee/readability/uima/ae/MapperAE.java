@@ -25,17 +25,17 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 
 public class MapperAE extends JCasAnnotator_ImplBase {
-
+    
     final static public String RES_KEY = "RES_KEY";
     @ExternalResource(key = RES_KEY)
     private ReadabilityDict dict;
-
+    
     final private SetMultimap<Tokens, Pair<Revised, Integer>> byTokens
             = HashMultimap.create();
-
+    
     final private SetMultimap<POSs, Pair<Revised, Integer>> byPOS
             = HashMultimap.create();
-
+    
     @Override
     public void initialize(UimaContext context)
             throws ResourceInitializationException {
@@ -53,7 +53,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             }
         }
     }
-
+    
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         List<Token> tokens
@@ -94,6 +94,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                                     jcas,
                                     begin,
                                     end);
+                    revised.setCount(pair.getValue());
                     StringArray sa = new StringArray(jcas, revisedWidth);
                     sa.copyFromArray(
                             rev.getPOS().toArray(new String[0]),
@@ -116,7 +117,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             }
         }
     }
-
+    
     private List<Integer> getSublistIndices(
             List<String> source,
             Tokens target) {
