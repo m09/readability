@@ -79,12 +79,23 @@ object Application extends Controller {
       val jcas = ae.newJCas()
       jcas.setDocumentText(data)
       ae.process(jcas)
-        val suggestions : scala.collection.Iterable[Suggestion] = JCasUtil.select(
-          jcas,
-          classOf[Suggestion])
+      val suggestions : scala.collection.Iterable[Suggestion] = JCasUtil.select(
+        jcas,
+        classOf[Suggestion])
+      val tokens : scala.collection.Iterable[Token] = JCasUtil.select(
+        jcas,
+        classOf[Token])
       Ok(
           Json.obj(
-            "text" -> jcas.getDocumentText,
+            "text"        -> jcas.getDocumentText,
+            "tokens"      -> tokens.map( t =>
+              Json.obj(
+                "text"    -> t.getCoveredText,
+                "begin"   -> t.getBegin,
+                "end"     -> t.getEnd,
+                "pos"     -> t.getPOS
+              )
+            ),
             "annotations" -> Json.toJson(suggestions)
           )
         )
