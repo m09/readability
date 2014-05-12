@@ -100,13 +100,9 @@ var Annotator = React.createClass({
 
 var InputPane = React.createClass({
     render: function() {
-        return (<section
-                className="tab-pane active"
-                id="input"
-                contentEditable="true"
-                style={{minHeight: "200px"}}>
-                this, and that!
-                </section>);
+        return (<section className="tab-pane active" id="input"
+                contentEditable="true" style={{minHeight: "200px"}}>
+                this, and that!</section>);
     }
 });
 
@@ -135,12 +131,6 @@ var OutputPane = React.createClass({
         jQuery(DOMNode).off('show.bs.popover');
         jQuery(DOMNode).off('hide.bs.popover');
         jQuery(DOMNode).popover('destroy');
-    },
-    render: function() {
-        return (<section className="tab-content">
-                {this.props.children}
-                </section>            
-        );
     },
     byBegins: function() {
         var byBegins = {}, byEnds = {}, lastBegin = undefined;
@@ -212,7 +202,6 @@ var OutputPane = React.createClass({
 });
 
 var Mapping = React.createClass({
-    shown: undefined,
     getInitialState: function()  {
         return  {
             htmlContents: {
@@ -220,18 +209,13 @@ var Mapping = React.createClass({
         }
     },
     render: function() {
-        return (<span
-                style={{color: this.props.style}}
-                rel="popover"
+        return (<span style={{color: this.props.style}} rel="popover"
                 data-title={this.props.text}
-                data-html-content-ref={this.props.ref}
-                >
+                data-html-content-ref={this.props.ref}>
                 {this.props.text}
-                </span>
-               );
+                </span>);
     }
 });
-React.renderComponent(
-        <Annotator url="http://localhost:9000/"/>,
-    document.getElementById('annotator')
-);
+
+React.renderComponent(<Annotator url="http://localhost:9000/"/>,
+                      document.getElementById('annotator'));
