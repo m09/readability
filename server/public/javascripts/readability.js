@@ -17,14 +17,13 @@ var Annotator = React.createClass({
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",
             fetched: {
-                "normal": true,
-                "filtered": true
-            },
-            currentTab: "input"
+                normal: true,
+                filtered: true
+            }
         };
     },
     handleSubmit: function(dict) {
-        var text = jQuery(this.refs.inputText.getDOMNode()).text();
+        var text = jQuery(this.refs['#input'].getDOMNode()).text();
         if (text === this.state.lastText) {
             if(this.state.fetched[dict]) {
                 return;
@@ -57,24 +56,40 @@ var Annotator = React.createClass({
             });
         }.bind(this));
     },
-    switchToNormal: function(e) {
+    toNormal: function(e) {
         e.preventDefault();
+        e.stopPropagation();
         this.handleSubmit("normal");
     },
-    switchToFiltered: function(e) {
+    toFiltered: function(e) {
         e.preventDefault();
+        e.stopPropagation();
         this.handleSubmit("filtered");
     },
     render: function() {
-        return (
-                <section className="container" style={{minHeight: "300px"}}>
+        return (<section className="container" style={{minHeight: "300px"}}>
                 <ul className="nav nav-tabs nav-justified">
-                <li className="active"><a href="#input" data-toggle="tab">Your text</a></li>
-                <li><a href="#normal" onClick={this.switchToNormal} data-toggle="tab">Normal analysis</a></li>
-                <li><a href="#filtered" onClick={this.switchToFiltered} data-toggle="tab">Filtered analysis</a></li>
+                <li className="active">
+                <a href="#input" data-toggle="tab">
+                Your text
+                </a>
+                </li>
+
+                <li>
+                <a href="#normal" onClick={this.toNormal} data-toggle="tab">
+                Normal analysis
+                </a>
+                </li>
+                
+                <li>
+                <a href="#filtered" onClick={this.toFiltered} data-toggle="tab">
+                Filtered analysis
+                </a>
+                </li>
                 </ul>
+                
                 <section className="tab-content">
-                <InputPane ref="inputText"/>
+                <InputPane ref="#input"/>
                 <OutputPane id="normal" data={this.state.data.normal}/>
                 <OutputPane id="filtered" data={this.state.data.filtered}/>
                 </section>
@@ -86,21 +101,49 @@ var Annotator = React.createClass({
 var InputPane = React.createClass({
     render: function() {
         return (<section
-                  className="active tab-pane"
-                  id="input"
-                  contentEditable="true"
-                  style={{minHeight: "200px"}}>
-                    this, and that!
+                className="tab-pane active"
+                id="input"
+                contentEditable="true"
+                style={{minHeight: "200px"}}>
+                this, and that!
                 </section>);
     }
 });
 
 
 var OutputPane = React.createClass({
+    getInitialState: function() { return { curr: undefined }; },
+    handleShowPopover: function(e) {
+        if (this.state.curr !== undefined)  $(this.state.curr).popover('hide');
+        this.setState({ curr: e.target });
+    },
+    handleHidePopover: function(e) {
+        this.setState({popoverShown: undefined});
+    },
+    componentDidMount: function() {
+        var DOMNode = this.getDOMNode();
+        jQuery(DOMNode).popover({
+            selector: '[rel="popover"]:visible',
+            html: true,
+            content: '<div>hai!</div>'
+        });
+        jQuery(DOMNode).on('show.bs.popover', this.handleShowPopover);
+        jQuery(DOMNode).on('hide.bs.popover', this.handleHidePopover);
+    },
+    componentWillUnmount: function() {
+        var DOMNode = this.getDOMNode();
+        jQuery(DOMNode).off('show.bs.popover');
+        jQuery(DOMNode).off('hide.bs.popover');
+        jQuery(DOMNode).popover('destroy');
+    },
+    render: function() {
+        return (<section className="tab-content">
+                {this.props.children}
+                </section>            
+        );
+    },
     byBegins: function() {
-        var byBegins = {};
-        var byEnds = {};
-        var lastBegin = undefined;
+        var byBegins = {}, byEnds = {}, lastBegin = undefined;
         _.each(this.props.data.annotations, function(ann) {
             var begin = _.first(ann.original.tokens).begin;
             var end = _.last(ann.original.tokens).end;
@@ -120,24 +163,21 @@ var OutputPane = React.createClass({
         return byBegins;
     },
     byBeginsAndEnds: function(byBegins) {
-        var result = [];
-        var pairs = _.sortBy(_.pairs(byBegins), function(p) { return Number(p[0]); });
+        var result = [], pairs = _.sortBy(_.pairs(byBegins),
+                                          function(p) { return Number(p[0]); });
         _.each(pairs, function(p) {
             p[1].sort(function(a, b) {
-                return _.last(a.original.tokens).end - _.last(b.original.tokens).end;
+                return _.last(a.original.tokens).end -
+                    _.last(b.original.tokens).end;
             });
         });
         _.each(pairs, function(p, i) {
-            var begin = Number(p[0]);
-            var anns = p[1]
-            var next = undefined;
+            var begin = +p[0], pEnd = begin, anns = p[1], next = undefined;
             if (pairs[i + 1] !== undefined) {
                 next = pairs[i + 1][0];
             }
-            var pEnd = begin;
             for(var j = 0; j < anns.length; j++) {
-                var ann = anns[j];
-                var end = _.last(ann.original.tokens).end;
+                var ann = anns[j], end = _.last(ann.original.tokens).end;
                 if (pEnd == end) {
                     break;
                 }
@@ -151,77 +191,44 @@ var OutputPane = React.createClass({
         return result;
     },
     toHtml: function(map) {
-        var wholeText = this.props.data.text;
-        if (map.length === 0) {
-            return wholeText;
-        }
-        var pEnd = 0;
-        var f = true;
-        var output = [];
-        _.each(map, function(span, i) {
-            var begin = span[0];
-            var end = span[1];
-            var anns = span[2];
+        var txt = this.props.data.text, pEnd = 0, f = true, output = [];
+        _.each(map, function(m, i) {
+            var begin = m[0], end = m[1], anns = m[2];
             if (pEnd !== begin) {
-                output.push(wholeText.substring(pEnd, begin));
+                output.push(txt.substring(pEnd, begin));
             }
-            output.push(<Mapping
-                        style={f ? 'red' : 'blue'}
-                        data={anns}
-                        text={wholeText.substring(begin, end)}
-                        />
-            );
+            output.push(<Mapping style={f ? 'red' : 'blue'} data={anns}
+                        text={txt.substring(begin, end)} ref={begin}/>);
             pEnd = end;
             f = !f;
         });
-        output.push(wholeText.substring(_.last(map)[1], wholeText.length));
+        output.push(txt.substring(pEnd, txt.length));
         return output;
     },
     render: function() {
-        return (
-            <section id={this.props.id} className="tab-pane">
-                {this.toHtml(this.byBeginsAndEnds(this.byBegins()))}
-            </section>
-        );
+        return (<section id={this.props.id} className="tab-pane">
+                {this.toHtml(this.byBeginsAndEnds(this.byBegins()))}</section>);
     }
 });
 
 var Mapping = React.createClass({
     shown: undefined,
-    handleShowPopover: function(e) {
-        if (this.shown !== undefined) {
-            $(this.shown).popover('hide');
+    getInitialState: function()  {
+        return  {
+            htmlContents: {
+            }
         }
-        this.shown = e.target;
-    },
-    handleHidePopover: function(e) {
-        if (this.shown === e.target) {
-            this.shown = undefined;
-        }
-    },
-    componentDidMount: function() {
-        $(document).popover({
-            selector: '[rel="popover"]:visible',
-            html: true,
-            content: '<div>hai!</div>'
-        });
-        $(document).on('show.bs.popover', this.handleShowPopover);
-        $(document).on('hide.bs.popover', this.handleHidePopover);
-    },
-    componentWillUnmount: function() {
-        $(document).off('show.bs.popover');
-        $(document).off('hide.bs.popover');
-        $(document).popover('destroy');
     },
     render: function() {
         return (<span
                 style={{color: this.props.style}}
                 rel="popover"
                 data-title={this.props.text}
+                data-html-content-ref={this.props.ref}
                 >
                 {this.props.text}
                 </span>
-        );
+               );
     }
 });
 React.renderComponent(
