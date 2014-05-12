@@ -5,10 +5,12 @@ var Annotator = React.createClass({
             data: {
                 normal: {
                     text: "",
+                    tokens: [],
                     annotations: []
                 },
                 filtered: {
                     text: "",
+                    tokens: [],
                     annotations: []
                 }
             },
@@ -83,45 +85,145 @@ var Annotator = React.createClass({
 
 var InputPane = React.createClass({
     render: function() {
-        return (
-                <section className="active tab-pane" id="input" contentEditable="true" style={{minHeight: "200px"}}>Hai there!</section>
-        );
+        return (<section
+                  className="active tab-pane"
+                  id="input"
+                  contentEditable="true"
+                  style={{minHeight: "200px"}}>
+                    this, and that!
+                </section>);
     }
 });
 
+
 var OutputPane = React.createClass({
-    render: function() {
-        var mappingNodes = this.props.data.annotations.map(function (mapping) {
-            return <Mapping mapping={mapping}></Mapping>;
+    byBegins: function() {
+        var byBegins = {};
+        var byEnds = {};
+        var lastBegin = undefined;
+        _.each(this.props.data.annotations, function(ann) {
+            var begin = _.first(ann.original.tokens).begin;
+            var end = _.last(ann.original.tokens).end;
+            var text = ann.original.text;
+            if (byBegins[begin] === undefined) {
+                byBegins[begin] = [];
+                _.each(byEnds, function(anns, oEnd) {
+                    if (oEnd > begin) {
+                        byBegins[begin] = byBegins[begin].concat(anns);
+                    }
+                });
+            }
+            byBegins[begin].push(ann);
+            byEnds[end] = byEnds[end] || [];
+            byEnds[end].push(ann);
         });
+        return byBegins;
+    },
+    byBeginsAndEnds: function(byBegins) {
+        var result = [];
+        var pairs = _.sortBy(_.pairs(byBegins), function(p) { return Number(p[0]); });
+        _.each(pairs, function(p) {
+            p[1].sort(function(a, b) {
+                return _.last(a.original.tokens).end - _.last(b.original.tokens).end;
+            });
+        });
+        _.each(pairs, function(p, i) {
+            var begin = Number(p[0]);
+            var anns = p[1]
+            var next = undefined;
+            if (pairs[i + 1] !== undefined) {
+                next = pairs[i + 1][0];
+            }
+            var pEnd = begin;
+            for(var j = 0; j < anns.length; j++) {
+                var ann = anns[j];
+                var end = _.last(ann.original.tokens).end;
+                if (pEnd == end) {
+                    break;
+                }
+                result.push([pEnd, Math.min(end, next || end), anns.slice(j)]);
+                if (next !== undefined && next < pEnd) {
+                    break;
+                }
+                pEnd = end;
+            }
+        });
+        return result;
+    },
+    toHtml: function(map) {
+        var wholeText = this.props.data.text;
+        if (map.length === 0) {
+            return wholeText;
+        }
+        var pEnd = 0;
+        var f = true;
+        var output = [];
+        _.each(map, function(span, i) {
+            var begin = span[0];
+            var end = span[1];
+            var anns = span[2];
+            if (pEnd !== begin) {
+                output.push(wholeText.substring(pEnd, begin));
+            }
+            output.push(<Mapping
+                        style={f ? 'red' : 'blue'}
+                        data={anns}
+                        text={wholeText.substring(begin, end)}
+                        />
+            );
+            pEnd = end;
+            f = !f;
+        });
+        output.push(wholeText.substring(_.last(map)[1], wholeText.length));
+        return output;
+    },
+    render: function() {
         return (
             <section id={this.props.id} className="tab-pane">
-                <ul>{mappingNodes}</ul>
+                {this.toHtml(this.byBeginsAndEnds(this.byBegins()))}
             </section>
         );
     }
 });
 
 var Mapping = React.createClass({
-    render: function() {
-        var sortedRevisions = _.sortBy(this.props.mapping.revised, function(r) {
-                return -r.count;
-            });
-        var revisionNodes = sortedRevisions.map(function (revision) {
-            return (
-                    <li>{revision.text}
-                    <span className="badge pull-right">{revision.count}</span>
-                    </li>
-            );
+    shown: undefined,
+    handleShowPopover: function(e) {
+        if (this.shown !== undefined) {
+            $(this.shown).popover('hide');
+        }
+        this.shown = e.target;
+    },
+    handleHidePopover: function(e) {
+        if (this.shown === e.target) {
+            this.shown = undefined;
+        }
+    },
+    componentDidMount: function() {
+        $(document).popover({
+            selector: '[rel="popover"]:visible',
+            html: true,
+            content: '<div>hai!</div>'
         });
-        return (
-                <li>{this.props.mapping.original.text}:
-                <ul>{revisionNodes}</ul>
-                </li>
+        $(document).on('show.bs.popover', this.handleShowPopover);
+        $(document).on('hide.bs.popover', this.handleHidePopover);
+    },
+    componentWillUnmount: function() {
+        $(document).off('show.bs.popover');
+        $(document).off('hide.bs.popover');
+        $(document).popover('destroy');
+    },
+    render: function() {
+        return (<span
+                style={{color: this.props.style}}
+                rel="popover"
+                data-title={this.props.text}
+                >
+                {this.props.text}
+                </span>
         );
     }
 });
-
 React.renderComponent(
         <Annotator url="http://localhost:9000/"/>,
     document.getElementById('annotator')
