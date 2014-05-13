@@ -43,13 +43,13 @@ var Annotator = React.createClass({
 
                 <li>
                 <a href="#normal" onClick={this.toNormal} data-toggle="tab">
-                Normal analysis
+                Full resource analysis
                 </a>
                 </li>
                 
                 <li>
                 <a href="#filtered" onClick={this.toFiltered} data-toggle="tab">
-                Filtered analysis
+                Filtered resource analysis
                 </a>
                 </li>
                 </ul>

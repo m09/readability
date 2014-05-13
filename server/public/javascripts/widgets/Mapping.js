@@ -9,7 +9,11 @@ var Mapping = React.createClass({
             var revs = _.sortBy(d.revised, function(r) { return -r.count;});
             _.each(_.take(revs, 10), function(r) {
                 lis.push(<li role="presentation">
-                         {r.text}
+                         {r.text.length > 20
+                          ? <span title={r.text}>
+                          {r.text.substring(0, 19) + '…'}
+                          </span>
+                          : r.text}
                          <span className="badge pull-right">
                          {r.count}
                          </span>
