@@ -34,13 +34,7 @@ public class XMLUtils {
         if (reader.getEventType() == XMLStreamReader.END_DOCUMENT) {
             return Optional.empty();
         } else {
-            return Optional.of(getTag(reader));
+            return Optional.of(reader.getName().getLocalPart());
         }
-    }
-
-    static private String getTag(
-            XMLStreamReader reader)
-            throws XMLStreamException {
-        return reader.getName().getLocalPart();
     }
 }
