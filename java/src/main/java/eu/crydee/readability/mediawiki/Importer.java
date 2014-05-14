@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -33,7 +32,7 @@ public class Importer {
             Importer.class.getCanonicalName());
 
     public static void main(String[] args)
-            throws JAXBException, FileNotFoundException, XMLStreamException {
+            throws FileNotFoundException, XMLStreamException {
         Options options = new Options();
         options.addOption("h", "help", false, "Print this message.");
         options.addOption(OptionBuilder
@@ -127,9 +126,12 @@ public class Importer {
                 DB_USER,
                 DB_PW)) {
             PreparedStatement psRevisionsInfo = connection.prepareStatement(
-                    "INSERT INTO rev "
-                    + "(id, parent_id, comment, minor, timestamp, text) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO rev ("
+                    + "id, parent_id, comment, minor, timestamp, text, page_id"
+                    + ") "
+                    + "VALUES ("
+                    + "?, ?, ?, ?, ?, ?, ?"
+                    + ")");
             XMLStreamReader reader = factory.createXMLStreamReader(
                     new FileInputStream(
                             "dump.xml"),
@@ -145,6 +147,7 @@ public class Importer {
                 if (page.isRedirect() || page.getNs() != 0) {
                     continue;
                 }
+                psRevisionsInfo.setLong(7, page.getId());
                 for (Revision revisionInfo : parseRevisions(reader)) {
                     psRevisionsInfo.setLong(1, revisionInfo.getId());
                     if (revisionInfo.getParentId().isPresent()) {
