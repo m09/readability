@@ -19,29 +19,35 @@ module.exports = function(grunt) {
                 separator: ';'
             },
             dist: {
-                src: [
-                    'src/js/lib/*.js',
-                    'build/js/widgets.js'
-                ],
-                dest: 'dist/js/<%= pkg.name %>.js'
+                src: ['build/js/widgets.js'],
+                dest: 'build/js/<%= pkg.name %>.js'
             }
         },
         uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-            },
             dist: {
                 files: {
-                    'dist/js/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+                    'dist/js/<%= pkg.name %>.min.js': [
+                        '<%= concat.dist.dest %>'
+                    ]
                 }
             }
-        }
+        },
+        cssmin: {
+            combine: {
+                files: {
+                    'dist/css/<%= pkg.name %>.min.css': [
+                        'src/css/<%= pkg.name %>.css'
+                    ]
+                }
+            }
+        } 
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-react');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-    grunt.registerTask('default', ['react', 'concat', 'uglify']);
+    grunt.registerTask('default', ['react', 'concat', 'uglify', 'cssmin']);
 
 };
