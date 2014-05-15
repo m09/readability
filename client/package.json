@@ -2,11 +2,22 @@
     "name": "readability",
     "version": "0.1.0",
     "description": "Demo client for the Simple Wikipedia readability project",
+    "keywords": [
+        "readability",
+        "uima",
+        "nlp"
+    ],
+    "homepage": "https://github.com/m09/readability/tree/master/client",
+    "license": "MIT",
+    "author": "Hugo “m09” Mougard",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/m09/readability"
+    },
     "main": "grunt",
     "devDependencies": {
         "load-grunt-tasks": "~0.4.0",
         "grunt": "~0.4.4",
-        "grunt-contrib-watch": "~0.6.1",
         "grunt-contrib-concat": "~0.4.0",
         "grunt-contrib-uglify": "~0.4.0",
         "grunt-react": "~0.8.2",
