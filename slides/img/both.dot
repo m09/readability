@@ -1,0 +1,21 @@
+digraph G {
+        rankdir=LR;
+        edge [weight=2, fontsize=11];
+        node [shape=circle, fontsize=11];
+        0 -> 2 [label="“:“"];
+        2 -> 4 [label="It:ε"];
+        4 -> 6 [label="is:ε"];
+        6 -> 8 [label="about:About"];
+        8 -> 10 [label="time:time"]; 
+        10 -> 12 [label="”:”"];
+        12 -> 14 [label=",:,"];
+        14 -> 16 [label="he:he"];
+        16 -> 18 [label="said:said"];
+        0 -> 1 [label="I:I"];
+        1 -> 3 [label="decided:decided"];
+        3 -> 5 [label="to:not"];
+        5 -> 7 [label="not:to"];
+        7 -> 9 [label="do:do"];
+        9 -> 18 [label="that:that"];
+        18 [peripheries=2]
+}

@@ -1,0 +1,14 @@
+digraph G {
+        rankdir=LR;
+        node [shape=circle];
+        0 -> 1 [label="“:“"];
+        1 -> 2 [label="It:ε"];
+        2 -> 3 [label="is:ε"];
+        3 -> 4 [label="about:About"];
+        4 -> 5 [label="time:time"]; 
+        5 -> 6 [label="”:”"];
+        6 -> 7 [label=",:,"];
+        7 -> 8 [label="he:he"];
+        8 -> 9 [label="said:said"];
+        9 [peripheries=2]
+}

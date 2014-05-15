@@ -1,0 +1,11 @@
+digraph G {
+        rankdir=LR;
+        node [shape=circle];
+        0 -> 1 [label="I:I"];
+        1 -> 2 [label="decided:decided"];
+        2 -> 3 [label="to:not"];
+        3 -> 4 [label="not:to"];
+        4 -> 5 [label="do:do"];
+        5 -> 6 [label="that:that"];
+        6 [peripheries=2]
+}

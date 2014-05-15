@@ -1,0 +1,20 @@
+digraph G {
+        rankdir=LR;
+        edge [weight=2, fontsize=11];
+        node [shape=circle, fontsize=11];
+        0 -> 2 [label="“:“"];
+        2 -> 4 [label="It:ε"];
+        4 -> 6 [label="is:ε"];
+        6 -> 8 [label="about:About"];
+        8 -> 10 [label="…"];
+        0 -> 1 [label="I:I"];
+        1 -> 3 [label="decided:decided/0.5"];
+        1 -> 3 [label="agreed:agreed/0.4"];
+        1 -> 7 [label="decided to not:refused to/0.1"]
+        3 -> 5 [label="to:not/0.68"];
+        3 -> 5 [label="to:never/0.3"];
+        3 -> 5 [label="to:always/0.02"];
+        5 -> 7 [label="not:to"];
+        7 -> 10 [label="…"];
+        10 [peripheries=2];
+}

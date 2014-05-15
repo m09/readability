@@ -43,8 +43,12 @@
     <div class="reveal">
       <div class="slides">
         <section>
-          <h2>Simple <strong>Wikipedia</strong> editors: can they
-            <strong>teach</strong> us?</h2>
+          <h2>Can
+            <br><strong>Simple English Wikipedia</strong>
+            <br>editors
+            <br><strong>teach</strong>
+            <br>us
+            <br> <strong class="text-danger">readability?</strong></h2>
           <div class="text-muted">
             For <strong class="text-primary">Aizawa Lab</strong>
             by <strong class="text-primary">Hugo Mougard</strong> on
@@ -189,19 +193,100 @@
             <br>
             <p>→ Can be extended to inflections.</p>
           </section>
+          <section>
+            <h2>More general string rewriting…</h2>
+            <p>We can model string rewriting as transducers:</p>
+            <img src="img/1.png">
+            <br>
+            <img src="img/2.png">
+            <br>
+            <img src="img/both.png">
+          </section>
+          <section>
+            <h2>… and introduce weights</h2>
+            <p>We can model string rewriting as transducers:</p>
+            <br>
+            <img src="img/weighted.png" class="stretch">
+          </section>
+          <section>
+            <h2>Ranking translations</h2>
+            <p>We can then choose a weight and rank:</p>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Set</th>
+                  <th>⊕</th>
+                  <th>⊗</th>
+                  <th>0</th>
+                  <th>1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Real</td>
+                  <td>$\{0, +\infty\}$</td>
+                  <td>$+$</td>
+                  <td>$*$</td>
+                  <td>$0$</td>
+                  <td>$1$</td>
+                </tr>
+                <tr>
+                  <td>Log</td>
+                  <td>$\{-\infty, +\infty\}$</td>
+                  <td>$-\log(e^{-x} + e^{-y})$</td>
+                  <td>$+$</td>
+                  <td>$+\infty$</td>
+                  <td>$0$</td>
+                </tr>
+                <tr>
+                  <td>Tropical</td>
+                  <td>$\{-\infty, +\infty\}$</td>
+                  <td>$\min$</td>
+                  <td>$+$</td>
+                  <td>$+\infty$</td>
+                  <td>$0$</td>
+                </tr>
+                <tr>
+                  <td>MinMax</td>
+                  <td>$\{-\infty, +\infty\}$</td>
+                  <td>$\min$</td>
+                  <td>$\max$</td>
+                  <td>$+\infty$</td>
+                  <td>$-\infty$</td>
+                </tr>
+                <tr>
+                  <td>MaxMin</td>
+                  <td>$\{-\infty, +\infty\}$</td>
+                  <td>$\max$</td>
+                  <td>$\min$</td>
+                  <td>$-\infty$</td>
+                  <td>$+\infty$</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section>
+            <h2>From strings to trees</h2>
+            <p>With parse trees available, we can define tree
+            transducers:</p>
+            <ul>
+              <li>one branch per sentence/transformation (as before)</li>
+              <li>S is the starting node and is pattern matched
+                on</li>
+              <li>the branches split as each level, as the resulting
+                parse tree.</li>
+            </ul>
+          </section>
         </section>
         <section data-state="sunset">
           <h1>Conclusion</h1>
-          <p>We have looked into:</p>
           <ul>
-            <li>how to define readability (people-dependent,
-              understanding, focus on text)</li>
-            <li>the factors of readability (people-based and
-              text-based)</li>
-            <li>classic formulas and their issues</li>
-            <li>new ML approches</li>
-            <li>an interesting way to infer domain-specific
-              difficulty</li>
+            <li>Simple English Wikipedia is a promising resource</li>
+            <li>There are many ways we can approach rewriting for
+              readability</li>
+            <li>Please get in touch if you have an idea of another
+              one!</li>
           </ul>
         </section>
         <section data-state="mint">
