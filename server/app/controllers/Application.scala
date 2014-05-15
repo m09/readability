@@ -1,5 +1,6 @@
 package controllers
 
+
 import eu.crydee.readability.uima.DictUsagePipeline
 import eu.crydee.readability.uima.ts.Revised
 import eu.crydee.readability.uima.ts.Suggestion
@@ -70,10 +71,6 @@ object Application extends Controller {
     }
   }
 
-  def index = Action {
-    Ok(views.html.index())
-  }
-
   def annotate = Action(parse.json) { request =>
     def work(data: String, ae: AnalysisEngine) = {
       val jcas = ae.newJCas()
@@ -86,19 +83,19 @@ object Application extends Controller {
         jcas,
         classOf[Token])
       Ok(
-          Json.obj(
-            "text"        -> jcas.getDocumentText,
-            "tokens"      -> tokens.map( t =>
-              Json.obj(
-                "text"    -> t.getCoveredText,
-                "begin"   -> t.getBegin,
-                "end"     -> t.getEnd,
-                "pos"     -> t.getPOS
-              )
-            ),
-            "annotations" -> Json.toJson(suggestions)
-          )
+        Json.obj(
+          "text"        -> jcas.getDocumentText,
+          "tokens"      -> tokens.map( t =>
+            Json.obj(
+              "text"    -> t.getCoveredText,
+              "begin"   -> t.getBegin,
+              "end"     -> t.getEnd,
+              "pos"     -> t.getPOS
+            )
+          ),
+          "annotations" -> Json.toJson(suggestions)
         )
+      ).withHeaders(headers : _*)
     }
     request.body.validate[Input].map {
       case input => {
@@ -110,5 +107,16 @@ object Application extends Controller {
     }.recoverTotal {
       e => BadRequest("JSON parsing impossible: " + JsError.toFlatJson(e))
     }
+  }
+
+  def headers = List(
+    "Access-Control-Allow-Origin" -> "*",
+    "Access-Control-Allow-Methods" -> "POST",
+    "Access-Control-Max-Age" -> "360",
+    "Access-Control-Allow-Headers" -> "Origin, Content-Type, Accept"
+  )
+
+  def options = Action { request =>
+    NoContent.withHeaders(headers : _*)
   }
 }

@@ -12,3 +12,6 @@ dependency-reduced-pom.xml
 indented.xml
 dict.xml
 filtered.xml
+/server/conf/application.conf
+/client/build
+/client/node_modules
