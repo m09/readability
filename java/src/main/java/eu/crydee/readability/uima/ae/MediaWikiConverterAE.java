@@ -21,7 +21,9 @@ public class MediaWikiConverterAE extends JCasAnnotator_ImplBase {
     @ConfigurationParameter(name = PARAM_OUT_VIEW_HTML, mandatory = true)
     private String outputHtmlViewName;
 
-    final private Pattern comments = Pattern.compile("<!--.*?-->");
+    final private Pattern comments = Pattern.compile("<!--.*?-->"),
+            refs = Pattern.compile("<ref>.*?</ref>"),
+            math = Pattern.compile("<math>.*?</math>");
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
@@ -32,8 +34,13 @@ public class MediaWikiConverterAE extends JCasAnnotator_ImplBase {
                         jcas,
                         outputHtmlViewName);
 
-        String html = new MarkupParser(new MediaWikiLanguage()).parseToHtml(
-                comments.matcher(jcas.getDocumentText()).replaceAll(""));
+        String text = jcas.getDocumentText();
+        text = comments.matcher(text).replaceAll("");
+        text = refs.matcher(text).replaceAll("");
+        text = math.matcher(text).replaceAll("");
+
+        String html = new MarkupParser(new MediaWikiLanguage())
+                .parseToHtml(text);
         outputViewHtml.setDocumentText(html);
         outputViewTxt.setDocumentText(new HtmlToPlainText().getPlainText(
                 Jsoup.parse(html)));
