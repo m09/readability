@@ -22,7 +22,7 @@ public class MediaWikiConverterAE extends JCasAnnotator_ImplBase {
     private String outputHtmlViewName;
 
     final private Pattern comments = Pattern.compile("<!--.*?-->"),
-            refs = Pattern.compile("<ref>.*?</ref>"),
+            refs = Pattern.compile("<ref[^>]*?>.*?</ref>"),
             math = Pattern.compile("<math>.*?</math>");
 
     @Override
