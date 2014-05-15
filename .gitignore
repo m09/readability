@@ -13,5 +13,9 @@ indented.xml
 dict.xml
 filtered.xml
 /server/conf/application.conf
+/server/logs
+/server/project/project
+/server/project/target
+/server/target
 /client/build
 /client/node_modules
