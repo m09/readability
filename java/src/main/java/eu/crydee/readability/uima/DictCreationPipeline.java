@@ -1,5 +1,6 @@
 package eu.crydee.readability.uima;
 
+import eu.crydee.readability.uima.ae.CoveredCopierAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.ae.ResourceWriterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
@@ -9,13 +10,18 @@ import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
+import eu.crydee.readability.uima.ts.Chunk;
+import eu.crydee.readability.uima.ts.OriginalSentence;
 import eu.crydee.readability.uima.ts.OriginalSentences;
 import eu.crydee.readability.uima.ts.OriginalWords;
+import eu.crydee.readability.uima.ts.RevisedSentence;
 import eu.crydee.readability.uima.ts.RevisedSentences;
 import eu.crydee.readability.uima.ts.RevisedWords;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.util.Optional;
+import opennlp.uima.parser.Parser;
+import opennlp.uima.parser.ParserModelResourceImpl;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
@@ -74,6 +80,11 @@ public class DictCreationPipeline {
                 = ExternalResourceFactory.createExternalResourceDescription(
                         POSModelResourceImpl.class,
                         "file:opennlp/uima/models/en-pos-maxent.bin");
+
+        ExternalResourceDescription parserModel
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        ParserModelResourceImpl.class,
+                        "file:opennlp/uima/models/en-parser-chunking.bin");
 
         ExternalResourceDescription dict
                 = ExternalResourceFactory.createExternalResourceDescription(
@@ -191,6 +202,58 @@ public class DictCreationPipeline {
                         "opennlp.uima.POSFeature",
                         "POS");
 
+        AnalysisEngineDescription coveredCopierRevised
+                = AnalysisEngineFactory.createEngineDescription(
+                        CoveredCopierAE.class,
+                        CoveredCopierAE.PARAM_CONTAINER_TYPE,
+                        RevisedSentences.class.getCanonicalName(),
+                        CoveredCopierAE.PARAM_CHILD_TYPE,
+                        Sentence.class.getCanonicalName(),
+                        CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
+                        RevisedSentence.class.getCanonicalName());
+
+        AnalysisEngineDescription coveredCopierOriginal
+                = AnalysisEngineFactory.createEngineDescription(
+                        CoveredCopierAE.class,
+                        CoveredCopierAE.PARAM_CONTAINER_TYPE,
+                        OriginalSentences.class.getCanonicalName(),
+                        CoveredCopierAE.PARAM_CHILD_TYPE,
+                        Sentence.class.getCanonicalName(),
+                        CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
+                        OriginalSentence.class.getCanonicalName());
+
+        AnalysisEngineDescription parserRevised
+                = AnalysisEngineFactory.createEngineDescription(
+                        Parser.class,
+                        "opennlp.uima.ModelName",
+                        parserModel,
+                        "opennlp.uima.SentenceType",
+                        RevisedSentence.class.getCanonicalName(),
+                        "opennlp.uima.TokenType",
+                        Token.class.getCanonicalName(),
+                        "opennlp.uima.ParseType",
+                        Chunk.class.getCanonicalName(),
+                        "opennlp.uima.TypeFeature",
+                        "label",
+                        "opennlp.uima.ChildrenFeature",
+                        "children");
+
+        AnalysisEngineDescription parserOriginal
+                = AnalysisEngineFactory.createEngineDescription(
+                        Parser.class,
+                        "opennlp.uima.ModelName",
+                        parserModel,
+                        "opennlp.uima.SentenceType",
+                        OriginalSentence.class.getCanonicalName(),
+                        "opennlp.uima.TokenType",
+                        Token.class.getCanonicalName(),
+                        "opennlp.uima.ParseType",
+                        Chunk.class.getCanonicalName(),
+                        "opennlp.uima.TypeFeature",
+                        "label",
+                        "opennlp.uima.ChildrenFeature",
+                        "children");
+
         AnalysisEngineDescription wordDiffer
                 = AnalysisEngineFactory.createEngineDescription(
                         WordDiffAE.class,
@@ -238,6 +301,8 @@ public class DictCreationPipeline {
                         RevisedSentences.class,
                         OriginalWords.class,
                         RevisedWords.class,
+                        OriginalSentence.class,
+                        RevisedSentence.class,
                         Sentence.class,
                         Token.class),
                 FlowControllerFactory.createFlowControllerDescription(
@@ -277,6 +342,18 @@ public class DictCreationPipeline {
                 CAS.NAME_DEFAULT_SOFA, textRevised);
 
         builder.add("tagger-original", taggerOriginal,
+                CAS.NAME_DEFAULT_SOFA, textOriginal);
+
+        builder.add("covered-copier-revised", coveredCopierRevised,
+                CAS.NAME_DEFAULT_SOFA, textRevised);
+
+        builder.add("covered-copier-original", coveredCopierOriginal,
+                CAS.NAME_DEFAULT_SOFA, textOriginal);
+
+        builder.add("parser-revised", parserRevised,
+                CAS.NAME_DEFAULT_SOFA, textRevised);
+
+        builder.add("parser-original", parserOriginal,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
 
         builder.add("word-differ", wordDiffer,

@@ -49,6 +49,21 @@
             </features>
         </typeDescription>
         <typeDescription>
+            <name>eu.crydee.readability.uima.ts.Chunk</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>label</name>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>children</name>
+                    <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
             <name>eu.crydee.readability.uima.ts.OriginalSentences</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
@@ -58,6 +73,11 @@
                     <rangeTypeName>eu.crydee.readability.uima.ts.RevisedSentences</rangeTypeName>
                 </featureDescription>
             </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.OriginalSentence</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.OriginalWords</name>
@@ -80,6 +100,11 @@
                     <rangeTypeName>eu.crydee.readability.uima.ts.OriginalSentences</rangeTypeName>
                 </featureDescription>
             </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RevisedSentence</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.RevisedWords</name>
