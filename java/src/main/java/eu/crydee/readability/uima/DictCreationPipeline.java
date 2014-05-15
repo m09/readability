@@ -51,6 +51,14 @@ public class DictCreationPipeline {
     public static void main(String[] args) throws Exception {
         parseArguments(args);
 
+        /* View names */
+        final String textRevised = "txtRevised",
+                textOriginal = "txtOriginal",
+                htmlRevised = "htmlRevised",
+                htmlOriginal = "htmlOriginal",
+                rawRevised = "revised",
+                rawOriginal = "original";
+
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
@@ -105,17 +113,17 @@ public class DictCreationPipeline {
                 = AnalysisEngineFactory.createEngineDescription(
                         MediaWikiConverterAE.class,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                        "txtRevised",
+                        textRevised,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        "htmlRevised");
+                        htmlRevised);
 
         AnalysisEngineDescription mw2txtOriginal
                 = AnalysisEngineFactory.createEngineDescription(
                         MediaWikiConverterAE.class,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                        "txtOriginal",
+                        textOriginal,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        "htmlOriginal");
+                        htmlOriginal);
 
         AnalysisEngineDescription getter
                 = AnalysisEngineFactory.createEngineDescription(
@@ -133,7 +141,7 @@ public class DictCreationPipeline {
                         "opennlp.uima.ModelName",
                         sentenceModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.Sentence");
+                        Sentence.class.getCanonicalName());
 
         AnalysisEngineDescription tokenizer
                 = AnalysisEngineFactory.createEngineDescription(
@@ -141,19 +149,19 @@ public class DictCreationPipeline {
                         "opennlp.uima.ModelName",
                         tokenModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.Sentence",
+                        Sentence.class.getCanonicalName(),
                         "opennlp.uima.TokenType",
-                        "eu.crydee.readability.uima.ts.Token");
+                        Token.class.getCanonicalName());
 
         AnalysisEngineDescription sentenceDiffer
                 = AnalysisEngineFactory.createEngineDescription(
                         SentenceDiffAE.class,
                         SentenceDiffAE.PARAM_SENTENCE_TYPE,
-                        "eu.crydee.readability.uima.ts.Sentence",
+                        Sentence.class.getCanonicalName(),
                         SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        OriginalSentences.class.getCanonicalName(),
                         SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        RevisedSentences.class.getCanonicalName(),
                         SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
                         "originalSentences",
                         SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
@@ -165,9 +173,9 @@ public class DictCreationPipeline {
                         "opennlp.uima.ModelName",
                         posModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        RevisedSentences.class.getCanonicalName(),
                         "opennlp.uima.TokenType",
-                        "eu.crydee.readability.uima.ts.Token",
+                        Token.class.getCanonicalName(),
                         "opennlp.uima.POSFeature",
                         "POS");
 
@@ -177,9 +185,9 @@ public class DictCreationPipeline {
                         "opennlp.uima.ModelName",
                         posModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        OriginalSentences.class.getCanonicalName(),
                         "opennlp.uima.TokenType",
-                        "eu.crydee.readability.uima.ts.Token",
+                        Token.class.getCanonicalName(),
                         "opennlp.uima.POSFeature",
                         "POS");
 
@@ -187,17 +195,17 @@ public class DictCreationPipeline {
                 = AnalysisEngineFactory.createEngineDescription(
                         WordDiffAE.class,
                         WordDiffAE.PARAM_SENTENCE_TYPE,
-                        "eu.crydee.readability.uima.ts.Sentence",
+                        Sentence.class.getCanonicalName(),
                         WordDiffAE.PARAM_TOKEN_TYPE,
-                        "eu.crydee.readability.uima.ts.Token",
+                        Token.class.getCanonicalName(),
                         WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                        "eu.crydee.readability.uima.ts.OriginalSentences",
+                        OriginalSentences.class.getCanonicalName(),
                         WordDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                        "eu.crydee.readability.uima.ts.RevisedSentences",
+                        RevisedSentences.class.getCanonicalName(),
                         WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE,
-                        "eu.crydee.readability.uima.ts.OriginalWords",
+                        OriginalWords.class.getCanonicalName(),
                         WordDiffAE.PARAM_REVISED_WORDS_TYPE,
-                        "eu.crydee.readability.uima.ts.RevisedWords",
+                        RevisedWords.class.getCanonicalName(),
                         WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
                         "originalSentences",
                         WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
@@ -242,44 +250,44 @@ public class DictCreationPipeline {
         builder.add("getter", getter);
 
         builder.add("mediawiki-importer-revised", mw2txtRevised,
-                CAS.NAME_DEFAULT_SOFA, "revised");
+                CAS.NAME_DEFAULT_SOFA, rawRevised);
 
         builder.add("mediawiki-importer-original", mw2txtOriginal,
-                CAS.NAME_DEFAULT_SOFA, "original");
+                CAS.NAME_DEFAULT_SOFA, rawOriginal);
 
         builder.add("sentence-detector-revised", sentenceDetector,
-                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+                CAS.NAME_DEFAULT_SOFA, textRevised);
 
         builder.add("sentence-detector-original", sentenceDetector,
-                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+                CAS.NAME_DEFAULT_SOFA, textOriginal);
 
         builder.add("tokenizer-revised", tokenizer,
-                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+                CAS.NAME_DEFAULT_SOFA, textRevised);
 
         builder.add("tokenizer-original", tokenizer,
-                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+                CAS.NAME_DEFAULT_SOFA, textOriginal);
 
         builder.add("sentence-differ", sentenceDiffer,
-                SentenceDiffAE.ORIGINAL_VIEW, "txtOriginal",
-                SentenceDiffAE.REVISED_VIEW, "txtRevised");
+                SentenceDiffAE.ORIGINAL_VIEW, textOriginal,
+                SentenceDiffAE.REVISED_VIEW, textRevised);
 
         builder.add("first-xmi-consumer", consumerXmi);
 
         builder.add("tagger-revised", taggerRevised,
-                CAS.NAME_DEFAULT_SOFA, "txtRevised");
+                CAS.NAME_DEFAULT_SOFA, textRevised);
 
         builder.add("tagger-original", taggerOriginal,
-                CAS.NAME_DEFAULT_SOFA, "txtOriginal");
+                CAS.NAME_DEFAULT_SOFA, textOriginal);
 
         builder.add("word-differ", wordDiffer,
-                WordDiffAE.ORIGINAL_VIEW, "txtOriginal",
-                WordDiffAE.REVISED_VIEW, "txtRevised");
+                WordDiffAE.ORIGINAL_VIEW, textOriginal,
+                WordDiffAE.REVISED_VIEW, textRevised);
 
         builder.add("second-xmi-consumer", consumerXmi);
 
         builder.add("resource-consumer", consumerResource,
-                ResourceWriterAE.ORIGINAL_VIEW, "txtOriginal",
-                ResourceWriterAE.REVISED_VIEW, "txtRevised");
+                ResourceWriterAE.ORIGINAL_VIEW, textOriginal,
+                ResourceWriterAE.REVISED_VIEW, textRevised);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
