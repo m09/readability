@@ -54,10 +54,10 @@ public class CoveredCopierAE extends CasAnnotator_ImplBase {
         for (AnnotationFS container : index.keySet()) {
             for (AnnotationFS child : index.get(container)) {
                 if (!seen.contains(child)) {
-                    cas.createAnnotation(
+                    cas.addFsToIndexes(cas.createAnnotation(
                             newChildTypeT,
                             child.getBegin(),
-                            child.getEnd());
+                            child.getEnd()));
                     seen.add(child);
                 }
             }
