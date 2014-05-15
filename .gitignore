@@ -12,6 +12,7 @@ dependency-reduced-pom.xml
 indented.xml
 dict.xml
 filtered.xml
+/transducers
 /server/conf/application.conf
 /server/logs
 /server/project/project
