@@ -14,33 +14,39 @@ module.exports = function(grunt) {
                 }
             }
         },
-        concat: {
-            options: {
-                separator: ';'
-            },
-            dist: {
-                src: ['build/js/widgets.js'],
-                dest: 'build/js/<%= pkg.name %>.js'
-            }
-        },
         uglify: {
             dist: {
-                files: {
-                    'dist/js/<%= pkg.name %>.min.js': [
-                        '<%= concat.dist.dest %>'
-                    ]
-                }
+                files: { 'build/js/widgets.min.js': [ 'build/js/widgets.js' ] }
             }
         },
         cssmin: {
             combine: {
                 files: {
-                    'dist/css/<%= pkg.name %>.min.css': [
+                    'build/css/<%= pkg.name %>.min.css': [
                         'src/css/<%= pkg.name %>.css'
                     ]
                 }
             }
-        } 
+        }, 
+        concat: {
+            js: {
+                src: [
+                    'src/js/lib/jquery-1.11.0.min.js',
+                    'src/js/lib/bootstrap.min.js',
+                    'src/js/lib/react-0.10.0.min.js',
+                    'src/js/lib/underscore-min.js',
+                    'build/js/widgets.js'],
+                dest: 'dist/<%= pkg.name %>.js'
+            },
+            css: {
+                src: [
+                    'src/css/lib/bootstrap.min.css',
+                    'src/css/lib/bootstrap-theme.min.css',
+                    'build/css/<%= pkg.name %>.min.css'
+                ],
+                dest: 'dist/<%= pkg.name %>.css'
+            }
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -48,6 +54,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-react');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-    grunt.registerTask('default', ['react', 'concat', 'uglify', 'cssmin']);
+    grunt.registerTask('default', ['react', 'uglify', 'cssmin', 'concat']);
 
 };
