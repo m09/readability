@@ -204,8 +204,6 @@
           </section>
           <section>
             <h2>… and introduce weights</h2>
-            <p>We can model string rewriting as transducers:</p>
-            <br>
             <img src="img/weighted.png" class="stretch">
           </section>
           <section>
@@ -269,12 +267,12 @@
           <section>
             <h2>From strings to trees</h2>
             <p>With parse trees available, we can define tree
-            transducers:</p>
+              transducers, for example as:</p>
             <ul>
               <li>one branch per sentence/transformation (as before)</li>
-              <li>S is the starting node and is pattern matched
-                on</li>
-              <li>the branches split as each level, as the resulting
+              <li>recursively pattern matche on the root node and
+              apply transformation
+              <li>the branches split at each level, as the resulting
                 parse tree.</li>
             </ul>
           </section>
