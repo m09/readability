@@ -54,8 +54,7 @@ public class CurrentCR extends JCasCollectionReader_ImplBase {
                     dbUser,
                     dbPassword);
             StringBuilder querySb = new StringBuilder();
-            querySb.append("SELECT DISTINCT ON (page_id) text FROM rev ")
-                    .append("ORDER BY page_id, timestamp DESC");
+            querySb.append("SELECT * FROM rev_current");
             if (limit != null) {
                 querySb.append(" LIMIT ").append(limit);
                 logger.log(
@@ -102,7 +101,7 @@ public class CurrentCR extends JCasCollectionReader_ImplBase {
                 text = "";
             }
             jcas.setDocumentText(text);
-            if (++i % 10000 == 0) {
+            if (++i % 10 == 0) {
                 logger.log(Level.INFO, "processing page n°" + i);
             }
         } catch (SQLException ex) {
