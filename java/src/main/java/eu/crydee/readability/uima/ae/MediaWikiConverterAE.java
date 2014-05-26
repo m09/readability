@@ -23,6 +23,7 @@ public class MediaWikiConverterAE extends JCasAnnotator_ImplBase {
 
     final private Pattern comments = Pattern.compile("<!--.*?-->"),
             refs = Pattern.compile("<ref[^>]*?>.*?</ref>"),
+            brackets = Pattern.compile("\\{\\{.*?}}"),
             math = Pattern.compile("<math>.*?</math>");
 
     @Override
@@ -37,6 +38,7 @@ public class MediaWikiConverterAE extends JCasAnnotator_ImplBase {
         String text = jcas.getDocumentText();
         text = comments.matcher(text).replaceAll("");
         text = refs.matcher(text).replaceAll("");
+        text = brackets.matcher(text).replaceAll("");
         text = math.matcher(text).replaceAll("");
 
         String html = new MarkupParser(new MediaWikiLanguage())
