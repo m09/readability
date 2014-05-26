@@ -4,6 +4,8 @@ papers/
 target/
 cas/
 cas-usage/
+cas-lm/
+lm/
 processed/
 uima.log
 db.sql
