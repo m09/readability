@@ -1,8 +1,11 @@
 package eu.crydee.readability.uima;
 
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
+import de.tudarmstadt.ukp.dkpro.core.frequency.resources.Web1TFrequencyCountResource;
+import de.tudarmstadt.ukp.dkpro.core.io.web1t.Web1TFormatWriter;
+import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.cr.CurrentCR;
-import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.util.Optional;
 import opennlp.uima.postag.POSModelResourceImpl;
@@ -18,6 +21,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
@@ -27,7 +31,7 @@ import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.resource.ExternalResourceDescription;
 
-public class FrequencyPipeline {
+public class FrequencyCreationPipeline {
 
     static private String DB_URL = null,
             DB_USR = null,
@@ -36,6 +40,10 @@ public class FrequencyPipeline {
 
     public static void main(String[] args) throws Exception {
         parseArguments(args);
+
+        /* View names */
+        final String text = "text",
+                html = "html";
 
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
@@ -71,6 +79,14 @@ public class FrequencyPipeline {
         }
 
         /* Analysis engines */
+        AnalysisEngineDescription mw2txt
+                = AnalysisEngineFactory.createEngineDescription(
+                        MediaWikiConverterAE.class,
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
+                        text,
+                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
+                        html);
+
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(
                         SentenceDetector.class,
@@ -101,6 +117,34 @@ public class FrequencyPipeline {
                         "opennlp.uima.POSFeature",
                         "POS");
 
+        AnalysisEngineDescription ngramTextWriter
+                = AnalysisEngineFactory.createEngineDescription(
+                        Web1TFormatWriter.class,
+                        Web1TFormatWriter.PARAM_TARGET_LOCATION,
+                        "out/lm/text",
+                        Web1TFormatWriter.PARAM_INPUT_TYPES,
+                        new String[]{Token.class.getName()},
+                        Web1TFormatWriter.PARAM_MIN_NGRAM_LENGTH,
+                        1,
+                        Web1TFormatWriter.PARAM_MAX_NGRAM_LENGTH,
+                        3,
+                        Web1TFormatWriter.PARAM_MIN_FREQUENCY,
+                        2);
+
+        AnalysisEngineDescription ngramPOSWriter
+                = AnalysisEngineFactory.createEngineDescription(
+                        Web1TFormatWriter.class,
+                        Web1TFormatWriter.PARAM_TARGET_LOCATION,
+                        "out/lm/pos",
+                        Web1TFormatWriter.PARAM_INPUT_TYPES,
+                        new String[]{Token.class.getName() + "/POS"},
+                        Web1TFormatWriter.PARAM_MIN_NGRAM_LENGTH,
+                        1,
+                        Web1TFormatWriter.PARAM_MAX_NGRAM_LENGTH,
+                        3,
+                        Web1TFormatWriter.PARAM_MIN_FREQUENCY,
+                        2);
+
         AnalysisEngineDescription consumerXmi
                 = AnalysisEngineFactory.createEngineDescription(
                         XmiSerializerUsageAE.class,
@@ -114,10 +158,18 @@ public class FrequencyPipeline {
                         Token.class),
                 null);
 
-        builder.add(sentenceDetector);
-        builder.add(tokenizer);
+        builder.add(mw2txt);
+        builder.add(sentenceDetector,
+                CAS.NAME_DEFAULT_SOFA, text);
+        builder.add(tokenizer,
+                CAS.NAME_DEFAULT_SOFA, text);
+        builder.add(tagger,
+                CAS.NAME_DEFAULT_SOFA, text);
+        builder.add(ngramTextWriter,
+                CAS.NAME_DEFAULT_SOFA, text);
+        builder.add(ngramPOSWriter,
+                CAS.NAME_DEFAULT_SOFA, text);
         builder.add(consumerXmi);
-        builder.add(tagger);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
