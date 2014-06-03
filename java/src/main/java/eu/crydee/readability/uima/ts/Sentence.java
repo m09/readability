@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Thu May 15 14:44:53 JST 2014 */
+/* First created by JCasGen Tue Jun 03 10:36:02 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,8 +11,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Thu May 15 14:44:53 JST 2014
- * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictCreationTS.xml
+ * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
+ * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Sentence extends Annotation {
   /** @generated

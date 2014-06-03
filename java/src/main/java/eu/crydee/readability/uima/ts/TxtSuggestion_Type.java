@@ -9,12 +9,11 @@ import org.apache.uima.cas.impl.FSGenerator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
-import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
  * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
  * @generated */
-public class Sentence_Type extends Annotation_Type {
+public class TxtSuggestion_Type extends Suggestion_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -22,31 +21,31 @@ public class Sentence_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Sentence_Type.this.useExistingInstance) {
+  			 if (TxtSuggestion_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Sentence_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = TxtSuggestion_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Sentence(addr, Sentence_Type.this);
-  			   Sentence_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new TxtSuggestion(addr, TxtSuggestion_Type.this);
+  			   TxtSuggestion_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Sentence(addr, Sentence_Type.this);
+        } else return new TxtSuggestion(addr, TxtSuggestion_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Sentence.typeIndexID;
+  public final static int typeIndexID = TxtSuggestion.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Sentence");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.TxtSuggestion");
 
 
 
   /** initialize variables to correspond with Cas Type and Features
 	* @generated */
-  public Sentence_Type(JCas jcas, Type casType) {
+  public TxtSuggestion_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 

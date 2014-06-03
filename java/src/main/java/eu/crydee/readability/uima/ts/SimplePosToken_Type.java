@@ -16,7 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation_Type;
 /** 
  * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
  * @generated */
-public class Token_Type extends Annotation_Type {
+public class SimplePosToken_Type extends Annotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -24,25 +24,25 @@ public class Token_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Token_Type.this.useExistingInstance) {
+  			 if (SimplePosToken_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Token_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = SimplePosToken_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Token(addr, Token_Type.this);
-  			   Token_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new SimplePosToken(addr, SimplePosToken_Type.this);
+  			   SimplePosToken_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Token(addr, Token_Type.this);
+        } else return new SimplePosToken(addr, SimplePosToken_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Token.typeIndexID;
+  public final static int typeIndexID = SimplePosToken.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Token");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.SimplePosToken");
  
   /** @generated */
   final Feature casFeat_POS;
@@ -51,13 +51,13 @@ public class Token_Type extends Annotation_Type {
   /** @generated */ 
   public String getPOS(int addr) {
         if (featOkTst && casFeat_POS == null)
-      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
+      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.SimplePosToken");
     return ll_cas.ll_getStringValue(addr, casFeatCode_POS);
   }
   /** @generated */    
   public void setPOS(int addr, String v) {
         if (featOkTst && casFeat_POS == null)
-      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
+      jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.SimplePosToken");
     ll_cas.ll_setStringValue(addr, casFeatCode_POS, v);}
     
   
@@ -66,7 +66,7 @@ public class Token_Type extends Annotation_Type {
 
   /** initialize variables to correspond with Cas Type and Features
 	* @generated */
-  public Token_Type(JCas jcas, Type casType) {
+  public SimplePosToken_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 

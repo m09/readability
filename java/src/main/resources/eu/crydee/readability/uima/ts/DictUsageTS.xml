@@ -69,6 +69,32 @@
             </features>
         </typeDescription>
         <typeDescription>
+            <name>eu.crydee.readability.uima.ts.PosSuggestion</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Suggestion</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.TxtSuggestion</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Suggestion</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.SimpleTextToken</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.SimplePosToken</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>POS</name>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
             <name>eu.crydee.readability.uima.ts.Sentence</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>

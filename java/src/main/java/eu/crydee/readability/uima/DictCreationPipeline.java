@@ -2,9 +2,11 @@ package eu.crydee.readability.uima;
 
 import eu.crydee.readability.uima.ae.CoveredCopierAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
+import eu.crydee.readability.uima.ae.ResourcePopulatorAE;
 import eu.crydee.readability.uima.ae.ResourceWriterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
+import eu.crydee.readability.uima.ae.ScorerAE;
 import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerCreationAE;
@@ -86,7 +88,12 @@ public class DictCreationPipeline {
                         ParserModelResourceImpl.class,
                         "file:opennlp/uima/models/en-parser-chunking.bin");
 
-        ExternalResourceDescription dict
+        ExternalResourceDescription dictPos
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        ReadabilityDict_Impl.class,
+                        "");
+
+        ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
                         "");
@@ -126,7 +133,9 @@ public class DictCreationPipeline {
                         MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
                         textRevised,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        htmlRevised);
+                        htmlRevised,
+                        MediaWikiConverterAE.PARAM_LOWERCASE,
+                        true);
 
         AnalysisEngineDescription mw2txtOriginal
                 = AnalysisEngineFactory.createEngineDescription(
@@ -134,7 +143,9 @@ public class DictCreationPipeline {
                         MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
                         textOriginal,
                         MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        htmlOriginal);
+                        htmlOriginal,
+                        MediaWikiConverterAE.PARAM_LOWERCASE,
+                        true);
 
         AnalysisEngineDescription getter
                 = AnalysisEngineFactory.createEngineDescription(
@@ -284,13 +295,41 @@ public class DictCreationPipeline {
                         XmiSerializerCreationAE.PARAM_OUT_FOLDER,
                         "out/cas");
 
-        AnalysisEngineDescription consumerResource
+        AnalysisEngineDescription resourcePopulator
+                = AnalysisEngineFactory.createEngineDescription(
+                        ResourcePopulatorAE.class,
+                        ResourcePopulatorAE.RES_POS_KEY,
+                        dictPos,
+                        ResourcePopulatorAE.RES_TXT_KEY,
+                        dictTxt);
+
+        AnalysisEngineDescription scorerTxt
+                = AnalysisEngineFactory.createEngineDescription(
+                        ScorerAE.class,
+                        ScorerAE.PARAM_LM_FILENAME,
+                        "out/lm/txt",
+                        ScorerAE.RES_KEY,
+                        dictTxt);
+
+        AnalysisEngineDescription scorerPos
+                = AnalysisEngineFactory.createEngineDescription(
+                        ScorerAE.class,
+                        ScorerAE.PARAM_LM_FILENAME,
+                        "out/lm/pos",
+                        ScorerAE.RES_KEY,
+                        dictPos);
+
+        AnalysisEngineDescription resourceWriter
                 = AnalysisEngineFactory.createEngineDescription(
                         ResourceWriterAE.class,
-                        ResourceWriterAE.PARAM_OUT_PS,
-                        "out/res/dict.xml",
-                        ResourceWriterAE.RES_KEY,
-                        dict);
+                        ResourceWriterAE.PARAM_OUT_POS_FILENAME,
+                        "out/res/dictPos.xml",
+                        ResourceWriterAE.PARAM_OUT_TXT_FILENAME,
+                        "out/res/dictTxt.xml",
+                        ResourceWriterAE.RES_POS_KEY,
+                        dictPos,
+                        ResourceWriterAE.RES_TXT_KEY,
+                        dictTxt);
 
         /* The type priority is important especially to retrieve tokens. The
          rest of the order is not accurate but it does not matter.*/
@@ -336,8 +375,6 @@ public class DictCreationPipeline {
                 SentenceDiffAE.ORIGINAL_VIEW, textOriginal,
                 SentenceDiffAE.REVISED_VIEW, textRevised);
 
-        builder.add("first-xmi-consumer", consumerXmi);
-
         builder.add("tagger-revised", taggerRevised,
                 CAS.NAME_DEFAULT_SOFA, textRevised);
 
@@ -350,21 +387,27 @@ public class DictCreationPipeline {
         builder.add("covered-copier-original", coveredCopierOriginal,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
 
-        builder.add("parser-revised", parserRevised,
-                CAS.NAME_DEFAULT_SOFA, textRevised);
-
-        builder.add("parser-original", parserOriginal,
-                CAS.NAME_DEFAULT_SOFA, textOriginal);
-
+//        builder.add("parser-revised", parserRevised,
+//                CAS.NAME_DEFAULT_SOFA, textRevised);
+//
+//        builder.add("parser-original", parserOriginal,
+//                CAS.NAME_DEFAULT_SOFA, textOriginal);
+//
         builder.add("word-differ", wordDiffer,
                 WordDiffAE.ORIGINAL_VIEW, textOriginal,
                 WordDiffAE.REVISED_VIEW, textRevised);
 
-        builder.add("second-xmi-consumer", consumerXmi);
+        builder.add("xmi-consumer", consumerXmi);
 
-        builder.add("resource-consumer", consumerResource,
-                ResourceWriterAE.ORIGINAL_VIEW, textOriginal,
-                ResourceWriterAE.REVISED_VIEW, textRevised);
+        builder.add("resource-populator", resourcePopulator,
+                ResourcePopulatorAE.ORIGINAL_VIEW, textOriginal,
+                ResourcePopulatorAE.REVISED_VIEW, textRevised);
+
+        builder.add("scorer-txt", scorerTxt);
+
+        builder.add("scorer-pos", scorerPos);
+
+        builder.add("resource-consumer", resourceWriter);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }

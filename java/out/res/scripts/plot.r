@@ -1,6 +1,10 @@
-f.resultsN <- "processed/dict-count.tsv"
-f.resultsF <- "processed/filtered-count.tsv"
-f.graphics <- "processed/plot.pdf"
+args <- commandArgs(trailingOnly=T)
+
+f.folder <- args[1]
+
+f.resultsN <- paste("processed/", f.folder, "/dict-count.tsv", sep="")
+f.resultsF <- paste("processed/", f.folder, "/filtered-count.tsv", sep="")
+f.graphics <- paste("processed/", f.folder, "/plot.pdf", sep="")
 
 resN <- read.delim(f.resultsN,
                   header=T,

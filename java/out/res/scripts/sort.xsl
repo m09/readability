@@ -7,18 +7,25 @@
 
   <xsl:template match="/">
     <dict>
-      <xsl:apply-templates select="dict/original">
-        <xsl:sort select="count( revised-list/revised )"
+      <xsl:copy>
+        <xsl:apply-templates select="dict/original">
+          <xsl:sort select="count( revised-list/revised )"
+                    order="descending"
+                    data-type="number"
+                    />
+        </xsl:apply-templates>
+      </xsl:copy>
+    </dict>
+  </xsl:template>
+
+  <xsl:template match="revised-list">
+    <xsl:copy>
+      <xsl:apply-templates select="revised">
+        <xsl:sort select="@score"
                   order="descending"
                   data-type="number"
                   />
       </xsl:apply-templates>
-    </dict>
-  </xsl:template>
-
-  <xsl:template match="original">
-    <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
     </xsl:copy>
   </xsl:template>
 

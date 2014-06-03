@@ -1,44 +1,54 @@
 #!/usr/bin/env bash
 
-xmllint \
-    --format dict.xml \
-    > processed/indented.xml
+rm -rf processed
 
-xsltproc \
-    -o processed/sorted.xml \
-    scripts/sort.xsl \
-    dict.xml
+mkdir processed
 
-xsltproc \
-    -o processed/dict.tsv \
-    scripts/tsv.xsl \
-    dict.xml
+for d in 'dictTxt.xml' 'dictPos.xml'; do
 
-xsltproc \
-    -o processed/dict-summary.tsv \
-    scripts/summary.xsl \
-    dict.xml
+    mkdir "processed/$d"
 
-xsltproc -o processed/filtered.xml \
-    scripts/filter-long-revised.xsl \
-    dict.xml
+    xmllint \
+        --format "$d" \
+        > "processed/$d/indented.xml"
 
-xsltproc \
-    -o processed/filtered-sorted.xml \
-    scripts/sort.xsl \
-    processed/filtered.xml
+    xsltproc \
+        -o "processed/$d/sorted.xml" \
+        scripts/sort.xsl \
+        "$d"
 
-xsltproc -o processed/filtered.tsv \
-    scripts/tsv.xsl \
-    processed/filtered.xml
+    xsltproc \
+        -o "processed/$d/dict.tsv" \
+        scripts/tsv.xsl \
+        "$d"
 
-xsltproc -o processed/filtered-summary.tsv \
-    scripts/summary.xsl \
-    processed/filtered.xml
+    xsltproc \
+        -o "processed/$d/dict-summary.tsv" \
+        scripts/summary.xsl \
+        "$d"
 
-./scripts/count.sh "dict.xml" > "processed/dict-count.tsv"
-./scripts/count.sh "processed/filtered.xml" > "processed/filtered-count.tsv"
+    xsltproc -o "processed/$d/filtered.xml" \
+        scripts/filter-long-revised.xsl \
+        "$d"
 
-Rscript \
-    --vanilla \
-    'scripts/plot.r'
+    xsltproc \
+        -o "processed/$d/filtered-sorted.xml" \
+        scripts/sort.xsl \
+        "processed/$d/filtered.xml"
+
+    xsltproc -o "processed/$d/filtered.tsv" \
+        scripts/tsv.xsl \
+        "processed/$d/filtered.xml"
+
+    xsltproc -o "processed/$d/filtered-summary.tsv" \
+        scripts/summary.xsl \
+        "processed/$d/filtered.xml"
+
+    ./scripts/count.sh "$d" > "processed/$d/dict-count.tsv"
+    ./scripts/count.sh "processed/$d/filtered.xml" > "processed/$d/filtered-count.tsv"
+
+    Rscript \
+        --vanilla \
+        'scripts/plot.r' \
+        "$d"
+done

@@ -14,12 +14,12 @@ import org.apache.uima.jcas.tcas.Annotation;
  * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
-public class Token extends Annotation {
+public class SimplePosToken extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(Token.class);
+  public final static int typeIndexID = JCasRegistry.register(SimplePosToken.class);
   /** @generated
    * @ordered 
    */
@@ -31,23 +31,23 @@ public class Token extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected Token() {/* intentionally empty block */}
+  protected SimplePosToken() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public Token(int addr, TOP_Type type) {
+  public SimplePosToken(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public Token(JCas jcas) {
+  public SimplePosToken(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public Token(JCas jcas, int begin, int end) {
+  public SimplePosToken(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
@@ -68,16 +68,16 @@ public class Token extends Annotation {
   /** getter for POS - gets 
    * @generated */
   public String getPOS() {
-    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_POS == null)
-      jcasType.jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
-    return jcasType.ll_cas.ll_getStringValue(addr, ((Token_Type)jcasType).casFeatCode_POS);}
+    if (SimplePosToken_Type.featOkTst && ((SimplePosToken_Type)jcasType).casFeat_POS == null)
+      jcasType.jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.SimplePosToken");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((SimplePosToken_Type)jcasType).casFeatCode_POS);}
     
   /** setter for POS - sets  
    * @generated */
   public void setPOS(String v) {
-    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_POS == null)
-      jcasType.jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
-    jcasType.ll_cas.ll_setStringValue(addr, ((Token_Type)jcasType).casFeatCode_POS, v);}    
+    if (SimplePosToken_Type.featOkTst && ((SimplePosToken_Type)jcasType).casFeat_POS == null)
+      jcasType.jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.SimplePosToken");
+    jcasType.ll_cas.ll_setStringValue(addr, ((SimplePosToken_Type)jcasType).casFeatCode_POS, v);}    
   }
 
     

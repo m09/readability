@@ -1,9 +1,8 @@
 package eu.crydee.readability.uima.res;
 
 import eu.crydee.readability.misc.XMLUtils;
-import eu.crydee.readability.uima.model.POSs;
-import eu.crydee.readability.uima.model.Revised;
-import eu.crydee.readability.uima.model.Tokens;
+import eu.crydee.readability.uima.model.Mapped;
+import eu.crydee.readability.uima.model.Metrics;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -32,7 +31,8 @@ public class ReadabilityDict_Impl
     final static private Logger logger = UIMAFramework.getLogger(
             ReadabilityDict_Impl.class);
 
-    final private Map<Revised, Map<Revised, Integer>> dict = new HashMap<>();
+    final private Map<Mapped, Map<Mapped, Metrics>> dict = new HashMap<>();
+    private int totalCount = 0;
 
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
@@ -42,7 +42,7 @@ public class ReadabilityDict_Impl
                     .createXMLStreamReader(is, "UTF8");
             int mappings = 0;
             while (XMLUtils.goToNextXBeforeY(xsr, "original", "dict")) {
-                Revised rev = parseRevision(xsr);
+                Mapped rev = parseRevision(xsr);
                 while (XMLUtils.goToNextXBeforeY(
                         xsr,
                         "revised",
@@ -67,13 +67,16 @@ public class ReadabilityDict_Impl
         }
     }
 
-    private void addRevised(XMLStreamReader xsr, Revised rev)
+    private void addRevised(XMLStreamReader xsr, Mapped rev)
             throws XMLStreamException {
         Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
-        add(rev, parseRevision(xsr), count);
+        Double score = Double.parseDouble(xsr.getAttributeValue(null, "score"));
+        Mapped revised = parseRevision(xsr);
+        add(rev, revised, count);
+        dict.get(rev).get(revised).score = score;
     }
 
-    private Revised parseRevision(XMLStreamReader xsr)
+    private Mapped parseRevision(XMLStreamReader xsr)
             throws XMLStreamException {
         XMLUtils.nextTag(xsr);
         String originalText = xsr.getElementText();
@@ -82,15 +85,7 @@ public class ReadabilityDict_Impl
         while (XMLUtils.goToNextXBeforeY(xsr, "token", "token-list")) {
             tokens.add(xsr.getElementText());
         }
-        XMLUtils.nextTag(xsr);
-        List<String> pos = new ArrayList<>();
-        while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
-            pos.add(xsr.getElementText());
-        }
-        return new Revised(
-                originalText,
-                new Tokens(tokens),
-                new POSs(pos));
+        return new Mapped(originalText, tokens);
     }
 
     @Override
@@ -99,14 +94,19 @@ public class ReadabilityDict_Impl
                 .createXMLStreamWriter(ps, "UTF8");
         xsw.writeStartDocument("utf-8", "1.0");
         xsw.writeStartElement("dict");
-        for (Revised original : dict.keySet()) {
+        for (Mapped original : dict.keySet()) {
             xsw.writeStartElement("original");
             saveRevision(xsw, original);
             xsw.writeStartElement("revised-list");
-            Map<Revised, Integer> revisedMap = dict.get(original);
-            for (Revised revised : revisedMap.keySet()) {
+            Map<Mapped, Metrics> revisedMap = dict.get(original);
+            for (Mapped revised : revisedMap.keySet()) {
                 xsw.writeStartElement("revised");
-                xsw.writeAttribute("count", revisedMap.get(revised).toString());
+                xsw.writeAttribute(
+                        "count",
+                        String.valueOf(revisedMap.get(revised).count));
+                xsw.writeAttribute(
+                        "score",
+                        String.valueOf(revisedMap.get(revised).score));
                 saveRevision(xsw, revised);
                 xsw.writeEndElement();
             }
@@ -118,7 +118,7 @@ public class ReadabilityDict_Impl
         xsw.close();
     }
 
-    private void saveRevision(XMLStreamWriter xsw, Revised revision)
+    private void saveRevision(XMLStreamWriter xsw, Mapped revision)
             throws XMLStreamException {
         xsw.writeStartElement("text");
         xsw.writeCharacters(revision.getText());
@@ -130,33 +130,37 @@ public class ReadabilityDict_Impl
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
-        xsw.writeStartElement("pos-list");
-        for (String pos : revision.getPOS()) {
-            xsw.writeStartElement("pos");
-            xsw.writeCharacters(pos);
-            xsw.writeEndElement();
-        }
-        xsw.writeEndElement();
     }
 
     @Override
-    public void add(Revised original, Revised revised, Integer count) {
-        Map<Revised, Integer> revisions = dict.get(original);
+    public void add(Mapped original, Mapped revised, Integer count) {
+        Map<Mapped, Metrics> revisions = dict.get(original);
         if (revisions == null) {
             revisions = new HashMap<>();
             dict.put(original, revisions);
         }
-        revisions.put(revised, revisions.getOrDefault(revised, 0) + count);
+        Metrics scores = revisions.get(revised);
+        if (scores == null) {
+            scores = new Metrics();
+            revisions.put(revised, scores);
+        }
+        scores.count += count;
+        totalCount += count;
     }
 
     @Override
-    public void add(Revised original, Revised revised) {
+    public void add(Mapped original, Mapped revised) {
         add(original, revised, 1);
     }
+    
+    @Override
+    public int getTotalCount() {
+        return totalCount;
+    }
 
     @Override
-    public Optional<Map<Revised, Integer>> getRevisions(Revised original) {
-        Map<Revised, Integer> revisions = dict.get(original);
+    public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original) {
+        Map<Mapped, Metrics> revisions = dict.get(original);
         if (dict == null) {
             return Optional.empty();
         }
@@ -164,7 +168,7 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public Set<Revised> keySet() {
+    public Set<Mapped> keySet() {
         return Collections.unmodifiableSet(dict.keySet());
     }
 }

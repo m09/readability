@@ -1,8 +1,6 @@
 package eu.crydee.readability.uima;
 
-import de.tudarmstadt.ukp.dkpro.core.frequency.resources.Web1TFrequencyCountResource;
 import eu.crydee.readability.uima.ae.MapperAE;
-import eu.crydee.readability.uima.ae.ScorerAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
@@ -29,7 +27,10 @@ public class DictUsagePipeline {
     public static void main(String[] args)
             throws ResourceInitializationException,
             AnalysisEngineProcessException {
-        AnalysisEngine ae = buildAe("file:out/res/dict.xml", true);
+        AnalysisEngine ae = buildAe(
+                "file:out/res/dictTxt.xml",
+                "file:out/res/dictPos.xml",
+                true);
 
         JCas jcas = ae.newJCas();
         jcas.setDocumentText("Hello there, and how do you do?");
@@ -37,7 +38,10 @@ public class DictUsagePipeline {
         ae.process(jcas);
     }
 
-    public static AnalysisEngine buildAe(String fileURI, boolean serialize)
+    public static AnalysisEngine buildAe(
+            String fileTxtURI,
+            String filePosURI,
+            boolean serialize)
             throws ResourceInitializationException {
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
@@ -55,20 +59,15 @@ public class DictUsagePipeline {
                         POSModelResourceImpl.class,
                         "file:opennlp/uima/models/en-pos-maxent.bin");
 
-        ExternalResourceDescription dict
+        ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        fileURI);
+                        fileTxtURI);
 
-        ExternalResourceDescription counts
+        ExternalResourceDescription dictPos
                 = ExternalResourceFactory.createExternalResourceDescription(
-                        Web1TFrequencyCountResource.class,
-                        Web1TFrequencyCountResource.PARAM_MIN_NGRAM_LEVEL,
-                        "1",
-                        Web1TFrequencyCountResource.PARAM_MAX_NGRAM_LEVEL,
-                        "3",
-                        Web1TFrequencyCountResource.PARAM_INDEX_PATH,
-                        "out/lm/text");
+                        ReadabilityDict_Impl.class,
+                        filePosURI);
 
         /* Analysis engines */
         AnalysisEngineDescription sentenceDetector
@@ -100,18 +99,14 @@ public class DictUsagePipeline {
                         "eu.crydee.readability.uima.ts.Token",
                         "opennlp.uima.POSFeature",
                         "POS");
-        
-        AnalysisEngineDescription scorer
-                = AnalysisEngineFactory.createEngineDescription(
-                        ScorerAE.class,
-                        ScorerAE.RES_KEY,
-                        counts);
 
         AnalysisEngineDescription mapper
                 = AnalysisEngineFactory.createEngineDescription(
                         MapperAE.class,
-                        MapperAE.RES_KEY,
-                        dict);
+                        MapperAE.RES_TXT,
+                        dictTxt,
+                        MapperAE.RES_POS,
+                        dictPos);
 
         AnalysisEngineDescription consumerXmi = null;
         if (serialize) {
@@ -127,15 +122,14 @@ public class DictUsagePipeline {
                         Sentence.class,
                         Token.class),
                 null);
-//        builder.add(sentenceDetector);
-//        builder.add(tokenizer);
-//        builder.add(tagger);
-        builder.add(scorer);
-//        builder.add(mapper);
-//        if (serialize) {
-//            builder.add(consumerXmi);
-//        }
-//
+        builder.add(sentenceDetector);
+        builder.add(tokenizer);
+        builder.add(tagger);
+        builder.add(mapper);
+        if (serialize) {
+            builder.add(consumerXmi);
+        }
+
         return builder.createAggregate();
     }
 }

@@ -1,11 +1,9 @@
 package eu.crydee.readability.uima;
 
-import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
-import de.tudarmstadt.ukp.dkpro.core.frequency.resources.Web1TFrequencyCountResource;
-import de.tudarmstadt.ukp.dkpro.core.io.web1t.Web1TFormatWriter;
+import eu.crydee.readability.uima.ae.LanguageModelMakerAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
-import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.cr.CurrentCR;
+import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.util.Optional;
 import opennlp.uima.postag.POSModelResourceImpl;
@@ -37,9 +35,27 @@ public class FrequencyCreationPipeline {
             DB_USR = null,
             DB_PW = null;
     static private Optional<Integer> LIMIT = Optional.empty();
+    static private boolean SKIP = false;
 
     public static void main(String[] args) throws Exception {
         parseArguments(args);
+
+        if (SKIP) {
+            AnalysisEngineFactory.createEngine(
+                    LanguageModelMakerAE.class,
+                    null,
+                    TypePrioritiesFactory.createTypePriorities(
+                            Sentence.class,
+                            Token.class),
+                    LanguageModelMakerAE.PARAM_TMP_FOLDER,
+                    "out/lm/tmp/txt",
+                    LanguageModelMakerAE.PARAM_OUT_FILE,
+                    "out/lm/txt",
+                    LanguageModelMakerAE.PARAM_SKIP_EXTRACTION,
+                    true)
+                    .collectionProcessComplete();
+            return;
+        }
 
         /* View names */
         final String text = "text",
@@ -117,39 +133,31 @@ public class FrequencyCreationPipeline {
                         "opennlp.uima.POSFeature",
                         "POS");
 
-        AnalysisEngineDescription ngramTextWriter
+        AnalysisEngineDescription lmMakerTxt
                 = AnalysisEngineFactory.createEngineDescription(
-                        Web1TFormatWriter.class,
-                        Web1TFormatWriter.PARAM_TARGET_LOCATION,
-                        "out/lm/text",
-                        Web1TFormatWriter.PARAM_INPUT_TYPES,
-                        new String[]{Token.class.getName()},
-                        Web1TFormatWriter.PARAM_MIN_NGRAM_LENGTH,
-                        1,
-                        Web1TFormatWriter.PARAM_MAX_NGRAM_LENGTH,
-                        3,
-                        Web1TFormatWriter.PARAM_MIN_FREQUENCY,
-                        2);
+                        LanguageModelMakerAE.class,
+                        LanguageModelMakerAE.PARAM_SENTENCE_TYPE,
+                        Sentence.class.getCanonicalName(),
+                        LanguageModelMakerAE.PARAM_TOKEN_TYPE,
+                        Token.class.getCanonicalName(),
+                        LanguageModelMakerAE.PARAM_TMP_FOLDER,
+                        "out/lm/tmp/txt",
+                        LanguageModelMakerAE.PARAM_OUT_FILE,
+                        "out/lm/txt");
 
-        AnalysisEngineDescription ngramPOSWriter
+        AnalysisEngineDescription lmMakerPos
                 = AnalysisEngineFactory.createEngineDescription(
-                        Web1TFormatWriter.class,
-                        Web1TFormatWriter.PARAM_TARGET_LOCATION,
-                        "out/lm/pos",
-                        Web1TFormatWriter.PARAM_INPUT_TYPES,
-                        new String[]{Token.class.getName() + "/POS"},
-                        Web1TFormatWriter.PARAM_MIN_NGRAM_LENGTH,
-                        1,
-                        Web1TFormatWriter.PARAM_MAX_NGRAM_LENGTH,
-                        3,
-                        Web1TFormatWriter.PARAM_MIN_FREQUENCY,
-                        2);
-
-        AnalysisEngineDescription consumerXmi
-                = AnalysisEngineFactory.createEngineDescription(
-                        XmiSerializerUsageAE.class,
-                        XmiSerializerUsageAE.PARAM_OUT_FOLDER,
-                        "out/cas-lm");
+                        LanguageModelMakerAE.class,
+                        LanguageModelMakerAE.PARAM_SENTENCE_TYPE,
+                        Sentence.class.getCanonicalName(),
+                        LanguageModelMakerAE.PARAM_TOKEN_TYPE,
+                        Token.class.getCanonicalName(),
+                        LanguageModelMakerAE.PARAM_TOKEN_FEATURE,
+                        "POS",
+                        LanguageModelMakerAE.PARAM_TMP_FOLDER,
+                        "out/lm/tmp/pos",
+                        LanguageModelMakerAE.PARAM_OUT_FILE,
+                        "out/lm/pos");
 
         AggregateBuilder builder = new AggregateBuilder(
                 null,
@@ -165,11 +173,10 @@ public class FrequencyCreationPipeline {
                 CAS.NAME_DEFAULT_SOFA, text);
         builder.add(tagger,
                 CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(ngramTextWriter,
+        builder.add(lmMakerTxt,
                 CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(ngramPOSWriter,
+        builder.add(lmMakerPos,
                 CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(consumerXmi);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
@@ -208,6 +215,10 @@ public class FrequencyCreationPipeline {
                 .withDescription("How many revisions to use. No limit means "
                         + "all the revisions available.")
                 .create('l'));
+        options.addOption(OptionBuilder
+                .withLongOpt("skip-extraction")
+                .withDescription("Skip temp files creation for the LM creation")
+                .create("s"));
         CommandLineParser parser = new PosixParser();
         @SuppressWarnings("UnusedAssignment")
         CommandLine cmd = null;
@@ -224,6 +235,7 @@ public class FrequencyCreationPipeline {
         DB_URL = cmd.getOptionValue('d');
         DB_USR = cmd.getOptionValue('u');
         DB_PW = cmd.getOptionValue('p');
+        SKIP = cmd.hasOption('s');
 
         if (cmd.hasOption('l')) {
             LIMIT = Optional.of(Integer.parseInt(cmd.getOptionValue('l')));

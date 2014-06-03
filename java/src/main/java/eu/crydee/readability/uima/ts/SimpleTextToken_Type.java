@@ -14,7 +14,7 @@ import org.apache.uima.jcas.tcas.Annotation_Type;
 /** 
  * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
  * @generated */
-public class Sentence_Type extends Annotation_Type {
+public class SimpleTextToken_Type extends Annotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -22,31 +22,31 @@ public class Sentence_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Sentence_Type.this.useExistingInstance) {
+  			 if (SimpleTextToken_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Sentence_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = SimpleTextToken_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Sentence(addr, Sentence_Type.this);
-  			   Sentence_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new SimpleTextToken(addr, SimpleTextToken_Type.this);
+  			   SimpleTextToken_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Sentence(addr, Sentence_Type.this);
+        } else return new SimpleTextToken(addr, SimpleTextToken_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Sentence.typeIndexID;
+  public final static int typeIndexID = SimpleTextToken.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Sentence");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.SimpleTextToken");
 
 
 
   /** initialize variables to correspond with Cas Type and Features
 	* @generated */
-  public Sentence_Type(JCas jcas, Type casType) {
+  public SimpleTextToken_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
