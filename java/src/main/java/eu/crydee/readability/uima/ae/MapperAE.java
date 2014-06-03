@@ -12,6 +12,7 @@ import eu.crydee.readability.uima.ts.SimplePosToken;
 import eu.crydee.readability.uima.ts.SimpleTextToken;
 import eu.crydee.readability.uima.ts.Suggestion;
 import eu.crydee.readability.uima.ts.Token;
+import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,8 @@ public class MapperAE extends CasAnnotator_ImplBase {
         suggestionT = aTypeSystem.getType(Suggestion.class.getCanonicalName());
         suggestionPosT
                 = aTypeSystem.getType(PosSuggestion.class.getCanonicalName());
+        suggestionTxtT
+                = aTypeSystem.getType(TxtSuggestion.class.getCanonicalName());
         suggestionOriF = suggestionT.getFeatureByBaseName("original");
         suggestionRevF = suggestionT.getFeatureByBaseName("revised");
     }
@@ -125,9 +128,9 @@ public class MapperAE extends CasAnnotator_ImplBase {
                             simplePosTokenT,
                             t.getBegin(),
                             t.getEnd());
-                    ann.setFeatureValue(
+                    ann.setFeatureValueFromString(
                             simplePosTokenF,
-                            t.getFeatureValue(tokenPosF));
+                            t.getFeatureValueAsString(tokenPosF));
                     return ann;
                 })
                 .collect(Collectors.toList())

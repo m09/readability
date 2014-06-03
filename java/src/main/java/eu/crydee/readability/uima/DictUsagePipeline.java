@@ -14,6 +14,7 @@ import opennlp.uima.tokenize.TokenizerModelResourceImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
@@ -32,10 +33,10 @@ public class DictUsagePipeline {
                 "file:out/res/dictPos.xml",
                 true);
 
-        JCas jcas = ae.newJCas();
-        jcas.setDocumentText("Hello there, and how do you do?");
+        CAS aCas = ae.newCAS();
+        aCas.setDocumentText("Hello there, and how do you do?");
 
-        ae.process(jcas);
+        ae.process(aCas);
     }
 
     public static AnalysisEngine buildAe(
