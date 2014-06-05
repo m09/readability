@@ -8,8 +8,6 @@ import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.ts.Original;
 import eu.crydee.readability.uima.ts.PosSuggestion;
 import eu.crydee.readability.uima.ts.Revised;
-import eu.crydee.readability.uima.ts.SimplePosToken;
-import eu.crydee.readability.uima.ts.SimpleTextToken;
 import eu.crydee.readability.uima.ts.Suggestion;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
@@ -51,14 +49,11 @@ public class MapperAE extends CasAnnotator_ImplBase {
             = HashMultimap.create();
 
     private Type tokenT,
-            simpleTextTokenT,
-            simplePosTokenT,
             suggestionT,
             suggestionTxtT,
             suggestionPosT;
 
     private Feature tokenPosF,
-            simplePosTokenF,
             suggestionOriF,
             suggestionRevF;
 
@@ -91,11 +86,6 @@ public class MapperAE extends CasAnnotator_ImplBase {
         super.typeSystemInit(aTypeSystem);
         tokenT = aTypeSystem.getType(Token.class.getCanonicalName());
         tokenPosF = tokenT.getFeatureByBaseName("POS");
-        simpleTextTokenT
-                = aTypeSystem.getType(SimpleTextToken.class.getCanonicalName());
-        simplePosTokenT
-                = aTypeSystem.getType(SimplePosToken.class.getCanonicalName());
-        simplePosTokenF = simplePosTokenT.getFeatureByBaseName("POS");
         suggestionT = aTypeSystem.getType(Suggestion.class.getCanonicalName());
         suggestionPosT
                 = aTypeSystem.getType(PosSuggestion.class.getCanonicalName());
@@ -117,7 +107,7 @@ public class MapperAE extends CasAnnotator_ImplBase {
                 .collect(Collectors.toList());
         AnnotationFS[] txtTokensArray = tokens.stream()
                 .map(t -> aCas.createAnnotation(
-                                simpleTextTokenT,
+                                tokenT,
                                 t.getBegin(),
                                 t.getEnd()))
                 .collect(Collectors.toList())
@@ -125,11 +115,11 @@ public class MapperAE extends CasAnnotator_ImplBase {
                 posTokensArray = tokens.stream()
                 .map(t -> {
                     AnnotationFS ann = aCas.createAnnotation(
-                            simplePosTokenT,
+                            tokenT,
                             t.getBegin(),
                             t.getEnd());
                     ann.setFeatureValueFromString(
-                            simplePosTokenF,
+                            tokenPosF,
                             t.getFeatureValueAsString(tokenPosF));
                     return ann;
                 })
