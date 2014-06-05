@@ -106,72 +106,63 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
         jQuery(DOMNode).off('hide.bs.popover');
         jQuery(DOMNode).popover('destroy');
     },
-    byBegins: function() {
-        var byBegins = {}, byEnds = {}, lastBegin = undefined;
-        _.each(this.props.data.annotations, function(ann) {
+    spans: function(text, anns) {
+        var indices = [0, text.length];
+        _.each(anns, function(ann) {
             var begin = _.first(ann.original.tokens).begin;
             var end = _.last(ann.original.tokens).end;
-            var text = ann.original.text;
-            if (byBegins[begin] === undefined) {
-                byBegins[begin] = [];
-                _.each(byEnds, function(anns, oEnd) {
-                    if (oEnd > begin) {
-                        byBegins[begin] = byBegins[begin].concat(anns);
-                    }
-                });
-            }
-            byBegins[begin].push(ann);
-            byEnds[end] = byEnds[end] || [];
-            byEnds[end].push(ann);
+            indices.splice(_.sortedIndex(indices, begin), 0, begin);
+            indices.splice(_.sortedIndex(indices, end), 0, end);
+            indices = _.uniq(indices, true);
         });
-        return byBegins;
-    },
-    byBeginsAndEnds: function(byBegins) {
-        var result = [], pairs = _.sortBy(_.pairs(byBegins),
-                                          function(p) { return Number(p[0]); });
-        _.each(pairs, function(p) {
-            p[1].sort(function(a, b) {
-                return _.last(a.original.tokens).end -
-                    _.last(b.original.tokens).end;
-            });
-        });
-        _.each(pairs, function(p, i) {
-            var begin = +p[0], pEnd = begin, anns = p[1], next = undefined;
-            if (pairs[i + 1] !== undefined) {
-                next = pairs[i + 1][0];
+        var previous = undefined;
+        var result = [];
+        _.each(indices, function(i) {
+            if (previous !== undefined) {
+                result.push([previous, i, []]);
             }
-            for(var j = 0; j < anns.length; j++) {
-                var ann = anns[j], end = _.last(ann.original.tokens).end;
-                if (pEnd == end) {
-                    break;
-                }
-                result.push([pEnd, Math.min(end, next || end), anns.slice(j)]);
-                if (next !== undefined && next < pEnd) {
-                    break;
-                }
-                pEnd = end;
-            }
+            previous = i;
         });
         return result;
     },
-    toHtml: function(map) {
-        var txt = this.props.data.text, pEnd = 0, f = true, output = [];
-        _.each(map, function(m, i) {
-            var begin = m[0], end = m[1], anns = m[2];
-            if (pEnd !== begin) {
-                output.push(txt.substring(pEnd, begin));
-            }
-            output.push(Mapping( {style:f ? 'red' : 'blue', data:anns,
-                        text:txt.substring(begin, end), ref:begin}));
-            pEnd = end;
-            f = !f;
+    fillSpans: function(anns, spans) {
+        _.each(anns, function(ann) {
+            _.each(spans, function(span) {
+                var begin = _.first(ann.original.tokens).begin;
+                var end = _.last(ann.original.tokens).end;
+                if (begin < span[1] && end > span[0]) {
+                    span[2].push(ann);
+                }
+            });
         });
-        output.push(txt.substring(pEnd, txt.length));
+    },
+    toHtml: function(text, spans) {
+        console.log("HEY", spans);
+        var output = [];
+        var f = true;
+        _.each(spans, function(span) {
+            console.log("HAI");
+            if (!_.isEmpty(span[2])) {
+                output.push(Mapping( {style:f ? 'red' : 'blue', data:span[2],
+                            text:text.substring(span[0], span[1])}));
+                f = !f;
+            } else {
+                output.push(text.substring(span[0], span[1]));
+            }
+        });
         return output;
     },
     render: function() {
+        var text = this.props.data.text,
+            anns = this.props.data.annotations.text,
+            spans = this.spans(text, anns);
+        this.fillSpans(anns, spans);
+        var mappings = this.toHtml(text, spans);
+        console.log("spans       ", spans);
+        console.log("filled spans", spans);
+        console.log("mappings", mappings);
         return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
-                this.toHtml(this.byBeginsAndEnds(this.byBegins()))));
+                mappings));
     }
 });
 
@@ -180,8 +171,8 @@ var Annotator = React.createClass({displayName: 'Annotator',
     getInitialState: function() {
         return {
             data: {
-                normal: { text: "", tokens: [], annotations: [] },
-                filtered: { text: "", tokens: [], annotations: [] }
+                normal: { text: "", tokens: [], annotations: {text: [], pos: []} },
+                filtered: { text: "", tokens: [], annotations: {text: [], pos: []} }
             },
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",

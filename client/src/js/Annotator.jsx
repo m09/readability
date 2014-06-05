@@ -3,8 +3,8 @@ var Annotator = React.createClass({
     getInitialState: function() {
         return {
             data: {
-                normal: { text: "", tokens: [], annotations: [] },
-                filtered: { text: "", tokens: [], annotations: [] }
+                normal: { text: "", tokens: [], annotations: {text: [], pos: []} },
+                filtered: { text: "", tokens: [], annotations: {text: [], pos: []} }
             },
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",
