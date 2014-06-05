@@ -2,8 +2,10 @@ package controllers
 
 
 import eu.crydee.readability.uima.DictUsagePipeline
+import eu.crydee.readability.uima.ts.Original
 import eu.crydee.readability.uima.ts.Revised
-import eu.crydee.readability.uima.ts.Suggestion
+import eu.crydee.readability.uima.ts.TxtSuggestion
+import eu.crydee.readability.uima.ts.PosSuggestion
 import eu.crydee.readability.uima.ts.Token
 import org.apache.uima.analysis_engine.AnalysisEngine
 import org.apache.uima.cas.FeatureStructure
@@ -25,17 +27,17 @@ case object Filtered extends Dict
 
 object Application extends Controller {
 
-  private val aeNormal = DictUsagePipeline buildAe("file:dict.xml", false)
-  private val aeFiltered = DictUsagePipeline buildAe("file:filtered.xml", false)
-  private val typeTok = CasUtil.getType(aeNormal.newCAS, classOf[Token])
-  private val featTokBeg = typeTok.getFeatureByBaseName("begin")
-  private val featTokEnd = typeTok.getFeatureByBaseName("end")
-  private val featTokPos = typeTok.getFeatureByBaseName("POS")
-  private val typeRev = CasUtil.getType(aeNormal.newCAS, classOf[Revised])
-  private val featRevCnt = typeRev.getFeatureByBaseName("count")
-  private val featRevTxt = typeRev.getFeatureByBaseName("text")
-  private val featRevTok = typeRev.getFeatureByBaseName("tokens")
-  private val featRevPos = typeRev.getFeatureByBaseName("pos")
+  private val aeN = DictUsagePipeline buildAe("file:data/fullTxt.xml", "file:data/fullPos.xml", false)
+  private val aeF = DictUsagePipeline buildAe("file:data/filteredTxt.xml", "file:data/filteredPos.xml", false)
+  private val tokT = CasUtil.getType(aeN.newCAS, classOf[Token])
+  private val tokBegF = tokT.getFeatureByBaseName("begin")
+  private val tokEndF = tokT.getFeatureByBaseName("end")
+  private val tokPosF = tokT.getFeatureByBaseName("POS")
+  private val revT = CasUtil.getType(aeN.newCAS, classOf[Revised])
+  private val revCntF = revT.getFeatureByBaseName("count")
+  private val revTxtF = revT.getFeatureByBaseName("text")
+  private val revTokF = revT.getFeatureByBaseName("tokens")
+  private val revPosF = revT.getFeatureByBaseName("pos")
 
   implicit val inputReads: Reads[Input] = (
     (JsPath \ "data").read[String] and
@@ -44,31 +46,46 @@ object Application extends Controller {
       case _ => Normal
     }
   )(Input.apply _)
+  
+  def writeRev(rev: FeatureStructure): JsValue = Json.obj(
+    "text"    -> rev.getStringValue (revTxtF),
+    "tokens"  -> rev.getFeatureValue(revTokF).asInstanceOf[StringArray].toArray,
+    "count"   -> rev.getIntValue    (revCntF)
+  )
 
-  implicit val suggestionWrites = new Writes[Suggestion] {
-    def writes(suggestion: Suggestion): JsValue = {
-      val arr = suggestion.getRevised.toArray
-      Json.obj(
-        "original"    -> Json.obj(
-          "text"      -> suggestion.getOriginal.getText,
-          "tokens"    -> suggestion.getOriginal.getTokens.toArray.map( fs =>
-            Json.obj(
-              "pos"   -> fs.getStringValue(featTokPos),
-              "begin" -> fs.getIntValue   (featTokBeg),
-              "end"   -> fs.getIntValue   (featTokEnd)
-            )
-          )
-        ),
-        "revised"  -> arr.map( fs =>
-          Json.obj(
-            "text"    -> fs.getStringValue (featRevTxt),
-            "tokens"  -> fs.getFeatureValue(featRevTok).asInstanceOf[StringArray].toArray,
-            "pos"     -> fs.getFeatureValue(featRevPos).asInstanceOf[StringArray].toArray,
-            "count"   -> fs.getIntValue    (featRevCnt)
-          )
-        )
-      )
-    }
+  def writeTxtOriginal(ori: Original): JsValue = Json.obj(
+    "text"   -> ori.getText,
+    "tokens" -> ori.getTokens.toArray.map( writeTxtToken )
+  )
+
+  def writePosOriginal(ori: Original): JsValue = Json.obj(
+    "text"   -> ori.getText,
+    "tokens" -> ori.getTokens.toArray.map( writePosToken )
+  )
+
+  def writeTxtToken(tok: FeatureStructure): JsValue = Json.obj(
+    "begin" -> tok.getIntValue   (tokBegF),
+    "end"   -> tok.getIntValue   (tokEndF)
+  )
+
+  def writePosToken(tok: FeatureStructure): JsValue = Json.obj(
+    "pos"   -> tok.getStringValue(tokPosF),
+    "begin" -> tok.getIntValue   (tokBegF),
+    "end"   -> tok.getIntValue   (tokEndF)
+  )
+
+  implicit val txtSuggestionWrites = new Writes[TxtSuggestion] {
+    def writes(suggestion: TxtSuggestion): JsValue = Json.obj(
+      "original" -> writeTxtOriginal(suggestion.getOriginal),
+      "revised"  -> suggestion.getRevised.toArray.map( writeRev )
+    )
+  }
+
+  implicit val posSuggestionWrites = new Writes[PosSuggestion] {
+    def writes(suggestion: PosSuggestion): JsValue = Json.obj(
+      "original" -> writePosOriginal(suggestion.getOriginal),
+      "revised"  -> suggestion.getRevised.toArray.map( writeRev )
+    )
   }
 
   def annotate = Action(parse.json) { request =>
@@ -76,9 +93,12 @@ object Application extends Controller {
       val jcas = ae.newJCas()
       jcas.setDocumentText(data)
       ae.process(jcas)
-      val suggestions : scala.collection.Iterable[Suggestion] = JCasUtil.select(
+      val posSuggs : scala.collection.Iterable[PosSuggestion] = JCasUtil.select(
         jcas,
-        classOf[Suggestion])
+        classOf[PosSuggestion])
+      val txtSuggs : scala.collection.Iterable[TxtSuggestion] = JCasUtil.select(
+        jcas,
+        classOf[TxtSuggestion])
       val tokens : scala.collection.Iterable[Token] = JCasUtil.select(
         jcas,
         classOf[Token])
@@ -93,15 +113,18 @@ object Application extends Controller {
               "pos"     -> t.getPOS
             )
           ),
-          "annotations" -> Json.toJson(suggestions)
+          "annotations" -> Json.obj(
+            "text" -> Json.toJson(txtSuggs),
+            "pos"  -> Json.toJson(posSuggs)
+          )
         )
       ).withHeaders(headers : _*)
     }
     request.body.validate[Input].map {
       case input => {
         input.dict match {
-          case Normal => work(input.data, aeNormal)
-          case Filtered => work(input.data, aeFiltered)
+          case Normal => work(input.data, aeN)
+          case Filtered => work(input.data, aeF)
         }
       }
     }.recoverTotal {
