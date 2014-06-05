@@ -19,7 +19,6 @@ import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ExternalResourceDescription;
 import org.apache.uima.resource.ResourceInitializationException;
 
