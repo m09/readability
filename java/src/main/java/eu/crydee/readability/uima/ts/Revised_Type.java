@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Tue Jun 03 10:36:02 JST 2014 */
+/* First created by JCasGen Wed Jun 04 11:48:42 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
+ * Updated by JCasGen Wed Jun 04 11:48:42 JST 2014
  * @generated */
 public class Revised_Type extends Annotation_Type {
   /** @generated */
@@ -100,43 +100,6 @@ public class Revised_Type extends Annotation_Type {
  
  
   /** @generated */
-  final Feature casFeat_pos;
-  /** @generated */
-  final int     casFeatCode_pos;
-  /** @generated */ 
-  public int getPos(int addr) {
-        if (featOkTst && casFeat_pos == null)
-      jcas.throwFeatMissing("pos", "eu.crydee.readability.uima.ts.Revised");
-    return ll_cas.ll_getRefValue(addr, casFeatCode_pos);
-  }
-  /** @generated */    
-  public void setPos(int addr, int v) {
-        if (featOkTst && casFeat_pos == null)
-      jcas.throwFeatMissing("pos", "eu.crydee.readability.uima.ts.Revised");
-    ll_cas.ll_setRefValue(addr, casFeatCode_pos, v);}
-    
-   /** @generated */
-  public String getPos(int addr, int i) {
-        if (featOkTst && casFeat_pos == null)
-      jcas.throwFeatMissing("pos", "eu.crydee.readability.uima.ts.Revised");
-    if (lowLevelTypeChecks)
-      return ll_cas.ll_getStringArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i, true);
-    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i);
-	return ll_cas.ll_getStringArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i);
-  }
-   
-  /** @generated */ 
-  public void setPos(int addr, int i, String v) {
-        if (featOkTst && casFeat_pos == null)
-      jcas.throwFeatMissing("pos", "eu.crydee.readability.uima.ts.Revised");
-    if (lowLevelTypeChecks)
-      ll_cas.ll_setStringArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i, v, true);
-    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i);
-    ll_cas.ll_setStringArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_pos), i, v);
-  }
- 
- 
-  /** @generated */
   final Feature casFeat_count;
   /** @generated */
   final int     casFeatCode_count;
@@ -151,6 +114,24 @@ public class Revised_Type extends Annotation_Type {
         if (featOkTst && casFeat_count == null)
       jcas.throwFeatMissing("count", "eu.crydee.readability.uima.ts.Revised");
     ll_cas.ll_setIntValue(addr, casFeatCode_count, v);}
+    
+  
+ 
+  /** @generated */
+  final Feature casFeat_score;
+  /** @generated */
+  final int     casFeatCode_score;
+  /** @generated */ 
+  public double getScore(int addr) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revised");
+    return ll_cas.ll_getDoubleValue(addr, casFeatCode_score);
+  }
+  /** @generated */    
+  public void setScore(int addr, double v) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revised");
+    ll_cas.ll_setDoubleValue(addr, casFeatCode_score, v);}
     
   
 
@@ -171,12 +152,12 @@ public class Revised_Type extends Annotation_Type {
     casFeatCode_tokens  = (null == casFeat_tokens) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_tokens).getCode();
 
  
-    casFeat_pos = jcas.getRequiredFeatureDE(casType, "pos", "uima.cas.StringArray", featOkTst);
-    casFeatCode_pos  = (null == casFeat_pos) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_pos).getCode();
-
- 
     casFeat_count = jcas.getRequiredFeatureDE(casType, "count", "uima.cas.Integer", featOkTst);
     casFeatCode_count  = (null == casFeat_count) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_count).getCode();
+
+ 
+    casFeat_score = jcas.getRequiredFeatureDE(casType, "score", "uima.cas.Double", featOkTst);
+    casFeatCode_score  = (null == casFeat_score) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_score).getCode();
 
   }
 }

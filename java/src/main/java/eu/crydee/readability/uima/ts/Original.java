@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Tue Jun 03 10:36:02 JST 2014 */
+/* First created by JCasGen Wed Jun 04 11:48:42 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -12,7 +12,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Tue Jun 03 10:36:02 JST 2014
+ * Updated by JCasGen Wed Jun 04 11:48:42 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Original extends Annotation {
