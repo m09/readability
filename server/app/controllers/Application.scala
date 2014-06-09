@@ -34,6 +34,7 @@ object Application extends Controller {
   private val tokEndF = tokT.getFeatureByBaseName("end")
   private val tokPosF = tokT.getFeatureByBaseName("POS")
   private val revT = CasUtil.getType(aeN.newCAS, classOf[Revised])
+  private val revScrF = revT.getFeatureByBaseName("score")
   private val revCntF = revT.getFeatureByBaseName("count")
   private val revTxtF = revT.getFeatureByBaseName("text")
   private val revTokF = revT.getFeatureByBaseName("tokens")
@@ -50,7 +51,8 @@ object Application extends Controller {
   def writeRev(rev: FeatureStructure): JsValue = Json.obj(
     "text"    -> rev.getStringValue (revTxtF),
     "tokens"  -> rev.getFeatureValue(revTokF).asInstanceOf[StringArray].toArray,
-    "count"   -> rev.getIntValue    (revCntF)
+    "count"   -> rev.getIntValue    (revCntF),
+    "score"   -> rev.getDoubleValue (revScrF)
   )
 
   def writeTxtOriginal(ori: Original): JsValue = Json.obj(

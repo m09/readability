@@ -53,12 +53,18 @@ var OutputPane = React.createClass({
             });
         });
     },
-    toHtml: function(text, spans) {
+    toHtml: function(text, anns, spans) {
         var output = [];
         var f = true;
+        var scores = _.pluck(_.flatten(_.pluck(anns, 'revised')), 'score');
+        var maxScore = _.max(scores);
+        var minScore = _.min(scores);
+        console.log('min', minScore, 'max', maxScore);
         _.each(spans, function(span) {
             if (!_.isEmpty(span[2])) {
-                output.push(<Mapping style={f ? 'red' : 'blue'} data={span[2]}
+                output.push(<Mapping data={span[2]}
+                            maxScore={maxScore}
+                            minScore={minScore}
                             text={text.substring(span[0], span[1])}/>);
                 f = !f;
             } else {
@@ -72,7 +78,7 @@ var OutputPane = React.createClass({
             anns = this.props.data.annotations.text,
             spans = this.spans(text, anns);
         this.fillSpans(anns, spans);
-        var mappings = this.toHtml(text, spans);
+        var mappings = this.toHtml(text, anns, spans);
         return (<section id={this.props.id} className="tab-pane">
                 {mappings}</section>);
     }

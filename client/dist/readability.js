@@ -38,29 +38,82 @@ r.batchedUpdates(n,s)}};t.exports=i},{"./EventPluginHub":16,"./ReactUpdates":69}
 //# sourceMappingURL=underscore-min.map
 /** @jsx React.DOM */
 var Mapping = React.createClass({displayName: 'Mapping',
+    // https://stackoverflow.com/questions/5560248
+    color: function(min, max, value) {
+        var p = (value - min) / (max - min),
+            c0 = "#FF0000",
+            c1 = "#00FF00",
+            f = parseInt(c0.slice(1), 16),
+            t = parseInt(c1.slice(1), 16),
+            R1 = f >> 16,
+            G1 = f >> 8 & 0x00FF,
+            B1 = f & 0x0000FF,
+            R2 = t >> 16,
+            G2 = t >> 8 & 0x00FF,
+            B2 = t & 0x0000FF;
+        return (
+            "#" + (0x1000000 + (Math.round((R2 - R1) * p) + R1) * 0x10000
+                   + (Math.round((G2 - G1) * p) + G1) * 0x100
+                   + (Math.round((B2 - B1) * p) + B1))
+                .toString(16)
+                .slice(1));
+    },
     render: function() {
+        if (_.isEmpty(this.props.data)) {
+            return;
+        }
+        var sortedSpan = _.sortBy(
+            _.map(this.props.data, function(m) {
+                return {
+                    original: m.original,
+                    revised: _.sortBy(m.revised, function(r) {
+                        return -r.count;
+                    })
+                };
+            }),
+            function(r) { return -r.revised[0].score; }
+        );
         var lis = [];
-        _.each(this.props.data, function(d) {
-            lis.push(React.DOM.li( {role:"presentation", className:"dropdown-header"}, 
-                    d.original.text
-                    ));
-            var revs = _.sortBy(d.revised, function(r) { return -r.count;});
+        var spanScore = sortedSpan[0].revised[0].score;
+        _.each(sortedSpan, function(d) {
+            var revs = d.revised;
+            lis.push(React.DOM.li( {role:"presentation",
+                     className:"dropdown-header",
+                     style:{
+                         color: this.color(
+                             this.props.minScore,
+                             this.props.maxScore,
+                             _.head(revs).score
+                         )
+                     }}, 
+                     d.original.text
+                     ));
             _.each(_.take(revs, 10), function(r) {
-                lis.push(React.DOM.li( {role:"presentation"}, 
-                         r.text.length > 20
+                lis.push(React.DOM.li( {role:"presentation",
+                         style:{
+                             color: this.color(
+                                 this.props.minScore,
+                                 this.props.maxScore,
+                                 r.score
+                                 )
+                         }}, 
+                         r.text.length > 15
                           ? React.DOM.span( {title:r.text}, 
-                          r.text.substring(0, 19) + '…'
+                          r.text.substring(0, 13) + '…'
                           )
                           : r.text,
                          React.DOM.span( {className:"badge pull-right"}, 
-                         r.count
+                         Math.round(r.score * 100) / 100
                          )
                          ));
-            });
-        });
+            }.bind(this));
+        }.bind(this));
         return (React.DOM.span( {className:"dropdown"}, 
                 React.DOM.span( {className:"dropdown-toggle", 'data-toggle':"dropdown",
-                style:{color: this.props.style,
+                style:{color: this.color(
+                    this.props.minScore,
+                    this.props.maxScore,
+                    spanScore),
                         textDecoration: 'underline',
                         cursor: 'help'}}, 
                 this.props.text
@@ -136,14 +189,18 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
             });
         });
     },
-    toHtml: function(text, spans) {
-        console.log("HEY", spans);
+    toHtml: function(text, anns, spans) {
         var output = [];
         var f = true;
+        var scores = _.pluck(_.flatten(_.pluck(anns, 'revised')), 'score');
+        var maxScore = _.max(scores);
+        var minScore = _.min(scores);
+        console.log('min', minScore, 'max', maxScore);
         _.each(spans, function(span) {
-            console.log("HAI");
             if (!_.isEmpty(span[2])) {
-                output.push(Mapping( {style:f ? 'red' : 'blue', data:span[2],
+                output.push(Mapping( {data:span[2],
+                            maxScore:maxScore,
+                            minScore:minScore,
                             text:text.substring(span[0], span[1])}));
                 f = !f;
             } else {
@@ -157,10 +214,7 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
             anns = this.props.data.annotations.text,
             spans = this.spans(text, anns);
         this.fillSpans(anns, spans);
-        var mappings = this.toHtml(text, spans);
-        console.log("spans       ", spans);
-        console.log("filled spans", spans);
-        console.log("mappings", mappings);
+        var mappings = this.toHtml(text, anns, spans);
         return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
                 mappings));
     }

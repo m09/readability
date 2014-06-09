@@ -185,6 +185,7 @@ public class MapperAE extends CasAnnotator_ImplBase {
                     int revisedWidth = rev.getTokens().size();
                     Revised revised = new Revised(aCas.getJCas(), begin, end);
                     revised.setCount(pair.getValue().count);
+                    revised.setScore(pair.getValue().score);
                     StringArray sa
                             = new StringArray(aCas.getJCas(), revisedWidth);
                     sa.copyFromArray(

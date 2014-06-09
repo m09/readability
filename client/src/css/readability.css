@@ -26,6 +26,10 @@ body {
      font-family: 'Ubuntu', sans-serif;
 }
 
+.dropdown-menu {
+     width: 200px;
+}
+
 .dropdown-menu > li {
      padding-left: 8px;
      padding-right: 3px;
