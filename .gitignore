@@ -23,3 +23,12 @@ indented.xml
 /server/project/target
 /server/target
 /transducers
+/docear
+/report/auto
+/report/*.aux
+/report/*.fdb_latexmk
+/report/*.fls
+/report/*.log
+/report/*.org
+/report/*.pdf
+/report/*.toc
