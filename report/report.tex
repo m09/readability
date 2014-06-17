@@ -1,0 +1,105 @@
+%%% Local Variables: 
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% End: 
+\documentclass[a4paper]{scrreprt}
+
+\usepackage{fontspec}
+\setmainfont{Linux Libertine O}
+\usepackage{polyglossia}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{wrapfig}
+\usepackage{float}
+
+\renewcommand\chaptername{Section}
+\renewcommand\thechapter{\Roman{chapter}}
+
+\DeclareGraphicsExtensions{.png, .jpeg, .jpg, .svg, .eps}
+
+\begin{document}
+\begin{titlepage}
+  \begin{center}
+    \noindent\rule{\textwidth}{0.4pt}
+    {\huge\bfseries Improving text readability using Simple
+      Wikipedia\\}
+    \noindent\rule{\textwidth}{0.4pt}\\
+    % ----------------------------------------------------------------
+    \vspace{1.5cm}
+    {\large
+      \textbf{Author:} \textsc{Hugo Mougard}
+      \hfill
+      \textbf{Advisor:} \textsc{Akiko Aizawa}}\\[5pt]
+    % ----------------------------------------------------------------
+    \vfill
+    \parbox{0pt}{\large \begin{tabbing}
+        \textbf{Sending institution:} \= National Institute of Informatics \kill
+        \textbf{Sending institution:} \> Université de Nantes, France \\
+        \textbf{Hosting institution:} \> National Institute of
+        Informatics, Japan \\
+      \end{tabbing}}
+    \vfill
+    {\LARGE ATAL Master 2 internship report}
+    \vfill
+    % ----------------------------------------------------------------
+    \includegraphics[width=0.19\textwidth]{img/nii.png}
+    \hfill
+    \includegraphics[width=0.19\textwidth]{img/lina.png}
+    \hfill
+    \includegraphics[width=0.19\textwidth]{img/univ.eps}
+    \vfill
+    {July 2014}
+  \end{center}
+\end{titlepage}
+
+\tableofcontents
+\chapter{Introduction, description de la problématique}
+
+\chapter{Présentation de l'entreprise ou du laboratoire}
+
+\section{National Institute of Informatics}
+\label{sec:national-institute-of-informatics}
+
+My internship takes place at the National Institute of Informatics,
+Tokyo, Japan. 
+
+\section{Aizawa Laboratory}
+\label{sec:aizawa-laboratory}
+
+The team that welcomed me for this work is Aizawa Laboratory. It is
+led by Professor Akiko Aizawa. At the time of this writing, the
+laboratory has 18 members and strong partnerships with ex-members of
+the laboratory.
+
+Its expertise lies in several sub-domains of NLP: gaze-NLP, Analysis
+and mining of scientific papers, mathematical information retrieval, etc…
+
+\chapter{Description à la fois globale (l'intérêt du sujet) et précise (quelle est la question) du sujet}
+
+\chapter{State of the art}
+\label{sec:sota}
+
+Readability as been studied extensively. The first works in this area
+date back to almost a century ago: Thorndike computed list of ten
+thousand easy words. This list got used shortly thereafter by teachers
+trying to select good books for children learning to read went through
+the process of estimating the readability of many books.
+
+More recently, from 2006 onwards, Simple English Wikipedia has been
+rightly seen as an important resource for readability studies. Many
+scientists have used it to compute parallel corpora of readable their
+hard-to-read counterparts sentences.
+
+\chapter{Etude de l'existant (solutions techniques)}
+
+
+
+\chapter{Descriptif de la solution (selon le sujet, analyse algorithmique, technique, technologique, etc)}
+\chapter{Conclusions  et perspectives}
+
+
+\end{document}
