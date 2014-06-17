@@ -1,6 +1,7 @@
 package eu.crydee.readability.uima;
 
 import eu.crydee.readability.uima.ae.MapperAE;
+import eu.crydee.readability.uima.ae.RewriterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
@@ -28,7 +29,7 @@ public class DictUsagePipeline {
             throws ResourceInitializationException,
             AnalysisEngineProcessException {
         AnalysisEngine ae = buildAe(
-                "file:out/res/dictTxt.xml",
+                "file:out/res/processed/dictTxt.xml/filtered.xml",
                 "file:out/res/dictPos.xml",
                 true);
 
@@ -108,6 +109,10 @@ public class DictUsagePipeline {
                         MapperAE.RES_POS,
                         dictPos);
 
+        AnalysisEngineDescription rewriter
+                = AnalysisEngineFactory.createEngineDescription(
+                        RewriterAE.class);
+
         AnalysisEngineDescription consumerXmi = null;
         if (serialize) {
             consumerXmi = AnalysisEngineFactory.createEngineDescription(
@@ -126,6 +131,7 @@ public class DictUsagePipeline {
         builder.add(tokenizer);
         builder.add(tagger);
         builder.add(mapper);
+        builder.add(rewriter);
         if (serialize) {
             builder.add(consumerXmi);
         }
