@@ -1,6 +1,5 @@
 package eu.crydee.readability.uima.ae;
 
-import com.google.common.collect.TreeMultimap;
 import eu.crydee.readability.uima.model.LogWeight;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metrics;
@@ -12,14 +11,12 @@ import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class RewriterAE extends JCasAnnotator_ImplBase {
@@ -77,17 +74,9 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
                         new UUID[]{UUID.fromString(sugg.getId())});
             }
         }
-        TreeMultimap<Double, UUID[]> rewritings = transitions.top(LIMIT);
-        int i = 0;
-        for (Entry<Double, UUID[]> rewriting : rewritings.entries()) {
+        for (Entry<Double, UUID[]> rewriting
+                : transitions.top(LIMIT).entries()) {
             mappings.addRewriting(rewriting.getValue(), rewriting.getKey());
-            logger.log(
-                    Level.INFO,
-                    "rewriting "
-                    + (++i)
-                    + ": "
-                    + ArrayUtils.toString(rewriting.getValue()));
         }
-        logger.log(Level.INFO, "mappings: " + mappings);
     }
 }
