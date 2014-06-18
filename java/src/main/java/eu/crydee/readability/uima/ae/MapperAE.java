@@ -157,8 +157,8 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                     Mapped rev = pair.getKey();
                     int revisedWidth = rev.getTokens().size();
                     Revised revised = new Revised(jcas, begin, end);
-                    revised.setCount(pair.getValue().count);
-                    revised.setScore(pair.getValue().score);
+                    revised.setCount(pair.getValue().getCount());
+                    revised.setScore(pair.getValue().getScore());
                     StringArray sa
                             = new StringArray(jcas, revisedWidth);
                     sa.copyFromArray(

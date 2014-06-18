@@ -57,9 +57,9 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             float lmProba = nlm.scoreSentence(tokens);
             for (Mapped revision : revisions.keySet()) {
                 Metrics metric = revisions.get(revision);
-                metric.score = Math.log(metric.count)
+                metric.setScore(Math.log(metric.getCount())
                         + Math.log(1 - Math.exp(lmProba))
-                        - Math.log(totalCount);
+                        - Math.log(totalCount));
             }
         }
     }

@@ -73,7 +73,7 @@ public class ReadabilityDict_Impl
         Double score = Double.parseDouble(xsr.getAttributeValue(null, "score"));
         Mapped revised = parseRevision(xsr);
         add(rev, revised, count);
-        dict.get(rev).get(revised).score = score;
+        dict.get(rev).get(revised).setScore(score);
     }
 
     private Mapped parseRevision(XMLStreamReader xsr)
@@ -103,10 +103,10 @@ public class ReadabilityDict_Impl
                 xsw.writeStartElement("revised");
                 xsw.writeAttribute(
                         "count",
-                        String.valueOf(revisedMap.get(revised).count));
+                        String.valueOf(revisedMap.get(revised).getCount()));
                 xsw.writeAttribute(
                         "score",
-                        String.valueOf(revisedMap.get(revised).score));
+                        String.valueOf(revisedMap.get(revised).getScore()));
                 saveRevision(xsw, revised);
                 xsw.writeEndElement();
             }
@@ -141,10 +141,10 @@ public class ReadabilityDict_Impl
         }
         Metrics scores = revisions.get(revised);
         if (scores == null) {
-            scores = new Metrics();
+            scores = new Metrics(0, 0d);
             revisions.put(revised, scores);
         }
-        scores.count += count;
+        scores.setCount(scores.getCount() + count);
         totalCount += count;
     }
 
@@ -152,7 +152,7 @@ public class ReadabilityDict_Impl
     public void add(Mapped original, Mapped revised) {
         add(original, revised, 1);
     }
-    
+
     @Override
     public int getTotalCount() {
         return totalCount;
