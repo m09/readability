@@ -4,6 +4,8 @@ package controllers
 import eu.crydee.readability.uima.DictUsagePipeline
 import eu.crydee.readability.uima.ts.Original
 import eu.crydee.readability.uima.ts.Revised
+import eu.crydee.readability.uima.ts.Rewritings
+import eu.crydee.readability.uima.ts.Rewriting
 import eu.crydee.readability.uima.ts.TxtSuggestion
 import eu.crydee.readability.uima.ts.PosSuggestion
 import eu.crydee.readability.uima.ts.Token
@@ -76,6 +78,24 @@ object Application extends Controller {
     "end"   -> tok.getIntValue   (tokEndF)
   )
 
+  implicit val rewritingWrites = new Writes[Rewriting] {
+    def writes(rewriting: Rewriting): JsValue = Json.obj(
+      "text"  -> rewriting.getRewriting,
+      "score" -> rewriting.getScore
+    )
+  }
+
+  implicit val rewritingsWrites = new Writes[Rewritings] {
+    def writes(rewritings: Rewritings): JsValue = {
+      val fsa = rewritings.getRewritings
+      Json.toJson(
+        0 until fsa.size map {
+          i => rewritings.getRewritings(i)
+        }
+      )
+    }
+  }
+
   implicit val txtSuggestionWrites = new Writes[TxtSuggestion] {
     def writes(suggestion: TxtSuggestion): JsValue = Json.obj(
       "original" -> writeTxtOriginal(suggestion.getOriginal),
@@ -104,6 +124,9 @@ object Application extends Controller {
       val tokens : scala.collection.Iterable[Token] = JCasUtil.select(
         jcas,
         classOf[Token])
+      val rewritings : Rewritings = JCasUtil.selectSingle(
+        jcas,
+        classOf[Rewritings])
       Ok(
         Json.obj(
           "text"        -> jcas.getDocumentText,
@@ -118,7 +141,8 @@ object Application extends Controller {
           "annotations" -> Json.obj(
             "text" -> Json.toJson(txtSuggs),
             "pos"  -> Json.toJson(posSuggs)
-          )
+          ),
+          "rewritings" -> rewritings
         )
       ).withHeaders(headers : _*)
     }

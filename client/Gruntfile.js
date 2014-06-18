@@ -9,6 +9,7 @@ module.exports = function(grunt) {
                         'src/js/Mapping.jsx',
                         'src/js/InputPane.jsx',
                         'src/js/OutputPane.jsx',
+                        'src/js/RewritingsPane.jsx',
                         'src/js/Annotator.jsx'
                     ]
                 }

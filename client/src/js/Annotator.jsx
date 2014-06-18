@@ -43,13 +43,25 @@ var Annotator = React.createClass({
 
                 <li>
                 <a href="#normal" onClick={this.toNormal} data-toggle="tab">
-                Full resource analysis
+                Full analysis
                 </a>
                 </li>
                 
                 <li>
                 <a href="#filtered" onClick={this.toFiltered} data-toggle="tab">
-                Filtered resource analysis
+                Filtered analysis
+                </a>
+                </li>
+
+                <li>
+                <a href="#normal-rewritings" onClick={this.toFiltered} data-toggle="tab">
+                Full rewritings
+                </a>
+                </li>
+
+                <li>
+                <a href="#filtered-rewritings" onClick={this.toFiltered} data-toggle="tab">
+                Filtered rewritings
                 </a>
                 </li>
                 </ul>
@@ -58,6 +70,8 @@ var Annotator = React.createClass({
                 <InputPane ref="input"/>
                 <OutputPane id="normal" data={this.state.data.normal}/>
                 <OutputPane id="filtered" data={this.state.data.filtered}/>
+                <RewritingsPane id="normal-rewritings" data={this.state.data.normal}/>
+                <RewritingsPane id="filtered-rewritings" data={this.state.data.filtered}/>
                 </section>
                 </section>
         );

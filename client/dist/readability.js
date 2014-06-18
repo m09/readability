@@ -221,6 +221,35 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
 });
 
 /** @jsx React.DOM */
+var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
+    toRows: function(tops) {
+        var output = [];
+
+        var row = null;
+        output.push(React.DOM.tr(null, React.DOM.td(null, "0.0"),React.DOM.td(null, "Hai")));
+        return _.map(tops, function(top) {
+            return React.DOM.tr(null, React.DOM.td(null, top.score),React.DOM.td(null, top.text));
+        });
+    },
+    render: function() {
+        var rows = this.toRows(this.props.data.rewritings);
+        return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
+                React.DOM.table( {className:"table table-striped table-condensed"}, 
+                React.DOM.thead(null, 
+                React.DOM.tr(null, 
+                React.DOM.th(null, "Score"),
+                React.DOM.th(null, "Rewriting")
+                )
+                ),
+                React.DOM.tbody(null, 
+                rows
+                )
+                )
+                ));
+    }
+});
+
+/** @jsx React.DOM */
 var Annotator = React.createClass({displayName: 'Annotator',
     getInitialState: function() {
         return {
@@ -265,13 +294,25 @@ var Annotator = React.createClass({displayName: 'Annotator',
 
                 React.DOM.li(null, 
                 React.DOM.a( {href:"#normal", onClick:this.toNormal, 'data-toggle':"tab"}, 
-                "Full resource analysis"
+                "Full analysis"
                 )
                 ),
                 
                 React.DOM.li(null, 
                 React.DOM.a( {href:"#filtered", onClick:this.toFiltered, 'data-toggle':"tab"}, 
-                "Filtered resource analysis"
+                "Filtered analysis"
+                )
+                ),
+
+                React.DOM.li(null, 
+                React.DOM.a( {href:"#normal-rewritings", onClick:this.toFiltered, 'data-toggle':"tab"}, 
+                "Full rewritings"
+                )
+                ),
+
+                React.DOM.li(null, 
+                React.DOM.a( {href:"#filtered-rewritings", onClick:this.toFiltered, 'data-toggle':"tab"}, 
+                "Filtered rewritings"
                 )
                 )
                 ),
@@ -279,7 +320,9 @@ var Annotator = React.createClass({displayName: 'Annotator',
                 React.DOM.section( {className:"tab-content"}, 
                 InputPane( {ref:"input"}),
                 OutputPane( {id:"normal", data:this.state.data.normal}),
-                OutputPane( {id:"filtered", data:this.state.data.filtered})
+                OutputPane( {id:"filtered", data:this.state.data.filtered}),
+                RewritingsPane( {id:"normal-rewritings", data:this.state.data.normal}),
+                RewritingsPane( {id:"filtered-rewritings", data:this.state.data.filtered})
                 )
                 )
         );
