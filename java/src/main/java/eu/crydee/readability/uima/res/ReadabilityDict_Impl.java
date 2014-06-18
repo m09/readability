@@ -171,14 +171,4 @@ public class ReadabilityDict_Impl
     public Set<Mapped> keySet() {
         return Collections.unmodifiableSet(dict.keySet());
     }
-
-    @Override
-    public void set(Mapped original, Mapped revised, Integer count, Double score) {
-        Map<Mapped, Metrics> revisions = dict.get(original);
-        if (revisions == null) {
-            revisions = new HashMap<>();
-            dict.put(original, revisions);
-        }
-        revisions.put(revised, new Metrics(count, score));
-    }
 }

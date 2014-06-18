@@ -13,12 +13,6 @@ public interface ReadabilityDict {
 
     public void add(Mapped original, Mapped revised, Integer count);
 
-    public void set(
-            Mapped original,
-            Mapped revised,
-            Integer count,
-            Double score);
-
     public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original);
 
     public Set<Mapped> keySet();
