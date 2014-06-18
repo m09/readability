@@ -13,6 +13,8 @@ public interface Mappings {
 
     void putRevision(UUID id, Mapped revision, Metrics metrics);
 
+    Map<UUID, Map<Mapped, Metrics>> getRevisionsMap();
+
     Optional<Map<Mapped, Metrics>> getRevisions(UUID id);
 
     Optional<Map<Mapped, Metrics>> getRevisions(String id);
