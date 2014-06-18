@@ -46,6 +46,4 @@ public class Mapped {
         }
         return Objects.equals(this.tokens, other.tokens);
     }
-    
-    
 }
