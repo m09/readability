@@ -28,32 +28,6 @@
             <supertypeName>eu.crydee.readability.uima.ts.Suggestion</supertypeName>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.Rewritings</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <featureDescription>
-                <name>rewritings</name>
-                <description/>
-                <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                <elementType>eu.crydee.readability.uima.ts.Rewriting</elementType>
-            </featureDescription>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.Rewriting</name>
-            <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
-            <featureDescription>
-                <name>rewriting</name>
-                <description/>
-                <rangeTypeName>uima.cas.String</rangeTypeName>
-            </featureDescription>
-            <featureDescription>
-                <name>score</name>
-                <description/>
-                <rangeTypeName>uima.cas.Double</rangeTypeName>
-            </featureDescription>
-        </typeDescription>
-        <typeDescription>
             <name>eu.crydee.readability.uima.ts.Sentence</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
