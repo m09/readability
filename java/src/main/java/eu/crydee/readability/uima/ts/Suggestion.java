@@ -1,18 +1,17 @@
 
 
-/* First created by JCasGen Tue Jun 17 15:34:47 JST 2014 */
+/* First created by JCasGen Wed Jun 18 17:07:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
 import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.cas.TOP_Type;
 
-import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Tue Jun 17 15:34:47 JST 2014
+ * Updated by JCasGen Wed Jun 18 17:07:12 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Suggestion extends Annotation {
@@ -64,55 +63,21 @@ public class Suggestion extends Annotation {
  
     
   //*--------------*
-  //* Feature: original
+  //* Feature: id
 
-  /** getter for original - gets 
+  /** getter for id - gets 
    * @generated */
-  public Original getOriginal() {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_original == null)
-      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.Suggestion");
-    return (Original)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_original)));}
+  public String getId() {
+    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_id == null)
+      jcasType.jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Suggestion");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((Suggestion_Type)jcasType).casFeatCode_id);}
     
-  /** setter for original - sets  
+  /** setter for id - sets  
    * @generated */
-  public void setOriginal(Original v) {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_original == null)
-      jcasType.jcas.throwFeatMissing("original", "eu.crydee.readability.uima.ts.Suggestion");
-    jcasType.ll_cas.ll_setRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_original, jcasType.ll_cas.ll_getFSRef(v));}    
-   
-    
-  //*--------------*
-  //* Feature: revised
-
-  /** getter for revised - gets 
-   * @generated */
-  public FSArray getRevised() {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
-      jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
-    return (FSArray)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised)));}
-    
-  /** setter for revised - sets  
-   * @generated */
-  public void setRevised(FSArray v) {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
-      jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
-    jcasType.ll_cas.ll_setRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised, jcasType.ll_cas.ll_getFSRef(v));}    
-    
-  /** indexed getter for revised - gets an indexed value - 
-   * @generated */
-  public Revised getRevised(int i) {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
-      jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
-    jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i);
-    return (Revised)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i)));}
-
-  /** indexed setter for revised - sets an indexed value - 
-   * @generated */
-  public void setRevised(int i, Revised v) { 
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revised == null)
-      jcasType.jcas.throwFeatMissing("revised", "eu.crydee.readability.uima.ts.Suggestion");
-    jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i);
-    jcasType.ll_cas.ll_setRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revised), i, jcasType.ll_cas.ll_getFSRef(v));}
+  public void setId(String v) {
+    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_id == null)
+      jcasType.jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Suggestion");
+    jcasType.ll_cas.ll_setStringValue(addr, ((Suggestion_Type)jcasType).casFeatCode_id, v);}    
   }
 
     

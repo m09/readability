@@ -2,28 +2,34 @@ package eu.crydee.readability.uima.ae;
 
 import com.google.common.collect.TreeMultimap;
 import eu.crydee.readability.uima.model.LogWeight;
+import eu.crydee.readability.uima.model.Mapped;
+import eu.crydee.readability.uima.model.Metrics;
 import eu.crydee.readability.uima.model.Transducer;
 import eu.crydee.readability.uima.model.Weight;
-import eu.crydee.readability.uima.ts.Original;
-import eu.crydee.readability.uima.ts.Revised;
-import eu.crydee.readability.uima.ts.Rewriting;
-import eu.crydee.readability.uima.ts.Rewritings;
+import eu.crydee.readability.uima.res.Mappings;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
+import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.FSArray;
+import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class RewriterAE extends JCasAnnotator_ImplBase {
 
     private static final Logger logger = UIMAFramework.getLogger(
             RewriterAE.class);
+
+    final static public String RES_MAPPINGS = "RES_MAPPINGS";
+    @ExternalResource(key = RES_MAPPINGS)
+    private Mappings mappings;
 
     public static final int LIMIT = 20;
 
@@ -33,7 +39,7 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         Transducer transitions = new Transducer(weight);
         int previousEnd = 0, txtLength = jcas.getDocumentText().length();
-        for (AnnotationFS token : JCasUtil.select(jcas, Token.class)) {
+        for (Token token : JCasUtil.select(jcas, Token.class)) {
             int begin = token.getBegin(),
                     end = token.getEnd();
             if (previousEnd < begin) {
@@ -41,13 +47,13 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
                         previousEnd,
                         begin,
                         weight.getUnit(),
-                        jcas.getDocumentText().substring(previousEnd, begin));
+                        new UUID[0]);
             }
             transitions.put(
                     begin,
                     end,
                     weight.getUnit(),
-                    token.getCoveredText());
+                    new UUID[0]);
             previousEnd = end;
         }
         if (previousEnd < txtLength) {
@@ -55,42 +61,33 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
                     previousEnd,
                     txtLength,
                     weight.getUnit(),
-                    jcas.getDocumentText().substring(previousEnd, txtLength));
+                    new UUID[0]);
         }
         for (TxtSuggestion sugg : JCasUtil.select(jcas, TxtSuggestion.class)) {
-            Original original = sugg.getOriginal();
-            int begin = original.getBegin(),
-                    end = original.getEnd();
-            for (int i = 0, s = sugg.getRevised().size();
-                    i < s && i < LIMIT;
-                    i++) {
-                Revised revised = sugg.getRevised(i);
+            int begin = sugg.getBegin(),
+                    end = sugg.getEnd();
+            Map<Mapped, Metrics> revisions
+                    = mappings.getRevisions(sugg.getId()).get();
+            for (Mapped revision : revisions.keySet()) {
+                Metrics metrics = revisions.get(revision);
                 transitions.put(
                         begin,
                         end,
-                        revised.getScore(),
-                        revised.getText());
+                        metrics.getScore(),
+                        new UUID[]{UUID.fromString(sugg.getId())});
             }
         }
-        TreeMultimap<Double, String> rewritings = transitions.top(LIMIT);
-        if (!rewritings.isEmpty()) {
-            Rewritings rewritingsAnn = new Rewritings(
-                    jcas,
-                    0,
-                    txtLength);
-            FSArray rewritingsA = new FSArray(
-                    jcas,
-                    rewritings.size());
-            rewritingsAnn.setRewritings(rewritingsA);
-            int i = 0;
-            for (Entry<Double, String> rewriting : rewritings.entries()) {
-                Rewriting rewritingAnn = new Rewriting(jcas);
-                rewritingAnn.setRewriting(rewriting.getValue());
-                rewritingAnn.setScore(rewriting.getKey());
-                rewritingsAnn.setRewritings(i, rewritingAnn);
-                ++i;
-            }
-            jcas.addFsToIndexes(rewritingsAnn);
+        TreeMultimap<Double, UUID[]> rewritings = transitions.top(LIMIT);
+        int i = 0;
+        for (Entry<Double, UUID[]> rewriting : rewritings.entries()) {
+            mappings.addRewriting(rewriting.getValue(), rewriting.getKey());
+            logger.log(
+                    Level.INFO,
+                    "rewriting "
+                    + (++i)
+                    + ": "
+                    + ArrayUtils.toString(rewriting.getValue()));
         }
+        logger.log(Level.INFO, "mappings: " + mappings);
     }
 }

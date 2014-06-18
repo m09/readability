@@ -3,6 +3,8 @@ package eu.crydee.readability.uima;
 import eu.crydee.readability.uima.ae.MapperAE;
 import eu.crydee.readability.uima.ae.RewriterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
+import eu.crydee.readability.uima.res.Mappings;
+import eu.crydee.readability.uima.res.Mappings_Impl;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
@@ -21,19 +23,22 @@ import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.resource.ExternalResourceDescription;
+import org.apache.uima.resource.ResourceAccessException;
 import org.apache.uima.resource.ResourceInitializationException;
 
 public class DictUsagePipeline {
 
     public static void main(String[] args)
             throws ResourceInitializationException,
-            AnalysisEngineProcessException {
+            AnalysisEngineProcessException,
+            ResourceAccessException {
         AnalysisEngine ae = buildAe(
                 "file:out/res/processed/dictTxt.xml/filtered.xml",
                 "file:out/res/dictPos.xml",
                 true);
-
         CAS aCas = ae.newCAS();
+        Mappings mappings
+                = (Mappings) ae.getResourceManager().getResource("mappings");
         aCas.setDocumentText("Hello there, and how do you do?");
 
         ae.process(aCas);
@@ -69,6 +74,12 @@ public class DictUsagePipeline {
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
                         filePosURI);
+
+        ExternalResourceDescription mappings
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        "mappings",
+                        Mappings_Impl.class,
+                        "");
 
         /* Analysis engines */
         AnalysisEngineDescription sentenceDetector
@@ -107,11 +118,15 @@ public class DictUsagePipeline {
                         MapperAE.RES_TXT,
                         dictTxt,
                         MapperAE.RES_POS,
-                        dictPos);
+                        dictPos,
+                        MapperAE.RES_MAPPINGS,
+                        mappings);
 
         AnalysisEngineDescription rewriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        RewriterAE.class);
+                        RewriterAE.class,
+                        RewriterAE.RES_MAPPINGS,
+                        mappings);
 
         AnalysisEngineDescription consumerXmi = null;
         if (serialize) {

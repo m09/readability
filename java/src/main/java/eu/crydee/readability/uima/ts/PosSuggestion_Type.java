@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Tue Jun 17 15:34:47 JST 2014 */
+/* First created by JCasGen Wed Jun 18 17:07:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -11,7 +11,7 @@ import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
 
 /** 
- * Updated by JCasGen Tue Jun 17 15:34:47 JST 2014
+ * Updated by JCasGen Wed Jun 18 17:07:12 JST 2014
  * @generated */
 public class PosSuggestion_Type extends Suggestion_Type {
   /** @generated */
