@@ -4,9 +4,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metrics;
-import eu.crydee.readability.uima.res.Mappings;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.ts.PosSuggestion;
+import eu.crydee.readability.uima.ts.Revision;
+import eu.crydee.readability.uima.ts.Revisions;
 import eu.crydee.readability.uima.ts.Suggestion;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
@@ -25,6 +26,8 @@ import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.FSArray;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
@@ -41,10 +44,6 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     final static public String RES_POS = "RES_POS";
     @ExternalResource(key = RES_POS)
     private ReadabilityDict dictPos;
-
-    final static public String RES_MAPPINGS = "RES_MAPPINGS";
-    @ExternalResource(key = RES_MAPPINGS)
-    private Mappings mappings;
 
     final private SetMultimap<List<String>, Pair<Mapped, Metrics>> byTxt
             = HashMultimap.create();
@@ -111,39 +110,48 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             throws AnalysisEngineProcessException {
         for (List<String> suggestionTokens : m.keySet()) {
             int width = suggestionTokens.size();
-            UUID id = mappings.freeId();
+            Set<Pair<Mapped, Metrics>> revisedSet = m.get(suggestionTokens);
+            Revisions revisions = new Revisions(jcas);
+            revisions.setRevisions(new FSArray(jcas, revisedSet.size()));
+            int k = 0;
+            for (Pair<Mapped, Metrics> pair : revisedSet) {
+                Mapped mapped = pair.getKey();
+                Metrics metrics = pair.getRight();
+                String[] toks = mapped.getTokens().toArray(new String[0]);
+                StringArray saToks = new StringArray(jcas, toks.length);
+                saToks.copyFromArray(toks, 0, 0, toks.length);
+                Revision revision = new Revision(jcas);
+                revision.setId(UUID.randomUUID().toString());
+                revision.setTokens(saToks);
+                revision.setCount(metrics.getCount());
+                revision.setScore(metrics.getScore());
+                revision.setText(mapped.getText());
+                revisions.setRevisions(k++, revision);
+            }
             for (Integer i : getSublistIndices(tokens, suggestionTokens)) {
                 int begin = positions.get(i).getLeft(),
                         end = positions.get(i + width - 1).getRight();
-                Set<Pair<Mapped, Metrics>> revisedSet = m.get(suggestionTokens);
-                if (!revisedSet.isEmpty()) {
-                    try {
-                        Suggestion suggestion;
-                        suggestion = suggestionClass.getConstructor(
-                                JCas.class,
-                                int.class,
-                                int.class)
-                                .newInstance(jcas, begin, end);
-                        suggestion.setId(id.toString());
-                        jcas.addFsToIndexes(suggestion);
-                        for (Pair<Mapped, Metrics> pair : revisedSet) {
-                            mappings.putRevision(
-                                    id,
-                                    pair.getKey(),
-                                    pair.getValue());
-                        }
-                    } catch (NoSuchMethodException |
-                            SecurityException |
-                            InstantiationException |
-                            IllegalAccessException |
-                            IllegalArgumentException |
-                            InvocationTargetException ex) {
-                        logger.log(
-                                Level.SEVERE,
-                                "couldn't create a suggestion annotation.",
-                                ex);
-                        throw new AnalysisEngineProcessException(ex);
-                    }
+                try {
+                    Suggestion suggestion;
+                    suggestion = suggestionClass.getConstructor(
+                            JCas.class,
+                            int.class,
+                            int.class)
+                            .newInstance(jcas, begin, end);
+                    suggestion.setRevisions(revisions);
+                    jcas.addFsToIndexes(suggestion);
+
+                } catch (NoSuchMethodException |
+                        SecurityException |
+                        InstantiationException |
+                        IllegalAccessException |
+                        IllegalArgumentException |
+                        InvocationTargetException ex) {
+                    logger.log(
+                            Level.SEVERE,
+                            "couldn't create a suggestion annotation.",
+                            ex);
+                    throw new AnalysisEngineProcessException(ex);
                 }
             }
         }

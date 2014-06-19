@@ -4,12 +4,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.TreeMultimap;
+import eu.crydee.readability.uima.ts.Revision;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.util.Level;
@@ -20,7 +21,7 @@ public class Transducer {
     private static final Logger logger = UIMAFramework.getLogger(
             Transducer.class);
 
-    private final SortedMap<Integer, Map<Integer, TreeMultimap<Double, UUID[]>>> byStarts;
+    private final SortedMap<Integer, Map<Integer, TreeMultimap<Double, Optional<Revision>>>> byStarts;
     private final SetMultimap<Integer, Integer> byEnds = HashMultimap.create();
     private final Weight weight;
 
@@ -32,17 +33,16 @@ public class Transducer {
     public void put(
             Integer start,
             Integer end,
-            Double score,
-            UUID[] revisions) {
+            Optional<Revision> revision) {
         byEnds.put(end, start);
-        Map<Integer, TreeMultimap<Double, UUID[]>> ends;
+        Map<Integer, TreeMultimap<Double, Optional<Revision>>> ends;
         if (!byStarts.containsKey(start)) {
             ends = new HashMap<>();
             byStarts.put(start, ends);
         } else {
             ends = byStarts.get(start);
         }
-        TreeMultimap<Double, UUID[]> scores;
+        TreeMultimap<Double, Optional<Revision>> scores;
         if (!ends.containsKey(end)) {
             scores = TreeMultimap.create(
                     weight.comparator().reversed(),
@@ -51,25 +51,29 @@ public class Transducer {
         } else {
             scores = ends.get(end);
         }
-        scores.put(score, revisions);
+        if (revision.isPresent()) {
+            scores.put(revision.get().getScore(), revision);
+        } else {
+            scores.put(weight.getUnit(), Optional.empty());
+        }
     }
 
-    public TreeMultimap<Double, UUID[]> top(int n) {
+    public TreeMultimap<Double, Revision[]> top(int n) {
         logger.log(Level.INFO, "byEnds  : " + byEnds.toString());
         logger.log(Level.INFO, "byStarts: " + byStarts.toString());
-        SortedMap<Integer, TreeMultimap<Double, UUID[]>> bests
+        SortedMap<Integer, TreeMultimap<Double, Revision[]>> bests
                 = new TreeMap<>();
-        TreeMultimap<Double, UUID[]> initial = TreeMultimap.create(
+        TreeMultimap<Double, Revision[]> initial = TreeMultimap.create(
                 weight.comparator().reversed(),
                 Ordering.allEqual());
-        initial.put(weight.getUnit(), new UUID[0]);
+        initial.put(weight.getUnit(), new Revision[0]);
         bests.put(0, initial);
         int current = 1;
-        SortedMap<Integer, Map<Integer, TreeMultimap<Double, UUID[]>>> tail
+        SortedMap<Integer, Map<Integer, TreeMultimap<Double, Optional<Revision>>>> tail
                 = byStarts.tailMap(current);
         while (!tail.isEmpty()) {
             current = tail.firstKey();
-            TreeMultimap<Double, UUID[]> currentBests
+            TreeMultimap<Double, Revision[]> currentBests
                     = TreeMultimap.create(
                             weight.comparator().reversed(),
                             Ordering.allEqual());
@@ -80,7 +84,7 @@ public class Transducer {
                             + leadingToCurrent
                             + " while it should");
                 }
-                Map<Integer, TreeMultimap<Double, UUID[]>> starts
+                Map<Integer, TreeMultimap<Double, Optional<Revision>>> starts
                         = byStarts.get(leadingToCurrent);
                 if (!starts.containsKey(current)) {
                     throw new IllegalStateException(
@@ -91,27 +95,35 @@ public class Transducer {
                             + current
                             + " while it should");
                 }
-                TreeMultimap<Double, UUID[]> transitions = starts.get(current);
-                for (Entry<Double, UUID[]> trans : transitions.entries()) {
-                    for (Entry<Double, UUID[]> start
+                TreeMultimap<Double, Optional<Revision>> transitions
+                        = starts.get(current);
+                for (Entry<Double, Optional<Revision>> trans
+                        : transitions.entries()) {
+                    for (Entry<Double, Revision[]> start
                             : bests.get(leadingToCurrent).entries()) {
-                        currentBests.put(
-                                weight.mul(start.getKey(), trans.getKey()),
-                                ArrayUtils.addAll(
-                                        start.getValue(),
-                                        trans.getValue()));
+                        if (trans.getValue().isPresent()) {
+                            currentBests.put(
+                                    weight.mul(start.getKey(), trans.getKey()),
+                                    ArrayUtils.add(
+                                            start.getValue(),
+                                            trans.getValue().get()));
+                        } else {
+                            currentBests.put(
+                                    weight.mul(start.getKey(), trans.getKey()),
+                                    ArrayUtils.clone(start.getValue()));
+                        }
                     }
                 }
                 logger.log(Level.INFO, transitions.toString());
 
             }
             int i = 0;
-            TreeMultimap<Double, UUID[]> toPut
+            TreeMultimap<Double, Revision[]> toPut
                     = TreeMultimap.create(weight.comparator().reversed(),
                             Ordering.allEqual());
             outer:
             for (Double w : currentBests.keySet()) {
-                for (UUID[] revisions : currentBests.get(w)) {
+                for (Revision[] revisions : currentBests.get(w)) {
                     if (i >= n) {
                         break outer;
                     }
@@ -123,13 +135,13 @@ public class Transducer {
             // while increment
             tail = tail.tailMap(current + 1);
         }
-        TreeMultimap<Double, UUID[]> result
+        TreeMultimap<Double, Revision[]> result
                 = TreeMultimap.create(weight.comparator().reversed(),
                         Ordering.allEqual());
         int i = 0;
-        TreeMultimap<Double, UUID[]> last = bests.get(bests.lastKey());
+        TreeMultimap<Double, Revision[]> last = bests.get(bests.lastKey());
         for (Double score : last.keySet()) {
-            for (UUID[] revisions : last.get(score)) {
+            for (Revision[] revisions : last.get(score)) {
                 result.put(score, revisions);
             }
         }

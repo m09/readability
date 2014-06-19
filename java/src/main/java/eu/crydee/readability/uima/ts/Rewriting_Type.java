@@ -16,7 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation_Type;
 /** 
  * Updated by JCasGen Thu Jun 19 18:22:11 JST 2014
  * @generated */
-public class Suggestion_Type extends Annotation_Type {
+public class Rewriting_Type extends Annotation_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
@@ -24,25 +24,25 @@ public class Suggestion_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Suggestion_Type.this.useExistingInstance) {
+  			 if (Rewriting_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Suggestion_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = Rewriting_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Suggestion(addr, Suggestion_Type.this);
-  			   Suggestion_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new Rewriting(addr, Rewriting_Type.this);
+  			   Rewriting_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Suggestion(addr, Suggestion_Type.this);
+        } else return new Rewriting(addr, Rewriting_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Suggestion.typeIndexID;
+  public final static int typeIndexID = Rewriting.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Suggestion");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Rewriting");
  
   /** @generated */
   final Feature casFeat_revisions;
@@ -51,27 +51,46 @@ public class Suggestion_Type extends Annotation_Type {
   /** @generated */ 
   public int getRevisions(int addr) {
         if (featOkTst && casFeat_revisions == null)
-      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Suggestion");
+      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     return ll_cas.ll_getRefValue(addr, casFeatCode_revisions);
   }
   /** @generated */    
   public void setRevisions(int addr, int v) {
         if (featOkTst && casFeat_revisions == null)
-      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Suggestion");
+      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     ll_cas.ll_setRefValue(addr, casFeatCode_revisions, v);}
     
-  
+   /** @generated */
+  public int getRevisions(int addr, int i) {
+        if (featOkTst && casFeat_revisions == null)
+      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
+    if (lowLevelTypeChecks)
+      return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i, true);
+    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i);
+	return ll_cas.ll_getRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i);
+  }
+   
+  /** @generated */ 
+  public void setRevisions(int addr, int i, int v) {
+        if (featOkTst && casFeat_revisions == null)
+      jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
+    if (lowLevelTypeChecks)
+      ll_cas.ll_setRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i, v, true);
+    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i);
+    ll_cas.ll_setRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i, v);
+  }
+ 
 
 
 
   /** initialize variables to correspond with Cas Type and Features
 	* @generated */
-  public Suggestion_Type(JCas jcas, Type casType) {
+  public Rewriting_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
-    casFeat_revisions = jcas.getRequiredFeatureDE(casType, "revisions", "eu.crydee.readability.uima.ts.Revisions", featOkTst);
+    casFeat_revisions = jcas.getRequiredFeatureDE(casType, "revisions", "uima.cas.FSArray", featOkTst);
     casFeatCode_revisions  = (null == casFeat_revisions) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_revisions).getCode();
 
   }

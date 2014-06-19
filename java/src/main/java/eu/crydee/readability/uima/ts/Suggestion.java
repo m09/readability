@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Wed Jun 18 17:07:12 JST 2014 */
+/* First created by JCasGen Thu Jun 19 18:22:11 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Wed Jun 18 17:07:12 JST 2014
+ * Updated by JCasGen Thu Jun 19 18:22:11 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Suggestion extends Annotation {
@@ -63,21 +63,21 @@ public class Suggestion extends Annotation {
  
     
   //*--------------*
-  //* Feature: id
+  //* Feature: revisions
 
-  /** getter for id - gets 
+  /** getter for revisions - gets 
    * @generated */
-  public String getId() {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_id == null)
-      jcasType.jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Suggestion");
-    return jcasType.ll_cas.ll_getStringValue(addr, ((Suggestion_Type)jcasType).casFeatCode_id);}
+  public Revisions getRevisions() {
+    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revisions == null)
+      jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Suggestion");
+    return (Revisions)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revisions)));}
     
-  /** setter for id - sets  
+  /** setter for revisions - sets  
    * @generated */
-  public void setId(String v) {
-    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_id == null)
-      jcasType.jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Suggestion");
-    jcasType.ll_cas.ll_setStringValue(addr, ((Suggestion_Type)jcasType).casFeatCode_id, v);}    
+  public void setRevisions(Revisions v) {
+    if (Suggestion_Type.featOkTst && ((Suggestion_Type)jcasType).casFeat_revisions == null)
+      jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Suggestion");
+    jcasType.ll_cas.ll_setRefValue(addr, ((Suggestion_Type)jcasType).casFeatCode_revisions, jcasType.ll_cas.ll_getFSRef(v));}    
   }
 
     

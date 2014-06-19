@@ -3,8 +3,6 @@ package eu.crydee.readability.uima;
 import eu.crydee.readability.uima.ae.MapperAE;
 import eu.crydee.readability.uima.ae.RewriterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
-import eu.crydee.readability.uima.res.Mappings;
-import eu.crydee.readability.uima.res.Mappings_Impl;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
@@ -37,10 +35,7 @@ public class DictUsagePipeline {
                 "file:out/res/dictPos.xml",
                 true);
         CAS aCas = ae.newCAS();
-        Mappings mappings
-                = (Mappings) ae.getResourceManager().getResource("mappings");
         aCas.setDocumentText("Hello there, and how do you do?");
-
         ae.process(aCas);
     }
 
@@ -75,12 +70,6 @@ public class DictUsagePipeline {
                         ReadabilityDict_Impl.class,
                         filePosURI);
 
-        ExternalResourceDescription mappings
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        "mappings",
-                        Mappings_Impl.class,
-                        "");
-
         /* Analysis engines */
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(
@@ -88,7 +77,7 @@ public class DictUsagePipeline {
                         "opennlp.uima.ModelName",
                         sentenceModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.Sentence");
+                        Sentence.class.getCanonicalName());
 
         AnalysisEngineDescription tokenizer
                 = AnalysisEngineFactory.createEngineDescription(
@@ -96,9 +85,9 @@ public class DictUsagePipeline {
                         "opennlp.uima.ModelName",
                         tokenModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.Sentence",
+                        Sentence.class.getCanonicalName(),
                         "opennlp.uima.TokenType",
-                        "eu.crydee.readability.uima.ts.Token");
+                        Token.class.getCanonicalName());
 
         AnalysisEngineDescription tagger
                 = AnalysisEngineFactory.createEngineDescription(
@@ -106,9 +95,9 @@ public class DictUsagePipeline {
                         "opennlp.uima.ModelName",
                         posModel,
                         "opennlp.uima.SentenceType",
-                        "eu.crydee.readability.uima.ts.Sentence",
+                        Sentence.class.getCanonicalName(),
                         "opennlp.uima.TokenType",
-                        "eu.crydee.readability.uima.ts.Token",
+                        Token.class.getCanonicalName(),
                         "opennlp.uima.POSFeature",
                         "POS");
 
@@ -118,15 +107,11 @@ public class DictUsagePipeline {
                         MapperAE.RES_TXT,
                         dictTxt,
                         MapperAE.RES_POS,
-                        dictPos,
-                        MapperAE.RES_MAPPINGS,
-                        mappings);
+                        dictPos);
 
         AnalysisEngineDescription rewriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        RewriterAE.class,
-                        RewriterAE.RES_MAPPINGS,
-                        mappings);
+                        RewriterAE.class);
 
         AnalysisEngineDescription consumerXmi = null;
         if (serialize) {
