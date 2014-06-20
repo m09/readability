@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Thu Jun 19 18:22:11 JST 2014 */
+/* First created by JCasGen Fri Jun 20 17:03:34 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -12,7 +12,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Thu Jun 19 18:22:11 JST 2014
+ * Updated by JCasGen Fri Jun 20 17:03:34 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Rewriting extends Annotation {
@@ -82,15 +82,15 @@ public class Rewriting extends Annotation {
     
   /** indexed getter for revisions - gets an indexed value - 
    * @generated */
-  public Revision getRevisions(int i) {
+  public RewritingId getRevisions(int i) {
     if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_revisions == null)
       jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i);
-    return (Revision)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i)));}
+    return (RewritingId)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i)));}
 
   /** indexed setter for revisions - sets an indexed value - 
    * @generated */
-  public void setRevisions(int i, Revision v) { 
+  public void setRevisions(int i, RewritingId v) { 
     if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_revisions == null)
       jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i);

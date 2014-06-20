@@ -1,7 +1,5 @@
 package eu.crydee.readability.uima.model;
 
-import java.util.Comparator;
-
 public class LogWeight implements Weight {
 
     @Override
@@ -33,12 +31,7 @@ public class LogWeight implements Weight {
     }
 
     @Override
-    public Comparator<Double> comparator() {
-        return (new Comparator<Double>() {
-            @Override
-            public int compare(Double o1, Double o2) {
-                return Double.compare(o1, o2);
-            }
-        });
+    public int compare(Double o1, Double o2) {
+        return Double.compare(o1, o2);
     }
 }

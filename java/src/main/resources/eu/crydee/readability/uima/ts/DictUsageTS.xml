@@ -19,6 +19,23 @@
             </features>
         </typeDescription>
         <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingId</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>revisionsId</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>revisionsIndex</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.Integer</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
             <name>eu.crydee.readability.uima.ts.Rewriting</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
@@ -27,7 +44,7 @@
                     <name>revisions</name>
                     <description/>
                     <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                    <elementType>eu.crydee.readability.uima.ts.Revision</elementType>
+                    <elementType>eu.crydee.readability.uima.ts.RewritingId</elementType>
                 </featureDescription>
             </features>
         </typeDescription>
@@ -36,6 +53,11 @@
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
+                <featureDescription>
+                    <name>id</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
                 <featureDescription>
                     <name>revisions</name>
                     <description/>
@@ -49,11 +71,6 @@
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
-                <featureDescription>
-                    <name>id</name>
-                    <description/>
-                    <rangeTypeName>uima.cas.String</rangeTypeName>
-                </featureDescription>
                 <featureDescription>
                     <name>tokens</name>
                     <description/>

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +25,7 @@ import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -44,6 +47,10 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     final static public String RES_POS = "RES_POS";
     @ExternalResource(key = RES_POS)
     private ReadabilityDict dictPos;
+
+    final static public String PARAM_LIMIT = "LIMIT";
+    @ConfigurationParameter(name = PARAM_LIMIT, mandatory = false)
+    private Integer limit;
 
     final private SetMultimap<List<String>, Pair<Mapped, Metrics>> byTxt
             = HashMultimap.create();
@@ -111,24 +118,38 @@ public class MapperAE extends JCasAnnotator_ImplBase {
         for (List<String> suggestionTokens : m.keySet()) {
             int width = suggestionTokens.size();
             Set<Pair<Mapped, Metrics>> revisedSet = m.get(suggestionTokens);
-            Revisions revisions = new Revisions(jcas);
-            revisions.setRevisions(new FSArray(jcas, revisedSet.size()));
-            int k = 0;
-            for (Pair<Mapped, Metrics> pair : revisedSet) {
-                Mapped mapped = pair.getKey();
-                Metrics metrics = pair.getRight();
-                String[] toks = mapped.getTokens().toArray(new String[0]);
-                StringArray saToks = new StringArray(jcas, toks.length);
-                saToks.copyFromArray(toks, 0, 0, toks.length);
-                Revision revision = new Revision(jcas);
-                revision.setId(UUID.randomUUID().toString());
-                revision.setTokens(saToks);
-                revision.setCount(metrics.getCount());
-                revision.setScore(metrics.getScore());
-                revision.setText(mapped.getText());
-                revisions.setRevisions(k++, revision);
+            List<Integer> starts = getSublistIndices(tokens, suggestionTokens);
+            Revisions revisions = null;
+            if (!starts.isEmpty()) {
+                List<Pair<Mapped, Metrics>> revisedSorted = revisedSet
+                        .stream()
+                        .sorted((Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScore(),
+                                        o1.getValue().getScore()))
+                        .limit(limit == null ? Integer.MAX_VALUE : limit)
+                        .collect(Collectors.toList());
+                revisions = new Revisions(jcas);
+                revisions.setId(UUID.randomUUID().toString());
+                revisions.setRevisions(new FSArray(jcas, revisedSorted.size()));
+                for (int k = 0, s = revisedSorted.size(); k < s; k++) {
+                    Pair<Mapped, Metrics> pair = revisedSorted.get(k);
+                    Mapped mapped = pair.getKey();
+                    Metrics metrics = pair.getRight();
+                    String[] toks = mapped.getTokens().toArray(new String[0]);
+                    StringArray saToks = new StringArray(jcas, toks.length);
+                    saToks.copyFromArray(toks, 0, 0, toks.length);
+                    Revision revision = new Revision(jcas);
+                    revision.setTokens(saToks);
+                    revision.setCount(metrics.getCount());
+                    revision.setScore(metrics.getScore());
+                    revision.setText(mapped.getText());
+                    revisions.setRevisions(k, revision);
+                }
+                revisions.addToIndexes();
             }
-            for (Integer i : getSublistIndices(tokens, suggestionTokens)) {
+            for (Integer i : starts) {
                 int begin = positions.get(i).getLeft(),
                         end = positions.get(i + width - 1).getRight();
                 try {

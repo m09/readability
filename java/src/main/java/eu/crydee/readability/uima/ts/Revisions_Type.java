@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu Jun 19 18:22:11 JST 2014 */
+/* First created by JCasGen Fri Jun 20 17:03:34 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu Jun 19 18:22:11 JST 2014
+ * Updated by JCasGen Fri Jun 20 17:03:34 JST 2014
  * @generated */
 public class Revisions_Type extends Annotation_Type {
   /** @generated */
@@ -43,6 +43,24 @@ public class Revisions_Type extends Annotation_Type {
      @modifiable */
   @SuppressWarnings ("hiding")
   public final static boolean featOkTst = JCasRegistry.getFeatOkTst("eu.crydee.readability.uima.ts.Revisions");
+ 
+  /** @generated */
+  final Feature casFeat_id;
+  /** @generated */
+  final int     casFeatCode_id;
+  /** @generated */ 
+  public String getId(int addr) {
+        if (featOkTst && casFeat_id == null)
+      jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Revisions");
+    return ll_cas.ll_getStringValue(addr, casFeatCode_id);
+  }
+  /** @generated */    
+  public void setId(int addr, String v) {
+        if (featOkTst && casFeat_id == null)
+      jcas.throwFeatMissing("id", "eu.crydee.readability.uima.ts.Revisions");
+    ll_cas.ll_setStringValue(addr, casFeatCode_id, v);}
+    
+  
  
   /** @generated */
   final Feature casFeat_revisions;
@@ -88,6 +106,10 @@ public class Revisions_Type extends Annotation_Type {
   public Revisions_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
+
+ 
+    casFeat_id = jcas.getRequiredFeatureDE(casType, "id", "uima.cas.String", featOkTst);
+    casFeatCode_id  = (null == casFeat_id) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_id).getCode();
 
  
     casFeat_revisions = jcas.getRequiredFeatureDE(casType, "revisions", "uima.cas.FSArray", featOkTst);

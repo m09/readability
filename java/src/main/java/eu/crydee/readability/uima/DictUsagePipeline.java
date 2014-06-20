@@ -107,7 +107,9 @@ public class DictUsagePipeline {
                         MapperAE.RES_TXT,
                         dictTxt,
                         MapperAE.RES_POS,
-                        dictPos);
+                        dictPos,
+                        MapperAE.PARAM_LIMIT,
+                        10);
 
         AnalysisEngineDescription rewriter
                 = AnalysisEngineFactory.createEngineDescription(

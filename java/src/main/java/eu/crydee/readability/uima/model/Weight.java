@@ -2,7 +2,7 @@ package eu.crydee.readability.uima.model;
 
 import java.util.Comparator;
 
-public interface Weight {
+public interface Weight extends Comparator<Double> {
 
     double getUnit();
 
@@ -11,6 +11,4 @@ public interface Weight {
     double add(double a, double b);
 
     double mul(double a, double b);
-    
-    Comparator<Double> comparator();
 }

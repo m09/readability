@@ -3,15 +3,15 @@ package eu.crydee.readability.uima.ae;
 import eu.crydee.readability.uima.model.LogWeight;
 import eu.crydee.readability.uima.model.Transducer;
 import eu.crydee.readability.uima.model.Weight;
-import eu.crydee.readability.uima.ts.Revision;
-import eu.crydee.readability.uima.ts.Revisions;
 import eu.crydee.readability.uima.ts.Rewriting;
+import eu.crydee.readability.uima.ts.RewritingId;
 import eu.crydee.readability.uima.ts.Rewritings;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
@@ -37,49 +37,38 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
             int begin = token.getBegin(),
                     end = token.getEnd();
             if (previousEnd < begin) {
-                transitions.put(
-                        previousEnd,
-                        begin,
-                        Optional.empty());
+                transitions.putEmptyTransition(previousEnd, begin);
             }
-            transitions.put(
-                    begin,
-                    end,
-                    Optional.empty());
+            transitions.putEmptyTransition(begin, end);
             previousEnd = end;
         }
         if (previousEnd < txtLength) {
-            transitions.put(
-                    previousEnd,
-                    txtLength,
-                    Optional.empty());
+            transitions.putEmptyTransition(previousEnd, txtLength);
         }
         for (TxtSuggestion sugg : JCasUtil.select(jcas, TxtSuggestion.class)) {
             int begin = sugg.getBegin(),
                     end = sugg.getEnd();
-            Revisions revisions = sugg.getRevisions();
-            for (int i = 0; i < revisions.getRevisions().size(); i++) {
-                Revision revision = revisions.getRevisions(i);
-                transitions.put(
-                        begin,
-                        end,
-                        Optional.of(revision));
-            }
+            transitions.put(begin, end, sugg.getRevisions());
         }
-        Set<Entry<Double, Revision[]>> topRewritings
+        Set<Entry<Double, Pair<UUID, Integer>[]>> topRewritings
                 = transitions.top(LIMIT).entries();
-        Rewritings rewritings = new Rewritings(jcas);
+        Rewritings rewritings = new Rewritings(jcas, 0, txtLength);
         rewritings.setRewritings(new FSArray(jcas, topRewritings.size()));
         int j = 0;
-        for (Entry<Double, Revision[]> e
+        for (Entry<Double, Pair<UUID, Integer>[]> e
                 : topRewritings) {
             int length = e.getValue().length;
-            FSArray fsaRevisions = new FSArray(jcas, length);
-            fsaRevisions.copyFromArray(e.getValue(), 0, 0, length);
             Rewriting r = new Rewriting(jcas);
-            r.setRevisions(fsaRevisions);
-            rewritings.setRewritings(j, r);
+            r.setRevisions(new FSArray(jcas, length));
+            for (int i = 0; i < length; i++) {
+                RewritingId ri = new RewritingId(jcas);
+                Pair<UUID, Integer> p = e.getValue()[i];
+                ri.setRevisionsId(p.getKey().toString());
+                ri.setRevisionsIndex(p.getValue());
+                r.setRevisions(i, ri);
+            }
+            rewritings.setRewritings(j++, r);
         }
-        jcas.addFsToIndexes(rewritings);
+        rewritings.addToIndexes();
     }
 }
