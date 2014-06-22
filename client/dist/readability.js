@@ -41,8 +41,8 @@ var Mapping = React.createClass({displayName: 'Mapping',
     // https://stackoverflow.com/questions/5560248
     color: function(min, max, value) {
         var p = (value - min) / (max - min),
-            c0 = "#FF0000",
-            c1 = "#00FF00",
+            c0 = "#000000",
+            c1 = "#FF0000",
             f = parseInt(c0.slice(1), 16),
             t = parseInt(c1.slice(1), 16),
             R1 = f >> 16,
@@ -59,24 +59,16 @@ var Mapping = React.createClass({displayName: 'Mapping',
                 .slice(1));
     },
     render: function() {
-        if (_.isEmpty(this.props.data)) {
+        if (_.isEmpty(this.props.anns)) {
             return;
         }
-        var sortedSpan = _.sortBy(
-            _.map(this.props.data, function(m) {
-                return {
-                    original: m.original,
-                    revised: _.sortBy(m.revised, function(r) {
-                        return -r.count;
-                    })
-                };
-            }),
-            function(r) { return -r.revised[0].score; }
-        );
+        var sortedSpan = _.sortBy(this.props.anns, function(ann) {
+            return -this.props.revs[ann.revisionsId][0].score;
+        }.bind(this));
         var lis = [];
-        var spanScore = sortedSpan[0].revised[0].score;
-        _.each(sortedSpan, function(d) {
-            var revs = d.revised;
+        var spanScore = this.props.revs[sortedSpan[0].revisionsId][0].score;
+        _.each(sortedSpan, function(ann) {
+            var revs = this.props.revs[ann.revisionsId];
             lis.push(React.DOM.li( {role:"presentation",
                      className:"dropdown-header",
                      style:{
@@ -86,7 +78,7 @@ var Mapping = React.createClass({displayName: 'Mapping',
                              _.head(revs).score
                          )
                      }}, 
-                     d.original.text
+                     this.props.wholeText.substring(ann.begin, ann.end)
                      ));
             _.each(_.take(revs, 10), function(r) {
                 lis.push(React.DOM.li( {role:"presentation",
@@ -159,13 +151,11 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
         jQuery(DOMNode).off('hide.bs.popover');
         jQuery(DOMNode).popover('destroy');
     },
-    spans: function(text, anns) {
+    spans: function(text, anns, revs) {
         var indices = [0, text.length];
         _.each(anns, function(ann) {
-            var begin = _.first(ann.original.tokens).begin;
-            var end = _.last(ann.original.tokens).end;
-            indices.splice(_.sortedIndex(indices, begin), 0, begin);
-            indices.splice(_.sortedIndex(indices, end), 0, end);
+            indices.splice(_.sortedIndex(indices, ann.begin), 0, ann.begin);
+            indices.splice(_.sortedIndex(indices, ann.end), 0, ann.end);
             indices = _.uniq(indices, true);
         });
         var previous = undefined;
@@ -181,40 +171,40 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
     fillSpans: function(anns, spans) {
         _.each(anns, function(ann) {
             _.each(spans, function(span) {
-                var begin = _.first(ann.original.tokens).begin;
-                var end = _.last(ann.original.tokens).end;
-                if (begin < span[1] && end > span[0]) {
+                if (ann.begin < span[1] && ann.end > span[0]) {
                     span[2].push(ann);
                 }
             });
         });
     },
-    toHtml: function(text, anns, spans) {
+    toHtml: function(text, anns, spans, revs) {
         var output = [];
         var f = true;
-        var scores = _.pluck(_.flatten(_.pluck(anns, 'revised')), 'score');
+        var scores = _.pluck(_.flatten(_.values(revs)), 'score');
         var maxScore = _.max(scores);
         var minScore = _.min(scores);
-        console.log('min', minScore, 'max', maxScore);
         _.each(spans, function(span) {
             if (!_.isEmpty(span[2])) {
-                output.push(Mapping( {data:span[2],
+                output.push(Mapping( {anns:span[2],
+                            revs:revs,
                             maxScore:maxScore,
                             minScore:minScore,
+                            wholeText:text,
                             text:text.substring(span[0], span[1])}));
                 f = !f;
             } else {
                 output.push(text.substring(span[0], span[1]));
             }
-        });
+        }.bind(this));
         return output;
     },
     render: function() {
         var text = this.props.data.text,
             anns = this.props.data.annotations.text,
-            spans = this.spans(text, anns);
-        this.fillSpans(anns, spans);
-        var mappings = this.toHtml(text, anns, spans);
+            revs = this.props.data.revisions.text,
+            spans = this.spans(text, anns, revs);
+        this.fillSpans(anns, spans, revs);
+        var mappings = this.toHtml(text, anns, spans, revs);
         return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
                 mappings));
     }
@@ -222,17 +212,37 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
 
 /** @jsx React.DOM */
 var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
-    toRows: function(tops) {
+    toRows: function(tops, revs, text) {
         var output = [];
-
-        var row = null;
-        output.push(React.DOM.tr(null, React.DOM.td(null, "0.0"),React.DOM.td(null, "Hai")));
-        return _.map(tops, function(top) {
-            return React.DOM.tr(null, React.DOM.td(null, top.score),React.DOM.td(null, top.text));
-        });
+        _.map(tops, function(top) {
+            var p = 0;
+            var rewritten = [];
+            _.each(top.revisions, function(r) {
+                console.log(r);
+                var rev = revs[r.revisionsId][r.revisionsIndex];
+                if (r.begin > p) {
+                    rewritten.push(
+                        React.DOM.span(null, text.substring(p, r.begin)));
+                }
+                rewritten.push(
+                    React.DOM.span( {className:"text-primary",
+                          style:{textDecoration: "underline"}}, 
+                        rev.text
+                    ));
+                p = r.end;
+            }.bind(this));
+            if (p < text.length - 1) {
+                rewritten.push(text.substring(p, text.length));
+            }
+            output.push(React.DOM.tr(null, React.DOM.td(null, top.score),React.DOM.td(null, rewritten)));
+        }.bind(this));
+        return output;
     },
     render: function() {
-        var rows = this.toRows(this.props.data.rewritings);
+        var revs = this.props.data.revisions.text;
+        var rewritings = this.props.data.rewritings;
+        var text = this.props.data.text;
+        var rows = this.toRows(rewritings, revs, text);
         return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
                 React.DOM.table( {className:"table table-striped table-condensed"}, 
                 React.DOM.thead(null, 
@@ -254,8 +264,32 @@ var Annotator = React.createClass({displayName: 'Annotator',
     getInitialState: function() {
         return {
             data: {
-                normal: { text: "", tokens: [], annotations: {text: [], pos: []} },
-                filtered: { text: "", tokens: [], annotations: {text: [], pos: []} }
+                normal: {
+                    text: "",
+                    tokens: [],
+                    revisions: {
+                        text: [],
+                        pos: []
+                    },
+                    annotations: {
+                        text: [],
+                        pos: []
+                    },
+                    rewritings: []
+                },
+                filtered: {
+                    text: "",
+                    tokens: [],
+                    revisions: {
+                        text: [],
+                        pos: []
+                    },
+                    annotations: {
+                        text: [],
+                        pos: []
+                    },
+                    rewritings: []
+                }
             },
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",
@@ -305,7 +339,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
                 ),
 
                 React.DOM.li(null, 
-                React.DOM.a( {href:"#normal-rewritings", onClick:this.toFiltered, 'data-toggle':"tab"}, 
+                React.DOM.a( {href:"#normal-rewritings", onClick:this.toNormal, 'data-toggle':"tab"}, 
                 "Full rewritings"
                 )
                 ),

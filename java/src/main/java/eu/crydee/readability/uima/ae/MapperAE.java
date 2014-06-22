@@ -5,19 +5,19 @@ import com.google.common.collect.SetMultimap;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metrics;
 import eu.crydee.readability.uima.res.ReadabilityDict;
+import eu.crydee.readability.uima.ts.PosRevisions;
 import eu.crydee.readability.uima.ts.PosSuggestion;
 import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Revisions;
 import eu.crydee.readability.uima.ts.Suggestion;
 import eu.crydee.readability.uima.ts.Token;
+import eu.crydee.readability.uima.ts.TxtRevisions;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
@@ -97,12 +97,14 @@ public class MapperAE extends JCasAnnotator_ImplBase {
         annotateFromMap(
                 jcas,
                 TxtSuggestion.class,
+                TxtRevisions.class,
                 positions,
                 txtTokens,
                 byTxt);
         annotateFromMap(
                 jcas,
                 PosSuggestion.class,
+                PosRevisions.class,
                 positions,
                 posTokens,
                 byPos);
@@ -111,6 +113,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     private void annotateFromMap(
             JCas jcas,
             Class<? extends Suggestion> suggestionClass,
+            Class<? extends Revisions> revisionsClass,
             List<Pair<Integer, Integer>> positions,
             List<String> tokens,
             SetMultimap<List<String>, Pair<Mapped, Metrics>> m)
@@ -119,36 +122,51 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             int width = suggestionTokens.size();
             Set<Pair<Mapped, Metrics>> revisedSet = m.get(suggestionTokens);
             List<Integer> starts = getSublistIndices(tokens, suggestionTokens);
-            Revisions revisions = null;
-            if (!starts.isEmpty()) {
-                List<Pair<Mapped, Metrics>> revisedSorted = revisedSet
-                        .stream()
-                        .sorted((Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScore(),
-                                        o1.getValue().getScore()))
-                        .limit(limit == null ? Integer.MAX_VALUE : limit)
-                        .collect(Collectors.toList());
-                revisions = new Revisions(jcas);
-                revisions.setId(UUID.randomUUID().toString());
-                revisions.setRevisions(new FSArray(jcas, revisedSorted.size()));
-                for (int k = 0, s = revisedSorted.size(); k < s; k++) {
-                    Pair<Mapped, Metrics> pair = revisedSorted.get(k);
-                    Mapped mapped = pair.getKey();
-                    Metrics metrics = pair.getRight();
-                    String[] toks = mapped.getTokens().toArray(new String[0]);
-                    StringArray saToks = new StringArray(jcas, toks.length);
-                    saToks.copyFromArray(toks, 0, 0, toks.length);
-                    Revision revision = new Revision(jcas);
-                    revision.setTokens(saToks);
-                    revision.setCount(metrics.getCount());
-                    revision.setScore(metrics.getScore());
-                    revision.setText(mapped.getText());
-                    revisions.setRevisions(k, revision);
-                }
-                revisions.addToIndexes();
+            if (starts.isEmpty()) {
+                continue;
             }
+            List<Pair<Mapped, Metrics>> revisedSorted = revisedSet
+                    .stream()
+                    .sorted((Pair<Mapped, Metrics> o1,
+                                    Pair<Mapped, Metrics> o2)
+                            -> Double.compare(
+                                    o2.getValue().getScore(),
+                                    o1.getValue().getScore()))
+                    .limit(limit == null ? Integer.MAX_VALUE : limit)
+                    .collect(Collectors.toList());
+            Revisions revisions;
+            try {
+                revisions = revisionsClass.getConstructor(JCas.class)
+                        .newInstance(jcas);
+            } catch (InstantiationException |
+                    IllegalAccessException |
+                    IllegalArgumentException |
+                    InvocationTargetException |
+                    NoSuchMethodException |
+                    SecurityException ex) {
+                logger.log(
+                        Level.SEVERE,
+                        "couldn't create a revisions annotation.",
+                        ex);
+                throw new AnalysisEngineProcessException(ex);
+            }
+            revisions.setId(UUID.randomUUID().toString());
+            revisions.setRevisions(new FSArray(jcas, revisedSorted.size()));
+            for (int k = 0, s = revisedSorted.size(); k < s; k++) {
+                Pair<Mapped, Metrics> pair = revisedSorted.get(k);
+                Mapped mapped = pair.getKey();
+                Metrics metrics = pair.getRight();
+                String[] toks = mapped.getTokens().toArray(new String[0]);
+                StringArray saToks = new StringArray(jcas, toks.length);
+                saToks.copyFromArray(toks, 0, 0, toks.length);
+                Revision revision = new Revision(jcas);
+                revision.setTokens(saToks);
+                revision.setCount(metrics.getCount());
+                revision.setScore(metrics.getScore());
+                revision.setText(mapped.getText());
+                revisions.setRevisions(k, revision);
+            }
+            revisions.addToIndexes();
             for (Integer i : starts) {
                 int begin = positions.get(i).getLeft(),
                         end = positions.get(i + width - 1).getRight();

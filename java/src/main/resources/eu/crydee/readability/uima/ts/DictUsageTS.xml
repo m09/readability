@@ -19,7 +19,7 @@
             </features>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingId</name>
+            <name>eu.crydee.readability.uima.ts.RewritingSpan</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
@@ -44,7 +44,12 @@
                     <name>revisions</name>
                     <description/>
                     <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                    <elementType>eu.crydee.readability.uima.ts.RewritingId</elementType>
+                    <elementType>eu.crydee.readability.uima.ts.RewritingSpan</elementType>
+                </featureDescription>
+                <featureDescription>
+                    <name>score</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.Double</rangeTypeName>
                 </featureDescription>
             </features>
         </typeDescription>
@@ -65,6 +70,16 @@
                     <elementType>eu.crydee.readability.uima.ts.Revision</elementType>
                 </featureDescription>
             </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.PosRevisions</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Revisions</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.TxtRevisions</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Revisions</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.Revision</name>

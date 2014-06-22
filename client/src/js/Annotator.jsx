@@ -3,8 +3,32 @@ var Annotator = React.createClass({
     getInitialState: function() {
         return {
             data: {
-                normal: { text: "", tokens: [], annotations: {text: [], pos: []} },
-                filtered: { text: "", tokens: [], annotations: {text: [], pos: []} }
+                normal: {
+                    text: "",
+                    tokens: [],
+                    revisions: {
+                        text: [],
+                        pos: []
+                    },
+                    annotations: {
+                        text: [],
+                        pos: []
+                    },
+                    rewritings: []
+                },
+                filtered: {
+                    text: "",
+                    tokens: [],
+                    revisions: {
+                        text: [],
+                        pos: []
+                    },
+                    annotations: {
+                        text: [],
+                        pos: []
+                    },
+                    rewritings: []
+                }
             },
             dict: jQuery("input:radio[name='dict']:checked").val(),
             lastText: "",
@@ -54,7 +78,7 @@ var Annotator = React.createClass({
                 </li>
 
                 <li>
-                <a href="#normal-rewritings" onClick={this.toFiltered} data-toggle="tab">
+                <a href="#normal-rewritings" onClick={this.toNormal} data-toggle="tab">
                 Full rewritings
                 </a>
                 </li>

@@ -2,16 +2,15 @@ package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.uima.model.LogWeight;
 import eu.crydee.readability.uima.model.Transducer;
+import eu.crydee.readability.uima.model.Transducer.Span;
 import eu.crydee.readability.uima.model.Weight;
 import eu.crydee.readability.uima.ts.Rewriting;
-import eu.crydee.readability.uima.ts.RewritingId;
+import eu.crydee.readability.uima.ts.RewritingSpan;
 import eu.crydee.readability.uima.ts.Rewritings;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
@@ -50,22 +49,23 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
                     end = sugg.getEnd();
             transitions.put(begin, end, sugg.getRevisions());
         }
-        Set<Entry<Double, Pair<UUID, Integer>[]>> topRewritings
+        Set<Entry<Double, Span[]>> topRewritings
                 = transitions.top(LIMIT).entries();
         Rewritings rewritings = new Rewritings(jcas, 0, txtLength);
         rewritings.setRewritings(new FSArray(jcas, topRewritings.size()));
         int j = 0;
-        for (Entry<Double, Pair<UUID, Integer>[]> e
+        for (Entry<Double, Span[]> e
                 : topRewritings) {
             int length = e.getValue().length;
             Rewriting r = new Rewriting(jcas);
+            r.setScore(e.getKey());
             r.setRevisions(new FSArray(jcas, length));
             for (int i = 0; i < length; i++) {
-                RewritingId ri = new RewritingId(jcas);
-                Pair<UUID, Integer> p = e.getValue()[i];
-                ri.setRevisionsId(p.getKey().toString());
-                ri.setRevisionsIndex(p.getValue());
-                r.setRevisions(i, ri);
+                Span s = e.getValue()[i];
+                RewritingSpan rs = new RewritingSpan(jcas, s.begin, s.end);
+                rs.setRevisionsId(s.id.toString());
+                rs.setRevisionsIndex(s.index);
+                r.setRevisions(i, rs);
             }
             rewritings.setRewritings(j++, r);
         }

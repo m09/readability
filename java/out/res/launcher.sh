@@ -2,53 +2,39 @@
 
 rm -rf processed
 
-mkdir processed
+for d in 'Txt' 'Pos'; do
+    for t in 'full' 'filtered'; do
 
-for d in 'dictTxt.xml' 'dictPos.xml'; do
+        bd="processed/$d/$t"
+        bf="$t$d.xml"
 
-    mkdir "processed/$d"
+        mkdir -p "$bd"
 
-    xmllint \
-        --format "$d" \
-        > "processed/$d/indented.xml"
+        xmllint \
+            --format "$bf" \
+            > "$bd/indented.xml"
 
-    xsltproc \
-        -o "processed/$d/sorted.xml" \
-        scripts/sort.xsl \
-        "$d"
+        xsltproc \
+            -o "$bd/sorted.xml" \
+            scripts/sort.xsl \
+            "$bf"
 
-    xsltproc \
-        -o "processed/$d/dict.tsv" \
-        scripts/tsv.xsl \
-        "$d"
+        xsltproc \
+            -o "$bd/dict.tsv" \
+            scripts/tsv.xsl \
+            "$bf"
 
-    xsltproc \
-        -o "processed/$d/dict-summary.tsv" \
-        scripts/summary.xsl \
-        "$d"
+        xsltproc \
+            -o "$bd/dict-summary.tsv" \
+            scripts/summary.xsl \
+            "$bf"
 
-    xsltproc -o "processed/$d/filtered.xml" \
-        scripts/filter-long-revised.xsl \
-        "$d"
+        # ./scripts/count.sh "$d" > "processed/$d/dict-count.tsv"
+        # ./scripts/count.sh "processed/$d/filtered.xml" > "processed/$d/filtered-count.tsv"
 
-    xsltproc \
-        -o "processed/$d/filtered-sorted.xml" \
-        scripts/sort.xsl \
-        "processed/$d/filtered.xml"
-
-    xsltproc -o "processed/$d/filtered.tsv" \
-        scripts/tsv.xsl \
-        "processed/$d/filtered.xml"
-
-    xsltproc -o "processed/$d/filtered-summary.tsv" \
-        scripts/summary.xsl \
-        "processed/$d/filtered.xml"
-
-    ./scripts/count.sh "$d" > "processed/$d/dict-count.tsv"
-    ./scripts/count.sh "processed/$d/filtered.xml" > "processed/$d/filtered-count.tsv"
-
-    Rscript \
-        --vanilla \
-        'scripts/plot.r' \
-        "$d"
+        # Rscript \
+        #     --vanilla \
+        #     'scripts/plot.r' \
+        #     "$d"
+    done
 done

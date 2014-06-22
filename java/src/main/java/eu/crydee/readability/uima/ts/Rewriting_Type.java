@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Fri Jun 20 17:03:34 JST 2014 */
+/* First created by JCasGen Sun Jun 22 14:52:09 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Fri Jun 20 17:03:34 JST 2014
+ * Updated by JCasGen Sun Jun 22 14:52:09 JST 2014
  * @generated */
 public class Rewriting_Type extends Annotation_Type {
   /** @generated */
@@ -80,6 +80,24 @@ public class Rewriting_Type extends Annotation_Type {
     ll_cas.ll_setRefArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_revisions), i, v);
   }
  
+ 
+  /** @generated */
+  final Feature casFeat_score;
+  /** @generated */
+  final int     casFeatCode_score;
+  /** @generated */ 
+  public double getScore(int addr) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Rewriting");
+    return ll_cas.ll_getDoubleValue(addr, casFeatCode_score);
+  }
+  /** @generated */    
+  public void setScore(int addr, double v) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Rewriting");
+    ll_cas.ll_setDoubleValue(addr, casFeatCode_score, v);}
+    
+  
 
 
 
@@ -92,6 +110,10 @@ public class Rewriting_Type extends Annotation_Type {
  
     casFeat_revisions = jcas.getRequiredFeatureDE(casType, "revisions", "uima.cas.FSArray", featOkTst);
     casFeatCode_revisions  = (null == casFeat_revisions) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_revisions).getCode();
+
+ 
+    casFeat_score = jcas.getRequiredFeatureDE(casType, "score", "uima.cas.Double", featOkTst);
+    casFeatCode_score  = (null == casFeat_score) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_score).getCode();
 
   }
 }

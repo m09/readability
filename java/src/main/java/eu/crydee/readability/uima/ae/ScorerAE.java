@@ -16,6 +16,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class ScorerAE extends JCasAnnotator_ImplBase {
@@ -47,20 +48,39 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
     @Override
     public void collectionProcessComplete()
             throws AnalysisEngineProcessException {
+        double lowestScore = Double.POSITIVE_INFINITY,
+                highestScore = Double.NEGATIVE_INFINITY;
         int totalCount = dict.getTotalCount();
         for (Mapped original : dict.keySet()) {
-            Map<Mapped, Metrics> revisions = dict.getRevisions(original).get();
+            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
+            int originalCount
+                    = revs.values().stream().mapToInt(Metrics::getCount).sum();
             List<String> tokens = new ArrayList<>();
             tokens.add("<s>");
             tokens.addAll(original.getTokens());
             tokens.add("</s>");
             float lmProba = nlm.scoreSentence(tokens);
-            for (Mapped revision : revisions.keySet()) {
-                Metrics metric = revisions.get(revision);
-                metric.setScore(Math.log(metric.getCount())
-                        + Math.log(1 - Math.exp(lmProba))
-                        - Math.log(totalCount));
+            logger.log(Level.FINEST, "originalCount: " + originalCount);
+            logger.log(Level.FINEST, "lmProba:       " + lmProba);
+            for (Mapped rev : revs.keySet()) {
+                Metrics metric = revs.get(rev);
+                double score = Math.log(metric.getCount())
+                        - Math.log(totalCount)
+                        - Math.log(1 - Math.exp(lmProba));
+                lowestScore = Math.min(score, lowestScore);
+                highestScore = Math.max(score, highestScore);
+                metric.setScore(score);
             }
         }
+//        double ambitus = highestScore - lowestScore;
+//        for (Mapped original : dict.keySet()) {
+//            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
+//            for (Mapped rev : revs.keySet()) {
+//                Metrics metric = revs.get(rev);
+//                metric.setScore(
+//                        (metric.getScore() - lowestScore)
+//                        / ambitus);
+//            }
+//        }
     }
 }

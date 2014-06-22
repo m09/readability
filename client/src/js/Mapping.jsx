@@ -3,8 +3,8 @@ var Mapping = React.createClass({
     // https://stackoverflow.com/questions/5560248
     color: function(min, max, value) {
         var p = (value - min) / (max - min),
-            c0 = "#FF0000",
-            c1 = "#00FF00",
+            c0 = "#000000",
+            c1 = "#FF0000",
             f = parseInt(c0.slice(1), 16),
             t = parseInt(c1.slice(1), 16),
             R1 = f >> 16,
@@ -21,24 +21,16 @@ var Mapping = React.createClass({
                 .slice(1));
     },
     render: function() {
-        if (_.isEmpty(this.props.data)) {
+        if (_.isEmpty(this.props.anns)) {
             return;
         }
-        var sortedSpan = _.sortBy(
-            _.map(this.props.data, function(m) {
-                return {
-                    original: m.original,
-                    revised: _.sortBy(m.revised, function(r) {
-                        return -r.count;
-                    })
-                };
-            }),
-            function(r) { return -r.revised[0].score; }
-        );
+        var sortedSpan = _.sortBy(this.props.anns, function(ann) {
+            return -this.props.revs[ann.revisionsId][0].score;
+        }.bind(this));
         var lis = [];
-        var spanScore = sortedSpan[0].revised[0].score;
-        _.each(sortedSpan, function(d) {
-            var revs = d.revised;
+        var spanScore = this.props.revs[sortedSpan[0].revisionsId][0].score;
+        _.each(sortedSpan, function(ann) {
+            var revs = this.props.revs[ann.revisionsId];
             lis.push(<li role="presentation"
                      className="dropdown-header"
                      style={{
@@ -48,7 +40,7 @@ var Mapping = React.createClass({
                              _.head(revs).score
                          )
                      }}>
-                     {d.original.text}
+                     {this.props.wholeText.substring(ann.begin, ann.end)}
                      </li>);
             _.each(_.take(revs, 10), function(r) {
                 lis.push(<li role="presentation"

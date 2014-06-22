@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Fri Jun 20 17:03:34 JST 2014 */
+/* First created by JCasGen Sun Jun 22 14:52:09 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -12,7 +12,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Fri Jun 20 17:03:34 JST 2014
+ * Updated by JCasGen Sun Jun 22 14:52:09 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class Rewriting extends Annotation {
@@ -82,19 +82,37 @@ public class Rewriting extends Annotation {
     
   /** indexed getter for revisions - gets an indexed value - 
    * @generated */
-  public RewritingId getRevisions(int i) {
+  public RewritingSpan getRevisions(int i) {
     if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_revisions == null)
       jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i);
-    return (RewritingId)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i)));}
+    return (RewritingSpan)(jcasType.ll_cas.ll_getFSForRef(jcasType.ll_cas.ll_getRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i)));}
 
   /** indexed setter for revisions - sets an indexed value - 
    * @generated */
-  public void setRevisions(int i, RewritingId v) { 
+  public void setRevisions(int i, RewritingSpan v) { 
     if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_revisions == null)
       jcasType.jcas.throwFeatMissing("revisions", "eu.crydee.readability.uima.ts.Rewriting");
     jcasType.jcas.checkArrayBounds(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i);
     jcasType.ll_cas.ll_setRefArrayValue(jcasType.ll_cas.ll_getRefValue(addr, ((Rewriting_Type)jcasType).casFeatCode_revisions), i, jcasType.ll_cas.ll_getFSRef(v));}
+   
+    
+  //*--------------*
+  //* Feature: score
+
+  /** getter for score - gets 
+   * @generated */
+  public double getScore() {
+    if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_score == null)
+      jcasType.jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Rewriting");
+    return jcasType.ll_cas.ll_getDoubleValue(addr, ((Rewriting_Type)jcasType).casFeatCode_score);}
+    
+  /** setter for score - sets  
+   * @generated */
+  public void setScore(double v) {
+    if (Rewriting_Type.featOkTst && ((Rewriting_Type)jcasType).casFeat_score == null)
+      jcasType.jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Rewriting");
+    jcasType.ll_cas.ll_setDoubleValue(addr, ((Rewriting_Type)jcasType).casFeatCode_score, v);}    
   }
 
     

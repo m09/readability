@@ -10,21 +10,13 @@ import org.apache.uima.jcas.JCas;
 
 public class ResourceWriterAE extends JCasAnnotator_ImplBase {
 
-    final static public String PARAM_OUT_POS_FILENAME = "OUT_POS_FILENAME";
-    @ConfigurationParameter(name = PARAM_OUT_POS_FILENAME, mandatory = true)
-    String fileNamePos;
+    final static public String PARAM_FILENAME = "FILENAME";
+    @ConfigurationParameter(name = PARAM_FILENAME, mandatory = true)
+    String fileName;
 
-    final static public String PARAM_OUT_TXT_FILENAME = "OUT_TXT_FILENAME";
-    @ConfigurationParameter(name = PARAM_OUT_TXT_FILENAME, mandatory = true)
-    String fileNameTxt;
-
-    final static public String RES_TXT_KEY = "TXT_KEY";
-    @ExternalResource(key = RES_TXT_KEY)
-    ReadabilityDict dictTxt;
-
-    final static public String RES_POS_KEY = "POS_KEY";
-    @ExternalResource(key = RES_POS_KEY)
-    ReadabilityDict dictPos;
+    final static public String RES_KEY = "KEY";
+    @ExternalResource(key = RES_KEY)
+    ReadabilityDict res;
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
@@ -34,10 +26,8 @@ public class ResourceWriterAE extends JCasAnnotator_ImplBase {
     public void collectionProcessComplete()
             throws AnalysisEngineProcessException {
         super.collectionProcessComplete();
-        try (PrintStream psTxt = new PrintStream(fileNameTxt, "UTF8");
-                PrintStream psPos = new PrintStream(fileNamePos, "UTF8")) {
-            dictPos.save(psPos);
-            dictTxt.save(psTxt);
+        try (PrintStream ps = new PrintStream(fileName, "UTF8")) {
+            res.save(ps);
         } catch (Exception ex) {
             throw new AnalysisEngineProcessException(ex);
         }

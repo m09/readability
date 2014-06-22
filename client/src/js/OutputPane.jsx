@@ -23,13 +23,11 @@ var OutputPane = React.createClass({
         jQuery(DOMNode).off('hide.bs.popover');
         jQuery(DOMNode).popover('destroy');
     },
-    spans: function(text, anns) {
+    spans: function(text, anns, revs) {
         var indices = [0, text.length];
         _.each(anns, function(ann) {
-            var begin = _.first(ann.original.tokens).begin;
-            var end = _.last(ann.original.tokens).end;
-            indices.splice(_.sortedIndex(indices, begin), 0, begin);
-            indices.splice(_.sortedIndex(indices, end), 0, end);
+            indices.splice(_.sortedIndex(indices, ann.begin), 0, ann.begin);
+            indices.splice(_.sortedIndex(indices, ann.end), 0, ann.end);
             indices = _.uniq(indices, true);
         });
         var previous = undefined;
@@ -45,40 +43,40 @@ var OutputPane = React.createClass({
     fillSpans: function(anns, spans) {
         _.each(anns, function(ann) {
             _.each(spans, function(span) {
-                var begin = _.first(ann.original.tokens).begin;
-                var end = _.last(ann.original.tokens).end;
-                if (begin < span[1] && end > span[0]) {
+                if (ann.begin < span[1] && ann.end > span[0]) {
                     span[2].push(ann);
                 }
             });
         });
     },
-    toHtml: function(text, anns, spans) {
+    toHtml: function(text, anns, spans, revs) {
         var output = [];
         var f = true;
-        var scores = _.pluck(_.flatten(_.pluck(anns, 'revised')), 'score');
+        var scores = _.pluck(_.flatten(_.values(revs)), 'score');
         var maxScore = _.max(scores);
         var minScore = _.min(scores);
-        console.log('min', minScore, 'max', maxScore);
         _.each(spans, function(span) {
             if (!_.isEmpty(span[2])) {
-                output.push(<Mapping data={span[2]}
+                output.push(<Mapping anns={span[2]}
+                            revs={revs}
                             maxScore={maxScore}
                             minScore={minScore}
+                            wholeText={text}
                             text={text.substring(span[0], span[1])}/>);
                 f = !f;
             } else {
                 output.push(text.substring(span[0], span[1]));
             }
-        });
+        }.bind(this));
         return output;
     },
     render: function() {
         var text = this.props.data.text,
             anns = this.props.data.annotations.text,
-            spans = this.spans(text, anns);
-        this.fillSpans(anns, spans);
-        var mappings = this.toHtml(text, anns, spans);
+            revs = this.props.data.revisions.text,
+            spans = this.spans(text, anns, revs);
+        this.fillSpans(anns, spans, revs);
+        var mappings = this.toHtml(text, anns, spans, revs);
         return (<section id={this.props.id} className="tab-pane">
                 {mappings}</section>);
     }

@@ -4,9 +4,11 @@ import com.google.common.collect.TreeMultimap
 import eu.crydee.readability.uima.DictUsagePipeline
 import eu.crydee.readability.uima.ts.PosSuggestion
 import eu.crydee.readability.uima.ts.Revision
+import eu.crydee.readability.uima.ts.TxtRevisions
+import eu.crydee.readability.uima.ts.PosRevisions
 import eu.crydee.readability.uima.ts.Revisions
 import eu.crydee.readability.uima.ts.Rewriting
-import eu.crydee.readability.uima.ts.RewritingId
+import eu.crydee.readability.uima.ts.RewritingSpan
 import eu.crydee.readability.uima.ts.Rewritings
 import eu.crydee.readability.uima.ts.Suggestion
 import eu.crydee.readability.uima.ts.Token
@@ -85,16 +87,21 @@ object Application extends Controller {
     )
   }
 
-  implicit val rewritingIdWrites = new Writes[RewritingId] {
-    def writes(r: RewritingId): JsValue = Json.obj(
+  implicit val rewritingSpanWrites = new Writes[RewritingSpan] {
+    def writes(r: RewritingSpan): JsValue = Json.obj(
+      "begin"          -> r.getBegin,
+      "end"            -> r.getEnd,
       "revisionsId"    -> r.getRevisionsId,
       "revisionsIndex" -> r.getRevisionsIndex
     )
   }
 
   implicit val rewritingWrites = new Writes[Rewriting] {
-    def writes(r: Rewriting): JsValue =
-      Json.toJson((0 until r.getRevisions.size) map (i => r.getRevisions(i)))
+    def writes(r: Rewriting): JsValue = Json.obj(
+      "revisions" -> Json.toJson(
+        (0 until r.getRevisions.size) map (i => r.getRevisions(i))),
+      "score"     -> r.getScore
+    )
   }
 
   implicit val rewritingsWrites = new Writes[Rewritings] {
@@ -111,35 +118,45 @@ object Application extends Controller {
       val jcas = ae.newJCas()
       jcas.setDocumentText(data)
       ae.process(jcas)
-      val posSuggs: Iterable[PosSuggestion] = JCasUtil.select(
+      val posSuggs: Iterable[Suggestion] = JCasUtil.select(
         jcas,
         classOf[PosSuggestion])
-      val txtSuggs: Iterable[TxtSuggestion] = JCasUtil.select(
+      val txtSuggs: Iterable[Suggestion] = JCasUtil.select(
         jcas,
         classOf[TxtSuggestion])
       val tokens: Iterable[Token] = JCasUtil.select(
         jcas,
         classOf[Token])
-      val revisions: Iterable[Revisions] = JCasUtil.select(
+      val txtRevisions: Iterable[Revisions] = JCasUtil.select(
         jcas,
-        classOf[Revisions])
-      val rewritings: Iterable[Rewritings] = JCasUtil.select(
+        classOf[TxtRevisions])
+      val posRevisions: Iterable[Revisions] = JCasUtil.select(
+        jcas,
+        classOf[PosRevisions])
+      val rewritings: Rewritings = JCasUtil.selectSingle(
         jcas,
         classOf[Rewritings])
       Ok(
         Json.obj(
           "text"        -> jcas.getDocumentText,
           "tokens"      -> tokens,
-          "revisions"   -> JsObject(
-            revisions.toSeq map (rs =>
-              rs.getId -> Json.toJson(rs)
+          "revisions"   -> Json.obj(
+            "text" -> JsObject(
+              txtRevisions.toSeq map (rs =>
+                rs.getId -> Json.toJson(rs)
+              )
+            ),
+            "pos" -> JsObject(
+              posRevisions.toSeq map (rs =>
+                rs.getId -> Json.toJson(rs)
+              )
             )
           ),
           "annotations" -> Json.obj(
             "text" -> Json.toJson(txtSuggs),
             "pos"  -> Json.toJson(posSuggs)
           ),
-          "rewritings" -> Json.toJson(rewritings)
+          "rewritings" -> rewritings
         )
       ).withHeaders(headers : _*)
     }

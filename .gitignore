@@ -13,8 +13,10 @@ indented.xml
 /java/out/cas-lm/
 /java/out/cas-usage/
 /java/out/lm/
-/java/out/res/dictPos.xml
-/java/out/res/dictTxt.xml
+/java/out/res/fullPos.xml
+/java/out/res/fullTxt.xml
+/java/out/res/filteredPos.xml
+/java/out/res/filteredTxt.xml
 /java/out/res/processed/
 /server/conf/application.conf
 /server/data/
