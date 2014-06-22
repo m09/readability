@@ -7,6 +7,7 @@ module.exports = function(grunt) {
                 files: {
                     'build/js/widgets.js': [
                         'src/js/Mapping.jsx',
+                        'src/js/ControlPane.jsx',
                         'src/js/InputPane.jsx',
                         'src/js/OutputPane.jsx',
                         'src/js/RewritingsPane.jsx',

@@ -3,7 +3,7 @@ var Annotator = React.createClass({
     getInitialState: function() {
         return {
             data: {
-                normal: {
+                noisy: {
                     text: "",
                     tokens: [],
                     revisions: {
@@ -30,72 +30,98 @@ var Annotator = React.createClass({
                     rewritings: []
                 }
             },
-            dict: jQuery("input:radio[name='dict']:checked").val(),
+            weight: 'a',
+            corpus: 'filtered',
+            tab: 'input',
             lastText: "",
-            fetched: { normal: true, filtered: true }
+            fetched: { noisy: true, filtered: true }
         };
     },
-    fetchAnnotations: function(dict) {
+    fetchData: function(corpus) {
         var text = jQuery(this.refs.input.getDOMNode()).text();
         if (text === this.state.lastText) {
-            if (this.state.fetched[dict]) return;
-        } else this.setState({ fetched: { normal: false, filtered: false } });
+            if (this.state.fetched[corpus]) return;
+        } else this.setState({ fetched: { noisy: false, filtered: false } });
         this.setState({lastText: text});
         jQuery.ajax({
             type: 'POST',
             url: this.props.url,
             contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify({ data: text, dict: dict })
+            data: JSON.stringify({ data: text, dict: corpus })
         }).done(function(data) {
             var dataMergeable = jQuery.extend({}, this.state.data);
-            dataMergeable[dict] = data;
+            dataMergeable[corpus] = data;
             var fetchedMergeable = jQuery.extend({}, this.state.fetched);
-            fetchedMergeable[dict] = true;
+            fetchedMergeable[corpus] = true;
             this.setState({ data: dataMergeable, fetched: fetchedMergeable });
         }.bind(this));
     },
-    toNormal: function(e) { this.fetchAnnotations("normal"); },
-    toFiltered: function(e) { this.fetchAnnotations("filtered"); },
+    controlCallbackWeight: function(weight) {
+        this.setState({weight: weight});
+    },
+    controlCallbackCorpus: function(corpus) {
+        this.setState({corpus: corpus});
+        if (this.state.tab === 'analysis'
+            || this.state.tab === 'rewritings') {
+            this.fetchData(corpus);
+        }
+    },
+    activateOutputTab: function(tab) {
+        this.fetchData(this.state.corpus);
+        this.activateTab(tab);
+    },
+    activateTab: function(tab) {
+        this.setState({tab: tab});
+    },
     render: function() {
         return (<section className="container" style={{minHeight: "300px"}}>
+                <ControlPane
+                weight={this.state.weight}
+                corpus={this.state.corpus}
+                callbackWeight={this.controlCallbackWeight}
+                callbackCorpus={this.controlCallbackCorpus}/>
                 <ul className="nav nav-tabs nav-justified">
-                <li className="active">
-                <a href="#input" data-toggle="tab">
-                Your text
+                <li className={this.state.tab === 'input' ? 'active' : ''}>
+                <a href="#"
+                   onClick={this.activateTab.bind(this, 'input')}>
+                  Input text
                 </a>
                 </li>
 
-                <li>
-                <a href="#normal" onClick={this.toNormal} data-toggle="tab">
-                Full analysis
+                <li className={this.state.tab === 'analysis' ? 'active' : ''}>
+                <a href="#"
+                   onClick={this.activateOutputTab.bind(this, 'analysis')}>
+                  Analysis
                 </a>
                 </li>
                 
-                <li>
-                <a href="#filtered" onClick={this.toFiltered} data-toggle="tab">
-                Filtered analysis
-                </a>
-                </li>
-
-                <li>
-                <a href="#normal-rewritings" onClick={this.toNormal} data-toggle="tab">
-                Full rewritings
-                </a>
-                </li>
-
-                <li>
-                <a href="#filtered-rewritings" onClick={this.toFiltered} data-toggle="tab">
-                Filtered rewritings
+                <li className={this.state.tab === 'rewritings' ? 'active' : ''}>
+                <a href="#"
+                   onClick={this.activateOutputTab.bind(this, 'rewritings')}>
+                  Rewritings
                 </a>
                 </li>
                 </ul>
                 
                 <section className="tab-content">
-                <InputPane ref="input"/>
-                <OutputPane id="normal" data={this.state.data.normal}/>
-                <OutputPane id="filtered" data={this.state.data.filtered}/>
-                <RewritingsPane id="normal-rewritings" data={this.state.data.normal}/>
-                <RewritingsPane id="filtered-rewritings" data={this.state.data.filtered}/>
+                <InputPane ref="input"
+                           active={this.state.tab === 'input'
+                                     ? true
+                                     : false}/>
+                <OutputPane id="analysis"
+                            data={this.state.corpus === 'noisy'
+                                    ? this.state.data.noisy
+                                    : this.state.data.filtered}
+                            active={this.state.tab === 'analysis'
+                                      ? true
+                                      : false}/>
+                <RewritingsPane id="rewritings"
+                                data={this.state.corpus === 'noisy'
+                                        ? this.state.data.noisy
+                                        : this.state.data.filtered}
+                                active={this.state.tab === 'rewritings'
+                                          ? true
+                                          : false}/>
                 </section>
                 </section>
         );

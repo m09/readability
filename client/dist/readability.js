@@ -118,9 +118,66 @@ var Mapping = React.createClass({displayName: 'Mapping',
 });
 
 /** @jsx React.DOM */
+var ControlPane = React.createClass({displayName: 'ControlPane',
+    render: function() {
+        return (
+          React.DOM.section( {className:"settings"}, 
+          React.DOM.div( {className:"row"}, 
+            React.DOM.div( {className:"col-sm-4"}, 
+            "Settings:"
+            ),
+            React.DOM.div( {className:"col-sm-4"}, 
+              "Corpus: ",
+              React.DOM.div( {className:"btn-group btn-group-xs"}, 
+                React.DOM.button( {className:this.props.corpus === 'filtered'
+                                     ? 'btn btn-default active'
+                                     : 'btn btn-default',
+                    onClick:this.props.callbackCorpus.bind(null, 'filtered')}, 
+                  "Filtered"
+                ),
+                React.DOM.button( {className:this.props.corpus === 'noisy'
+                                     ? 'btn btn-default active'
+                                     : 'btn btn-default',
+                    onClick:this.props.callbackCorpus.bind(null, 'noisy')}, 
+                  "Noisy"
+                )
+              )
+            ),
+            React.DOM.div( {className:"col-sm-4"}, 
+              "Weight: ",
+              React.DOM.div( {className:"btn-group btn-group-xs"}, 
+                React.DOM.button( {className:this.props.weight === 'a'
+                                     ? 'btn btn-default active'
+                                     : 'btn btn-default',
+                    onClick:this.props.callbackWeight.bind(this, 'a')}, 
+                  "a"
+                ),
+                React.DOM.button( {className:this.props.weight === 'b'
+                                     ? 'btn btn-default active'
+                                     : 'btn btn-default',
+                    onClick:this.props.callbackWeight.bind(this, 'b')}, 
+                  "b"
+                ),
+                React.DOM.button( {className:this.props.weight === 'c'
+                                     ? 'btn btn-default active'
+                                     : 'btn btn-default',
+                    onClick:this.props.callbackWeight.bind(this, 'c')}, 
+                  "c"
+                )
+              )
+            )
+          )
+          )
+        );
+    }
+});
+
+/** @jsx React.DOM */
 var InputPane = React.createClass({displayName: 'InputPane',
     render: function() {
-        return (React.DOM.section( {className:"tab-pane active", id:"input",
+        return (React.DOM.section( {className:this.props.active
+                                      ? "tab-pane active"
+                                      : "tab-pane",
                 contentEditable:"true", style:{minHeight: "200px"}}, 
                 "this, and that!"));
     }
@@ -205,7 +262,10 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
             spans = this.spans(text, anns, revs);
         this.fillSpans(anns, spans, revs);
         var mappings = this.toHtml(text, anns, spans, revs);
-        return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
+        return (React.DOM.section( {id:this.props.id,
+                         className:this.props.active
+                                      ? "tab-pane active"
+                                      : "tab-pane"}, 
                 mappings));
     }
 });
@@ -218,7 +278,6 @@ var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
             var p = 0;
             var rewritten = [];
             _.each(top.revisions, function(r) {
-                console.log(r);
                 var rev = revs[r.revisionsId][r.revisionsIndex];
                 if (r.begin > p) {
                     rewritten.push(
@@ -243,7 +302,9 @@ var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
         var rewritings = this.props.data.rewritings;
         var text = this.props.data.text;
         var rows = this.toRows(rewritings, revs, text);
-        return (React.DOM.section( {id:this.props.id, className:"tab-pane"}, 
+        return (React.DOM.section( {id:this.props.id, className:this.props.active
+                                                         ? "tab-pane active"
+                                                         : "tab-pane"}, 
                 React.DOM.table( {className:"table table-striped table-condensed"}, 
                 React.DOM.thead(null, 
                 React.DOM.tr(null, 
@@ -264,7 +325,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
     getInitialState: function() {
         return {
             data: {
-                normal: {
+                noisy: {
                     text: "",
                     tokens: [],
                     revisions: {
@@ -291,72 +352,98 @@ var Annotator = React.createClass({displayName: 'Annotator',
                     rewritings: []
                 }
             },
-            dict: jQuery("input:radio[name='dict']:checked").val(),
+            weight: 'a',
+            corpus: 'filtered',
+            tab: 'input',
             lastText: "",
-            fetched: { normal: true, filtered: true }
+            fetched: { noisy: true, filtered: true }
         };
     },
-    fetchAnnotations: function(dict) {
+    fetchData: function(corpus) {
         var text = jQuery(this.refs.input.getDOMNode()).text();
         if (text === this.state.lastText) {
-            if (this.state.fetched[dict]) return;
-        } else this.setState({ fetched: { normal: false, filtered: false } });
+            if (this.state.fetched[corpus]) return;
+        } else this.setState({ fetched: { noisy: false, filtered: false } });
         this.setState({lastText: text});
         jQuery.ajax({
             type: 'POST',
             url: this.props.url,
             contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify({ data: text, dict: dict })
+            data: JSON.stringify({ data: text, dict: corpus })
         }).done(function(data) {
             var dataMergeable = jQuery.extend({}, this.state.data);
-            dataMergeable[dict] = data;
+            dataMergeable[corpus] = data;
             var fetchedMergeable = jQuery.extend({}, this.state.fetched);
-            fetchedMergeable[dict] = true;
+            fetchedMergeable[corpus] = true;
             this.setState({ data: dataMergeable, fetched: fetchedMergeable });
         }.bind(this));
     },
-    toNormal: function(e) { this.fetchAnnotations("normal"); },
-    toFiltered: function(e) { this.fetchAnnotations("filtered"); },
+    controlCallbackWeight: function(weight) {
+        this.setState({weight: weight});
+    },
+    controlCallbackCorpus: function(corpus) {
+        this.setState({corpus: corpus});
+        if (this.state.tab === 'analysis'
+            || this.state.tab === 'rewritings') {
+            this.fetchData(corpus);
+        }
+    },
+    activateOutputTab: function(tab) {
+        this.fetchData(this.state.corpus);
+        this.activateTab(tab);
+    },
+    activateTab: function(tab) {
+        this.setState({tab: tab});
+    },
     render: function() {
         return (React.DOM.section( {className:"container", style:{minHeight: "300px"}}, 
+                ControlPane(
+                {weight:this.state.weight,
+                corpus:this.state.corpus,
+                callbackWeight:this.controlCallbackWeight,
+                callbackCorpus:this.controlCallbackCorpus}),
                 React.DOM.ul( {className:"nav nav-tabs nav-justified"}, 
-                React.DOM.li( {className:"active"}, 
-                React.DOM.a( {href:"#input", 'data-toggle':"tab"}, 
-                "Your text"
+                React.DOM.li( {className:this.state.tab === 'input' ? 'active' : ''}, 
+                React.DOM.a( {href:"#",
+                   onClick:this.activateTab.bind(this, 'input')}, 
+                  "Input text"
                 )
                 ),
 
-                React.DOM.li(null, 
-                React.DOM.a( {href:"#normal", onClick:this.toNormal, 'data-toggle':"tab"}, 
-                "Full analysis"
+                React.DOM.li( {className:this.state.tab === 'analysis' ? 'active' : ''}, 
+                React.DOM.a( {href:"#",
+                   onClick:this.activateOutputTab.bind(this, 'analysis')}, 
+                  "Analysis"
                 )
                 ),
                 
-                React.DOM.li(null, 
-                React.DOM.a( {href:"#filtered", onClick:this.toFiltered, 'data-toggle':"tab"}, 
-                "Filtered analysis"
-                )
-                ),
-
-                React.DOM.li(null, 
-                React.DOM.a( {href:"#normal-rewritings", onClick:this.toNormal, 'data-toggle':"tab"}, 
-                "Full rewritings"
-                )
-                ),
-
-                React.DOM.li(null, 
-                React.DOM.a( {href:"#filtered-rewritings", onClick:this.toFiltered, 'data-toggle':"tab"}, 
-                "Filtered rewritings"
+                React.DOM.li( {className:this.state.tab === 'rewritings' ? 'active' : ''}, 
+                React.DOM.a( {href:"#",
+                   onClick:this.activateOutputTab.bind(this, 'rewritings')}, 
+                  "Rewritings"
                 )
                 )
                 ),
                 
                 React.DOM.section( {className:"tab-content"}, 
-                InputPane( {ref:"input"}),
-                OutputPane( {id:"normal", data:this.state.data.normal}),
-                OutputPane( {id:"filtered", data:this.state.data.filtered}),
-                RewritingsPane( {id:"normal-rewritings", data:this.state.data.normal}),
-                RewritingsPane( {id:"filtered-rewritings", data:this.state.data.filtered})
+                InputPane( {ref:"input",
+                           active:this.state.tab === 'input'
+                                     ? true
+                                     : false}),
+                OutputPane( {id:"analysis",
+                            data:this.state.corpus === 'noisy'
+                                    ? this.state.data.noisy
+                                    : this.state.data.filtered,
+                            active:this.state.tab === 'analysis'
+                                      ? true
+                                      : false}),
+                RewritingsPane( {id:"rewritings",
+                                data:this.state.corpus === 'noisy'
+                                        ? this.state.data.noisy
+                                        : this.state.data.filtered,
+                                active:this.state.tab === 'rewritings'
+                                          ? true
+                                          : false})
                 )
                 )
         );

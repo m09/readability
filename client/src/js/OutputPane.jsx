@@ -77,7 +77,10 @@ var OutputPane = React.createClass({
             spans = this.spans(text, anns, revs);
         this.fillSpans(anns, spans, revs);
         var mappings = this.toHtml(text, anns, spans, revs);
-        return (<section id={this.props.id} className="tab-pane">
+        return (<section id={this.props.id}
+                         className={this.props.active
+                                      ? "tab-pane active"
+                                      : "tab-pane"}>
                 {mappings}</section>);
     }
 });

@@ -6,7 +6,6 @@ var RewritingsPane = React.createClass({
             var p = 0;
             var rewritten = [];
             _.each(top.revisions, function(r) {
-                console.log(r);
                 var rev = revs[r.revisionsId][r.revisionsIndex];
                 if (r.begin > p) {
                     rewritten.push(
@@ -31,7 +30,9 @@ var RewritingsPane = React.createClass({
         var rewritings = this.props.data.rewritings;
         var text = this.props.data.text;
         var rows = this.toRows(rewritings, revs, text);
-        return (<section id={this.props.id} className="tab-pane">
+        return (<section id={this.props.id} className={this.props.active
+                                                         ? "tab-pane active"
+                                                         : "tab-pane"}>
                 <table className="table table-striped table-condensed">
                 <thead>
                 <tr>
