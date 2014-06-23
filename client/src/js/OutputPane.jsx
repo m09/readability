@@ -52,7 +52,9 @@ var OutputPane = React.createClass({
     toHtml: function(text, anns, spans, revs, scoreIndex) {
         var output = [];
         var f = true;
-        var scores = _.pluck(_.pluck(_.flatten(_.values(revs)), 'score'), scoreIndex);
+        var scores =_.pluck(_.pluck(_.flatten(_.values(revs)),
+                                    'score'),
+                            scoreIndex);
         var maxScore = _.max(scores);
         var minScore = _.min(scores);
         _.each(spans, function(span) {
@@ -75,7 +77,7 @@ var OutputPane = React.createClass({
         var text = this.props.data.text,
             anns = this.props.data.annotations.text,
             revs = this.props.data.revisions.text,
-            scoreIndex = this.props.weight
+            scoreIndex = this.props.weight,
             spans = this.spans(text, anns, revs);
         this.fillSpans(anns, spans, revs);
         var mappings = this.toHtml(text, anns, spans, revs, scoreIndex);
