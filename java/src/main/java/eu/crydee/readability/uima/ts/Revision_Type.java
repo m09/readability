@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Sun Jun 22 14:52:09 JST 2014 */
+/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Sun Jun 22 14:52:09 JST 2014
+ * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
  * @generated */
 public class Revision_Type extends Annotation_Type {
   /** @generated */
@@ -122,18 +122,37 @@ public class Revision_Type extends Annotation_Type {
   /** @generated */
   final int     casFeatCode_score;
   /** @generated */ 
-  public double getScore(int addr) {
+  public int getScore(int addr) {
         if (featOkTst && casFeat_score == null)
       jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revision");
-    return ll_cas.ll_getDoubleValue(addr, casFeatCode_score);
+    return ll_cas.ll_getRefValue(addr, casFeatCode_score);
   }
   /** @generated */    
-  public void setScore(int addr, double v) {
+  public void setScore(int addr, int v) {
         if (featOkTst && casFeat_score == null)
       jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revision");
-    ll_cas.ll_setDoubleValue(addr, casFeatCode_score, v);}
+    ll_cas.ll_setRefValue(addr, casFeatCode_score, v);}
     
-  
+   /** @generated */
+  public double getScore(int addr, int i) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revision");
+    if (lowLevelTypeChecks)
+      return ll_cas.ll_getDoubleArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_score), i, true);
+    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_score), i);
+	return ll_cas.ll_getDoubleArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_score), i);
+  }
+   
+  /** @generated */ 
+  public void setScore(int addr, int i, double v) {
+        if (featOkTst && casFeat_score == null)
+      jcas.throwFeatMissing("score", "eu.crydee.readability.uima.ts.Revision");
+    if (lowLevelTypeChecks)
+      ll_cas.ll_setDoubleArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_score), i, v, true);
+    jcas.checkArrayBounds(ll_cas.ll_getRefValue(addr, casFeatCode_score), i);
+    ll_cas.ll_setDoubleArrayValue(ll_cas.ll_getRefValue(addr, casFeatCode_score), i, v);
+  }
+ 
 
 
 
@@ -156,7 +175,7 @@ public class Revision_Type extends Annotation_Type {
     casFeatCode_count  = (null == casFeat_count) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_count).getCode();
 
  
-    casFeat_score = jcas.getRequiredFeatureDE(casType, "score", "uima.cas.Double", featOkTst);
+    casFeat_score = jcas.getRequiredFeatureDE(casType, "score", "uima.cas.DoubleArray", featOkTst);
     casFeatCode_score  = (null == casFeat_score) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_score).getCode();
 
   }

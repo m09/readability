@@ -19,6 +19,31 @@
             </features>
         </typeDescription>
         <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsOcc</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsLM</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMN</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMW</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMWN</name>
+            <description/>
+            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
+        </typeDescription>
+        <typeDescription>
             <name>eu.crydee.readability.uima.ts.RewritingSpan</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
@@ -104,7 +129,7 @@
                 <featureDescription>
                     <name>score</name>
                     <description/>
-                    <rangeTypeName>uima.cas.Double</rangeTypeName>
+                    <rangeTypeName>uima.cas.DoubleArray</rangeTypeName>
                 </featureDescription>
             </features>
         </typeDescription>

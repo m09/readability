@@ -16,7 +16,6 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class ScorerAE extends JCasAnnotator_ImplBase {
@@ -48,8 +47,12 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
     @Override
     public void collectionProcessComplete()
             throws AnalysisEngineProcessException {
-        double lowestScore = Double.POSITIVE_INFINITY,
-                highestScore = Double.NEGATIVE_INFINITY;
+        double lowestScoreLM = Double.POSITIVE_INFINITY,
+                highestScoreLM = Double.NEGATIVE_INFINITY;
+        double lowestScoreLMW = Double.POSITIVE_INFINITY,
+                highestScoreLMW = Double.NEGATIVE_INFINITY;
+        double minLMProba = Double.POSITIVE_INFINITY;
+        double minLMWProba = Double.POSITIVE_INFINITY;
         int totalCount = dict.getTotalCount();
         for (Mapped original : dict.keySet()) {
             Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
@@ -59,28 +62,44 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             tokens.add("<s>");
             tokens.addAll(original.getTokens());
             tokens.add("</s>");
-            float lmProba = nlm.scoreSentence(tokens);
-            logger.log(Level.FINEST, "originalCount: " + originalCount);
-            logger.log(Level.FINEST, "lmProba:       " + lmProba);
+            float lmProba = nlm.scoreSentence(tokens),
+                    lmWProba = lmProba / original.getTokens().size();
+            minLMProba = Math.min(minLMProba, lmProba);
+            minLMWProba = Math.min(minLMWProba, lmWProba);
             for (Mapped rev : revs.keySet()) {
                 Metrics metric = revs.get(rev);
-                double score = Math.log(metric.getCount())
-                        - Math.log(totalCount)
-                        - Math.log(1 - Math.exp(lmProba));
-                lowestScore = Math.min(score, lowestScore);
-                highestScore = Math.max(score, highestScore);
-                metric.setScore(score);
+                double scoreOcc = Math.log(metric.getCount())
+                        - Math.log(totalCount),
+                        scoreLM = Math.log(metric.getCount())
+                        - Math.log(originalCount)
+                        - lmProba,
+                        scoreLMW = Math.log(metric.getCount())
+                        - Math.log(originalCount)
+                        - lmWProba;
+                lowestScoreLM = Math.min(scoreLM, lowestScoreLM);
+                highestScoreLM = Math.max(scoreLM, highestScoreLM);
+                lowestScoreLMW = Math.min(scoreLMW, lowestScoreLMW);
+                highestScoreLMW = Math.max(scoreLMW, highestScoreLMW);
+                metric.setScoreOcc(scoreOcc);
+                metric.setScoreLM(scoreLM);
+                metric.setScoreLMW(scoreLMW);
             }
         }
-//        double ambitus = highestScore - lowestScore;
-//        for (Mapped original : dict.keySet()) {
-//            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
-//            for (Mapped rev : revs.keySet()) {
-//                Metrics metric = revs.get(rev);
-//                metric.setScore(
-//                        (metric.getScore() - lowestScore)
-//                        / ambitus);
-//            }
-//        }
+        double ambitusLM = highestScoreLM - lowestScoreLM;
+        double ambitusLMW = highestScoreLMW - lowestScoreLMW;
+        for (Mapped original : dict.keySet()) {
+            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
+            for (Mapped rev : revs.keySet()) {
+                Metrics metric = revs.get(rev);
+                metric.setScoreLMWN(
+                        (metric.getScoreLMW() - lowestScoreLMW)
+                        / ambitusLMW);
+                metric.setScoreLMN(
+                        (metric.getScoreLM() - lowestScoreLM)
+                        / ambitusLM);
+                metric.setScoreLM(metric.getScoreLM() + minLMProba);
+                metric.setScoreLMW(metric.getScoreLMW() + minLMWProba);
+            }
+        }
     }
 }

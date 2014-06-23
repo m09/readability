@@ -31,8 +31,8 @@ public class DictUsagePipeline {
             AnalysisEngineProcessException,
             ResourceAccessException {
         AnalysisEngine ae = buildAe(
-                "file:out/res/processed/dictTxt.xml/filtered.xml",
-                "file:out/res/dictPos.xml",
+                "file:out/res/filteredTxt.xml",
+                "file:out/res/filteredPos.xml",
                 true);
         CAS aCas = ae.newCAS();
         aCas.setDocumentText("Hello there, and how do you do?");

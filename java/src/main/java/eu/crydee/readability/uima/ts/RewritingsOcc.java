@@ -13,12 +13,12 @@ import org.apache.uima.jcas.cas.TOP_Type;
  * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
-public class PosSuggestion extends Suggestion {
+public class RewritingsOcc extends Rewritings {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(PosSuggestion.class);
+  public final static int typeIndexID = JCasRegistry.register(RewritingsOcc.class);
   /** @generated
    * @ordered 
    */
@@ -30,23 +30,23 @@ public class PosSuggestion extends Suggestion {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected PosSuggestion() {/* intentionally empty block */}
+  protected RewritingsOcc() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public PosSuggestion(int addr, TOP_Type type) {
+  public RewritingsOcc(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public PosSuggestion(JCas jcas) {
+  public RewritingsOcc(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public PosSuggestion(JCas jcas, int begin, int end) {
+  public RewritingsOcc(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);

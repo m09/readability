@@ -70,10 +70,23 @@ public class ReadabilityDict_Impl
     private void addRevised(XMLStreamReader xsr, Mapped rev)
             throws XMLStreamException {
         Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
-        Double score = Double.parseDouble(xsr.getAttributeValue(null, "score"));
+        Double scoreOcc = Double.parseDouble(
+                xsr.getAttributeValue(null, "scoreOcc")),
+                scoreLM = Double.parseDouble(
+                        xsr.getAttributeValue(null, "scoreLM")),
+                scoreLMW = Double.parseDouble(
+                        xsr.getAttributeValue(null, "scoreLMW")),
+                scoreLMN = Double.parseDouble(
+                        xsr.getAttributeValue(null, "scoreLMN")),
+                scoreLMWN = Double.parseDouble(
+                        xsr.getAttributeValue(null, "scoreLMWN"));
         Mapped revised = parseRevision(xsr);
         add(rev, revised, count);
-        dict.get(rev).get(revised).setScore(score);
+        dict.get(rev).get(revised).setScoreOcc(scoreOcc);
+        dict.get(rev).get(revised).setScoreLM(scoreLM);
+        dict.get(rev).get(revised).setScoreLMW(scoreLMW);
+        dict.get(rev).get(revised).setScoreLMN(scoreLMN);
+        dict.get(rev).get(revised).setScoreLMWN(scoreLMWN);
     }
 
     private Mapped parseRevision(XMLStreamReader xsr)
@@ -105,8 +118,20 @@ public class ReadabilityDict_Impl
                         "count",
                         String.valueOf(revisedMap.get(revised).getCount()));
                 xsw.writeAttribute(
-                        "score",
-                        String.valueOf(revisedMap.get(revised).getScore()));
+                        "scoreOcc",
+                        String.valueOf(revisedMap.get(revised).getScoreOcc()));
+                xsw.writeAttribute(
+                        "scoreLM",
+                        String.valueOf(revisedMap.get(revised).getScoreLM()));
+                xsw.writeAttribute(
+                        "scoreLMN",
+                        String.valueOf(revisedMap.get(revised).getScoreLMN()));
+                xsw.writeAttribute(
+                        "scoreLMW",
+                        String.valueOf(revisedMap.get(revised).getScoreLMW()));
+                xsw.writeAttribute(
+                        "scoreLMWN",
+                        String.valueOf(revisedMap.get(revised).getScoreLMWN()));
                 saveRevision(xsw, revised);
                 xsw.writeEndElement();
             }
@@ -141,7 +166,7 @@ public class ReadabilityDict_Impl
         }
         Metrics scores = revisions.get(revised);
         if (scores == null) {
-            scores = new Metrics(0, 0d);
+            scores = new Metrics(0, 0d, 0d, 0d, 0d, 0d);
             revisions.put(revised, scores);
         }
         scores.setCount(scores.getCount() + count);

@@ -15,9 +15,13 @@ import eu.crydee.readability.uima.ts.TxtRevisions;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,6 +33,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.DoubleArray;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -125,15 +130,53 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             if (starts.isEmpty()) {
                 continue;
             }
-            List<Pair<Mapped, Metrics>> revisedSorted = revisedSet
-                    .stream()
-                    .sorted((Pair<Mapped, Metrics> o1,
-                                    Pair<Mapped, Metrics> o2)
-                            -> Double.compare(
-                                    o2.getValue().getScore(),
-                                    o1.getValue().getScore()))
-                    .limit(limit == null ? Integer.MAX_VALUE : limit)
-                    .collect(Collectors.toList());
+            if (limit != null) {
+                SortedSet<Pair<Mapped, Metrics>> revisedSortedOcc
+                        = getTop(revisedSet,
+                                (Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScoreOcc(),
+                                        o1.getValue().getScoreOcc()),
+                                limit == null ? Integer.MAX_VALUE : limit),
+                        revisedSortedLM
+                        = getTop(revisedSet,
+                                (Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScoreLM(),
+                                        o1.getValue().getScoreLM()),
+                                limit == null ? Integer.MAX_VALUE : limit),
+                        revisedSortedLMN
+                        = getTop(revisedSet,
+                                (Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScoreLMN(),
+                                        o1.getValue().getScoreLMN()),
+                                limit == null ? Integer.MAX_VALUE : limit),
+                        revisedSortedLMW
+                        = getTop(revisedSet,
+                                (Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScoreLMW(),
+                                        o1.getValue().getScoreLMW()),
+                                limit == null ? Integer.MAX_VALUE : limit),
+                        revisedSortedLMWN
+                        = getTop(revisedSet,
+                                (Pair<Mapped, Metrics> o1,
+                                        Pair<Mapped, Metrics> o2)
+                                -> Double.compare(
+                                        o2.getValue().getScoreLMWN(),
+                                        o1.getValue().getScoreLMWN()),
+                                limit == null ? Integer.MAX_VALUE : limit);
+                revisedSet = new HashSet<>(revisedSortedOcc);
+                revisedSet.addAll(revisedSortedLM);
+                revisedSet.addAll(revisedSortedLMN);
+                revisedSet.addAll(revisedSortedLMW);
+                revisedSet.addAll(revisedSortedLMWN);
+            }
             Revisions revisions;
             try {
                 revisions = revisionsClass.getConstructor(JCas.class)
@@ -151,9 +194,10 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 throw new AnalysisEngineProcessException(ex);
             }
             revisions.setId(UUID.randomUUID().toString());
-            revisions.setRevisions(new FSArray(jcas, revisedSorted.size()));
-            for (int k = 0, s = revisedSorted.size(); k < s; k++) {
-                Pair<Mapped, Metrics> pair = revisedSorted.get(k);
+            revisions.setRevisions(new FSArray(jcas, revisedSet.size()));
+            int k = -1;
+            for (Pair<Mapped, Metrics> pair : revisedSet) {
+                ++k;
                 Mapped mapped = pair.getKey();
                 Metrics metrics = pair.getRight();
                 String[] toks = mapped.getTokens().toArray(new String[0]);
@@ -162,7 +206,12 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 Revision revision = new Revision(jcas);
                 revision.setTokens(saToks);
                 revision.setCount(metrics.getCount());
-                revision.setScore(metrics.getScore());
+                revision.setScore(new DoubleArray(jcas, 5));
+                revision.setScore(0, metrics.getScoreOcc());
+                revision.setScore(1, metrics.getScoreLM());
+                revision.setScore(2, metrics.getScoreLMN());
+                revision.setScore(3, metrics.getScoreLMW());
+                revision.setScore(4, metrics.getScoreLMWN());
                 revision.setText(mapped.getText());
                 revisions.setRevisions(k, revision);
             }
@@ -194,6 +243,12 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 }
             }
         }
+    }
+
+    private static <T> SortedSet<T> getTop(Set<T> s, Comparator<T> c, int n) {
+        return s.stream()
+                .limit(n)
+                .collect(Collectors.toCollection(() -> new TreeSet<>(c)));
     }
 
     private List<Integer> getSublistIndices(

@@ -14,21 +14,22 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class Transducer {
-
+    
     private static final Logger logger = UIMAFramework.getLogger(
             Transducer.class);
-
+    
     public class Span {
-
+        
         public final UUID id;
         public final int begin, end, index;
-
+        
         public Span(UUID id, int begin, int end, int index) {
             this.id = id;
             this.begin = begin;
@@ -36,22 +37,22 @@ public class Transducer {
             this.index = index;
         }
     }
-
+    
     private class Cell implements Comparable<Cell> {
-
+        
         public final Optional<Span> id;
         public final double score;
-
+        
         public Cell(double score, Span id) {
             this.score = score;
             this.id = Optional.of(id);
         }
-
+        
         public Cell(double score) {
             this.score = score;
             this.id = Optional.empty();
         }
-
+        
         @Override
         public int compareTo(Cell o) {
             if (o == null) {
@@ -59,7 +60,7 @@ public class Transducer {
             }
             return Double.compare(score, o.score);
         }
-
+        
         @Override
         public int hashCode() {
             int hash = 7;
@@ -68,7 +69,7 @@ public class Transducer {
                     ^ (Double.doubleToLongBits(this.score) >>> 32));
             return hash;
         }
-
+        
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
@@ -85,20 +86,21 @@ public class Transducer {
                     == Double.doubleToLongBits(other.score);
         }
     }
-
+    
     private final SortedMap<Integer, SortedSetMultimap<Integer, Cell>> byStarts
             = new TreeMap<>();
     private final SetMultimap<Integer, Integer> byEnds = HashMultimap.create();
     private final Weight weight;
-
+    
     public Transducer(Weight weight) {
         this.weight = weight;
     }
-
+    
     public void put(
             Integer start,
             Integer end,
-            Revisions revs) {
+            Revisions revs,
+            Function<Revision, Double> scoreGetter) {
         byEnds.put(end, start);
         SortedSetMultimap<Integer, Cell> ends;
         if (!byStarts.containsKey(start)) {
@@ -112,11 +114,11 @@ public class Transducer {
         for (int i = 0, s = revs.getRevisions().size(); i < s; i++) {
             Revision rev = revs.getRevisions(i);
             ends.put(end, new Cell(
-                    rev.getScore(),
+                    scoreGetter.apply(rev),
                     new Span(UUID.fromString(revs.getId()), start, end, i)));
         }
     }
-
+    
     public void putEmptyTransition(Integer start, Integer end) {
         byEnds.put(end, start);
         SortedSetMultimap<Integer, Cell> ends;
@@ -130,7 +132,7 @@ public class Transducer {
         }
         ends.put(end, new Cell(weight.getUnit()));
     }
-
+    
     public TreeMultimap<Double, Span[]> top(int n) {
         SortedMap<Integer, TreeMultimap<Double, Span[]>> bests
                 = new TreeMap<>();
@@ -184,7 +186,7 @@ public class Transducer {
                     }
                 }
                 logger.log(Level.INFO, transitions.toString());
-
+                
             }
             int i = 0;
             TreeMultimap<Double, Span[]> toPut

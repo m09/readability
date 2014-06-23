@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Sun Jun 22 14:52:09 JST 2014 */
+/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -11,7 +11,7 @@ import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
 
 /** 
- * Updated by JCasGen Sun Jun 22 14:52:09 JST 2014
+ * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
  * @generated */
 public class TxtSuggestion_Type extends Suggestion_Type {
   /** @generated */
