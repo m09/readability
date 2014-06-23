@@ -35,7 +35,7 @@ public class DictUsagePipeline {
                 "file:out/res/filteredPos.xml",
                 true);
         CAS aCas = ae.newCAS();
-        aCas.setDocumentText("Hello there, and how do you do?");
+        aCas.setDocumentText("this, and that!");
         ae.process(aCas);
     }
 

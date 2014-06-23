@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
@@ -131,7 +129,7 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 continue;
             }
             if (limit != null) {
-                SortedSet<Pair<Mapped, Metrics>> revisedSortedOcc
+                List<Pair<Mapped, Metrics>> revisedSortedOcc
                         = getTop(revisedSet,
                                 (Pair<Mapped, Metrics> o1,
                                         Pair<Mapped, Metrics> o2)
@@ -245,10 +243,13 @@ public class MapperAE extends JCasAnnotator_ImplBase {
         }
     }
 
-    private static <T> SortedSet<T> getTop(Set<T> s, Comparator<T> c, int n) {
+    private static List<Pair<Mapped, Metrics>> getTop(
+            Set<Pair<Mapped, Metrics>> s,
+            Comparator<Pair<Mapped, Metrics>> c,
+            int n) {
         return s.stream()
                 .limit(n)
-                .collect(Collectors.toCollection(() -> new TreeSet<>(c)));
+                .collect(Collectors.toList());
     }
 
     private List<Integer> getSublistIndices(

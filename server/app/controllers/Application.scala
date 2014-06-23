@@ -10,6 +10,11 @@ import eu.crydee.readability.uima.ts.Revisions
 import eu.crydee.readability.uima.ts.Rewriting
 import eu.crydee.readability.uima.ts.RewritingSpan
 import eu.crydee.readability.uima.ts.Rewritings
+import eu.crydee.readability.uima.ts.RewritingsOcc
+import eu.crydee.readability.uima.ts.RewritingsLM
+import eu.crydee.readability.uima.ts.RewritingsLMN
+import eu.crydee.readability.uima.ts.RewritingsLMW
+import eu.crydee.readability.uima.ts.RewritingsLMWN
 import eu.crydee.readability.uima.ts.Suggestion
 import eu.crydee.readability.uima.ts.Token
 import eu.crydee.readability.uima.ts.TxtSuggestion
@@ -70,7 +75,7 @@ object Application extends Controller {
       "tokens" -> revision.getTokens.toArray,
       "text"   -> revision.getText,
       "count"  -> revision.getCount,
-      "score"  -> revision.getScore
+      "score"  -> revision.getScore.toArray
     )
   }
 
@@ -133,9 +138,21 @@ object Application extends Controller {
       val posRevisions: Iterable[Revisions] = JCasUtil.select(
         jcas,
         classOf[PosRevisions])
-      val rewritings: Rewritings = JCasUtil.selectSingle(
+      val rewritingsOcc: Rewritings = JCasUtil.selectSingle(
         jcas,
-        classOf[Rewritings])
+        classOf[RewritingsOcc])
+      val rewritingsLM: Rewritings = JCasUtil.selectSingle(
+        jcas,
+        classOf[RewritingsLM])
+      val rewritingsLMN: Rewritings = JCasUtil.selectSingle(
+        jcas,
+        classOf[RewritingsLMN])
+      val rewritingsLMW: Rewritings = JCasUtil.selectSingle(
+        jcas,
+        classOf[RewritingsLMW])
+      val rewritingsLMWN: Rewritings = JCasUtil.selectSingle(
+        jcas,
+        classOf[RewritingsLMWN])
       Ok(
         Json.obj(
           "text"        -> jcas.getDocumentText,
@@ -156,7 +173,13 @@ object Application extends Controller {
             "text" -> Json.toJson(txtSuggs),
             "pos"  -> Json.toJson(posSuggs)
           ),
-          "rewritings" -> rewritings
+          "rewritings" -> Json.arr(
+            rewritingsOcc,
+            rewritingsLM,
+            rewritingsLMN,
+            rewritingsLMW,
+            rewritingsLMWN
+          )
         )
       ).withHeaders(headers : _*)
     }

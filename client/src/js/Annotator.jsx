@@ -30,7 +30,7 @@ var Annotator = React.createClass({
                     rewritings: []
                 }
             },
-            weight: 'a',
+            weight: 0,
             corpus: 'filtered',
             tab: 'input',
             lastText: "",
@@ -109,6 +109,7 @@ var Annotator = React.createClass({
                                      ? true
                                      : false}/>
                 <OutputPane id="analysis"
+                            weight={this.state.weight}
                             data={this.state.corpus === 'noisy'
                                     ? this.state.data.noisy
                                     : this.state.data.filtered}
@@ -116,6 +117,7 @@ var Annotator = React.createClass({
                                       ? true
                                       : false}/>
                 <RewritingsPane id="rewritings"
+                                weight={this.state.weight}
                                 data={this.state.corpus === 'noisy'
                                         ? this.state.data.noisy
                                         : this.state.data.filtered}

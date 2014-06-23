@@ -24,11 +24,12 @@ var Mapping = React.createClass({
         if (_.isEmpty(this.props.anns)) {
             return;
         }
+        var scoreIndex = this.props.weight;
         var sortedSpan = _.sortBy(this.props.anns, function(ann) {
-            return -this.props.revs[ann.revisionsId][0].score;
+            return -this.props.revs[ann.revisionsId][0].score[scoreIndex];
         }.bind(this));
         var lis = [];
-        var spanScore = this.props.revs[sortedSpan[0].revisionsId][0].score;
+        var spanScore = this.props.revs[sortedSpan[0].revisionsId][0].score[scoreIndex];
         _.each(sortedSpan, function(ann) {
             var revs = this.props.revs[ann.revisionsId];
             lis.push(<li role="presentation"
@@ -37,7 +38,7 @@ var Mapping = React.createClass({
                          color: this.color(
                              this.props.minScore,
                              this.props.maxScore,
-                             _.head(revs).score
+                             _.head(revs).score[scoreIndex]
                          )
                      }}>
                      {this.props.wholeText.substring(ann.begin, ann.end)}
@@ -48,7 +49,7 @@ var Mapping = React.createClass({
                              color: this.color(
                                  this.props.minScore,
                                  this.props.maxScore,
-                                 r.score
+                                 r.score[scoreIndex]
                                  )
                          }}>
                          {r.text.length > 15
@@ -57,7 +58,7 @@ var Mapping = React.createClass({
                           </span>
                           : r.text}
                          <span className="badge pull-right">
-                         {Math.round(r.score * 100) / 100}
+                         {Math.round(r.score[scoreIndex] * 100) / 100}
                          </span>
                          </li>);
             }.bind(this));

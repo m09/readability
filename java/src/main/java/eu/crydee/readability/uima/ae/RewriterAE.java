@@ -94,8 +94,7 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
         }
         rewritings.setRewritings(new FSArray(jcas, topRewritings.size()));
         int j = 0;
-        for (Entry<Double, Span[]> e
-                : topRewritings) {
+        for (Entry<Double, Span[]> e : topRewritings) {
             int length = e.getValue().length;
             Rewriting r = new Rewriting(jcas);
             r.setRevisions(new FSArray(jcas, length));

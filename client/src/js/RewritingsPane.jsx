@@ -27,7 +27,7 @@ var RewritingsPane = React.createClass({
     },
     render: function() {
         var revs = this.props.data.revisions.text;
-        var rewritings = this.props.data.rewritings;
+        var rewritings = this.props.data.rewritings[this.props.weight];
         var text = this.props.data.text;
         var rows = this.toRows(rewritings, revs, text);
         return (<section id={this.props.id} className={this.props.active
