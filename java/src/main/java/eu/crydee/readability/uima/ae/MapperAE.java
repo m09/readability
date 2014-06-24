@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
@@ -129,51 +130,17 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 continue;
             }
             if (limit != null) {
-                List<Pair<Mapped, Metrics>> revisedSortedOcc
-                        = getTop(revisedSet,
-                                (Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScoreOcc(),
-                                        o1.getValue().getScoreOcc()),
-                                limit == null ? Integer.MAX_VALUE : limit),
-                        revisedSortedLM
-                        = getTop(revisedSet,
-                                (Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScoreLM(),
-                                        o1.getValue().getScoreLM()),
-                                limit == null ? Integer.MAX_VALUE : limit),
-                        revisedSortedLMN
-                        = getTop(revisedSet,
-                                (Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScoreLMN(),
-                                        o1.getValue().getScoreLMN()),
-                                limit == null ? Integer.MAX_VALUE : limit),
-                        revisedSortedLMW
-                        = getTop(revisedSet,
-                                (Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScoreLMW(),
-                                        o1.getValue().getScoreLMW()),
-                                limit == null ? Integer.MAX_VALUE : limit),
-                        revisedSortedLMWN
-                        = getTop(revisedSet,
-                                (Pair<Mapped, Metrics> o1,
-                                        Pair<Mapped, Metrics> o2)
-                                -> Double.compare(
-                                        o2.getValue().getScoreLMWN(),
-                                        o1.getValue().getScoreLMWN()),
-                                limit == null ? Integer.MAX_VALUE : limit);
-                revisedSet = new HashSet<>(revisedSortedOcc);
-                revisedSet.addAll(revisedSortedLM);
-                revisedSet.addAll(revisedSortedLMN);
-                revisedSet.addAll(revisedSortedLMW);
-                revisedSet.addAll(revisedSortedLMWN);
+                List<Pair<Mapped, Metrics>> a
+                        = getTop(revisedSet, Metrics::getScoreOcc, limit),
+                        b = getTop(revisedSet, Metrics::getScoreLM, limit),
+                        c = getTop(revisedSet, Metrics::getScoreLMN, limit),
+                        d = getTop(revisedSet, Metrics::getScoreLMW, limit),
+                        e = getTop(revisedSet, Metrics::getScoreLMWN, limit);
+                revisedSet = new HashSet<>(a);
+                revisedSet.addAll(b);
+                revisedSet.addAll(c);
+                revisedSet.addAll(d);
+                revisedSet.addAll(e);
             }
             Revisions revisions;
             try {
@@ -245,9 +212,14 @@ public class MapperAE extends JCasAnnotator_ImplBase {
 
     private static List<Pair<Mapped, Metrics>> getTop(
             Set<Pair<Mapped, Metrics>> s,
-            Comparator<Pair<Mapped, Metrics>> c,
+            Function<Metrics, Double> scoreGetter,
             int n) {
         return s.stream()
+                .sorted((Pair<Mapped, Metrics> o1,
+                                Pair<Mapped, Metrics> o2)
+                        -> Double.compare(
+                                scoreGetter.apply(o2.getValue()),
+                                scoreGetter.apply(o1.getValue())))
                 .limit(n)
                 .collect(Collectors.toList());
     }
