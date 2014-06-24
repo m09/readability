@@ -43,7 +43,7 @@ import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
-import org.apache.uima.fit.factory.ExternalResourceFactory;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import org.apache.uima.fit.factory.FlowControllerFactory;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
@@ -69,45 +69,26 @@ public class DictCreationPipeline {
                 rawOriginal = "original";
 
         /* Resources descriptions */
-        ExternalResourceDescription tokenModel
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        TokenizerModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-token.bin");
-
-        ExternalResourceDescription sentenceModel
-                = ExternalResourceFactory.createExternalResourceDescription(
+        ExternalResourceDescription tokenM = createExternalResourceDescription(
+                TokenizerModelResourceImpl.class,
+                "file:opennlp/uima/models/en-token.bin"),
+                sentenceM = createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-sent.bin");
-
-        ExternalResourceDescription posModel
-                = ExternalResourceFactory.createExternalResourceDescription(
+                        "file:opennlp/uima/models/en-sent.bin"),
+                posM = createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-pos-maxent.bin");
-
-        ExternalResourceDescription parserModel
-                = ExternalResourceFactory.createExternalResourceDescription(
+                        "file:opennlp/uima/models/en-pos-maxent.bin"),
+                parserM = createExternalResourceDescription(
                         ParserModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-parser-chunking.bin");
-
-        ExternalResourceDescription fullPos
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        ReadabilityDict_Impl.class,
-                        "");
-
-        ExternalResourceDescription filteredPos
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        ReadabilityDict_Impl.class,
-                        "");
-
-        ExternalResourceDescription fullTxt
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        ReadabilityDict_Impl.class,
-                        "");
-
-        ExternalResourceDescription filteredTxt
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        ReadabilityDict_Impl.class,
-                        "");
+                        "file:opennlp/uima/models/en-parser-chunking.bin"),
+                fullPos = createExternalResourceDescription(
+                        ReadabilityDict_Impl.class, ""),
+                filteredPos = createExternalResourceDescription(
+                        ReadabilityDict_Impl.class, ""),
+                fullTxt = createExternalResourceDescription(
+                        ReadabilityDict_Impl.class, ""),
+                filteredTxt = createExternalResourceDescription(
+                        ReadabilityDict_Impl.class, "");
 
         /* Collection reader */
         CollectionReaderDescription crd;
@@ -157,12 +138,12 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription sentenceDetector = createEngineDescription(
                 SentenceDetector.class,
-                "opennlp.uima.ModelName", sentenceModel,
+                "opennlp.uima.ModelName", sentenceM,
                 "opennlp.uima.SentenceType", Sentence.class.getCanonicalName());
 
         AnalysisEngineDescription tokenizer = createEngineDescription(
                 Tokenizer.class,
-                "opennlp.uima.ModelName", tokenModel,
+                "opennlp.uima.ModelName", tokenM,
                 "opennlp.uima.SentenceType", Sentence.class.getCanonicalName(),
                 "opennlp.uima.TokenType", Token.class.getCanonicalName());
 
@@ -181,14 +162,14 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription taggerRevised = createEngineDescription(
                 POSTagger.class,
-                "opennlp.uima.ModelName", posModel,
+                "opennlp.uima.ModelName", posM,
                 "opennlp.uima.SentenceType", RevisedSentences.class.getName(),
                 "opennlp.uima.TokenType", Token.class.getName(),
                 "opennlp.uima.POSFeature", "POS");
 
         AnalysisEngineDescription taggerOriginal = createEngineDescription(
                 POSTagger.class,
-                "opennlp.uima.ModelName", posModel,
+                "opennlp.uima.ModelName", posM,
                 "opennlp.uima.SentenceType", OriginalSentences.class.getName(),
                 "opennlp.uima.TokenType", Token.class.getName(),
                 "opennlp.uima.POSFeature", "POS");
@@ -213,7 +194,7 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription parserRevised = createEngineDescription(
                 Parser.class,
-                "opennlp.uima.ModelName", parserModel,
+                "opennlp.uima.ModelName", parserM,
                 "opennlp.uima.SentenceType", RevisedSentence.class.getName(),
                 "opennlp.uima.TokenType", Token.class.getName(),
                 "opennlp.uima.ParseType", Chunk.class.getName(),
@@ -222,7 +203,7 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription parserOriginal = createEngineDescription(
                 Parser.class,
-                "opennlp.uima.ModelName", parserModel,
+                "opennlp.uima.ModelName", parserM,
                 "opennlp.uima.SentenceType", OriginalSentence.class.getName(),
                 "opennlp.uima.TokenType", Token.class.getName(),
                 "opennlp.uima.ParseType", Chunk.class.getName(),
