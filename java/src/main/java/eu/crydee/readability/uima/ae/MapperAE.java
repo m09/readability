@@ -15,7 +15,6 @@ import eu.crydee.readability.uima.ts.TxtRevisions;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
