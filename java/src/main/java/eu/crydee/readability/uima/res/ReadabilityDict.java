@@ -2,12 +2,11 @@ package eu.crydee.readability.uima.res;
 
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metrics;
-import java.io.PrintStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface ReadabilityDict {
+public interface ReadabilityDict extends Saveable {
 
     public void add(Mapped original, Mapped revised);
 
@@ -18,6 +17,4 @@ public interface ReadabilityDict {
     public Set<Mapped> keySet();
 
     public int getTotalCount();
-
-    public void save(PrintStream ps) throws Exception;
 }

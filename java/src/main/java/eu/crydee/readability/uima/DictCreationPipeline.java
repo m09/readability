@@ -4,7 +4,7 @@ import eu.crydee.readability.uima.ae.CoveredCopierAE;
 import eu.crydee.readability.uima.ae.FilterDictAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.ae.ResourcePopulatorAE;
-import eu.crydee.readability.uima.ae.ResourceWriterAE;
+import eu.crydee.readability.uima.ae.SaveableWriterAE;
 import eu.crydee.readability.uima.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.ae.RevisionsGetterAE;
 import eu.crydee.readability.uima.ae.ScorerAE;
@@ -364,34 +364,34 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription fullTxtWriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        ResourceWriterAE.class,
-                        ResourceWriterAE.PARAM_FILENAME,
+                        SaveableWriterAE.class,
+                        SaveableWriterAE.PARAM_FILENAME,
                         "out/res/fullTxt.xml",
-                        ResourceWriterAE.RES_KEY,
+                        SaveableWriterAE.RES_KEY,
                         fullTxt);
 
         AnalysisEngineDescription fullPosWriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        ResourceWriterAE.class,
-                        ResourceWriterAE.PARAM_FILENAME,
+                        SaveableWriterAE.class,
+                        SaveableWriterAE.PARAM_FILENAME,
                         "out/res/fullPos.xml",
-                        ResourceWriterAE.RES_KEY,
+                        SaveableWriterAE.RES_KEY,
                         fullPos);
 
         AnalysisEngineDescription filteredTxtWriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        ResourceWriterAE.class,
-                        ResourceWriterAE.PARAM_FILENAME,
+                        SaveableWriterAE.class,
+                        SaveableWriterAE.PARAM_FILENAME,
                         "out/res/filteredTxt.xml",
-                        ResourceWriterAE.RES_KEY,
+                        SaveableWriterAE.RES_KEY,
                         filteredTxt);
 
         AnalysisEngineDescription filteredPosWriter
                 = AnalysisEngineFactory.createEngineDescription(
-                        ResourceWriterAE.class,
-                        ResourceWriterAE.PARAM_FILENAME,
+                        SaveableWriterAE.class,
+                        SaveableWriterAE.PARAM_FILENAME,
                         "out/res/filteredPos.xml",
-                        ResourceWriterAE.RES_KEY,
+                        SaveableWriterAE.RES_KEY,
                         filteredPos);
 
         /* The type priority is important especially to retrieve tokens. The

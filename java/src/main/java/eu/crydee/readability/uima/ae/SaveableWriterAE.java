@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.res.ReadabilityDict;
+import eu.crydee.readability.uima.res.Saveable;
 import java.io.PrintStream;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
@@ -8,7 +8,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 
-public class ResourceWriterAE extends JCasAnnotator_ImplBase {
+public class SaveableWriterAE extends JCasAnnotator_ImplBase {
 
     final static public String PARAM_FILENAME = "FILENAME";
     @ConfigurationParameter(name = PARAM_FILENAME, mandatory = true)
@@ -16,7 +16,7 @@ public class ResourceWriterAE extends JCasAnnotator_ImplBase {
 
     final static public String RES_KEY = "KEY";
     @ExternalResource(key = RES_KEY)
-    ReadabilityDict res;
+    Saveable res;
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
