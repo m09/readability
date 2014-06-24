@@ -41,7 +41,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.factory.ExternalResourceFactory;
 import org.apache.uima.fit.factory.FlowControllerFactory;
@@ -134,265 +134,182 @@ public class DictCreationPipeline {
         }
 
         /* Analysis engines */
-        AnalysisEngineDescription filter
-                = AnalysisEngineFactory.createEngineDescription(
-                        RevisionsFilterAE.class);
+        AnalysisEngineDescription filter = createEngineDescription(
+                RevisionsFilterAE.class);
 
-        AnalysisEngineDescription mw2txtRevised
-                = AnalysisEngineFactory.createEngineDescription(
-                        MediaWikiConverterAE.class,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                        textRevised,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        htmlRevised,
-                        MediaWikiConverterAE.PARAM_LOWERCASE,
-                        true);
+        AnalysisEngineDescription mw2txtRevised = createEngineDescription(
+                MediaWikiConverterAE.class,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, textRevised,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_HTML, htmlRevised,
+                MediaWikiConverterAE.PARAM_LOWERCASE, true);
 
-        AnalysisEngineDescription mw2txtOriginal
-                = AnalysisEngineFactory.createEngineDescription(
-                        MediaWikiConverterAE.class,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                        textOriginal,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        htmlOriginal,
-                        MediaWikiConverterAE.PARAM_LOWERCASE,
-                        true);
+        AnalysisEngineDescription mw2txtOriginal = createEngineDescription(
+                MediaWikiConverterAE.class,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, textOriginal,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_HTML, htmlOriginal,
+                MediaWikiConverterAE.PARAM_LOWERCASE, true);
 
-        AnalysisEngineDescription getter
-                = AnalysisEngineFactory.createEngineDescription(
-                        RevisionsGetterAE.class,
-                        RevisionsGetterAE.PARAM_DB_URL,
-                        DB_URL,
-                        RevisionsGetterAE.PARAM_DB_USER,
-                        DB_USR,
-                        RevisionsGetterAE.PARAM_DB_PASSWORD,
-                        DB_PW);
+        AnalysisEngineDescription getter = createEngineDescription(
+                RevisionsGetterAE.class,
+                RevisionsGetterAE.PARAM_DB_URL, DB_URL,
+                RevisionsGetterAE.PARAM_DB_USER, DB_USR,
+                RevisionsGetterAE.PARAM_DB_PASSWORD, DB_PW);
 
-        AnalysisEngineDescription sentenceDetector
-                = AnalysisEngineFactory.createEngineDescription(
-                        SentenceDetector.class,
-                        "opennlp.uima.ModelName",
-                        sentenceModel,
-                        "opennlp.uima.SentenceType",
-                        Sentence.class.getCanonicalName());
+        AnalysisEngineDescription sentenceDetector = createEngineDescription(
+                SentenceDetector.class,
+                "opennlp.uima.ModelName", sentenceModel,
+                "opennlp.uima.SentenceType", Sentence.class.getCanonicalName());
 
-        AnalysisEngineDescription tokenizer
-                = AnalysisEngineFactory.createEngineDescription(
-                        Tokenizer.class,
-                        "opennlp.uima.ModelName",
-                        tokenModel,
-                        "opennlp.uima.SentenceType",
-                        Sentence.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName());
+        AnalysisEngineDescription tokenizer = createEngineDescription(
+                Tokenizer.class,
+                "opennlp.uima.ModelName", tokenModel,
+                "opennlp.uima.SentenceType", Sentence.class.getCanonicalName(),
+                "opennlp.uima.TokenType", Token.class.getCanonicalName());
 
-        AnalysisEngineDescription sentenceDiffer
-                = AnalysisEngineFactory.createEngineDescription(
-                        SentenceDiffAE.class,
-                        SentenceDiffAE.PARAM_SENTENCE_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                        OriginalSentences.class.getCanonicalName(),
-                        SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                        RevisedSentences.class.getCanonicalName(),
-                        SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
-                        "originalSentences",
-                        SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
-                        "revisedSentences");
+        AnalysisEngineDescription sentenceDiffer = createEngineDescription(
+                SentenceDiffAE.class,
+                SentenceDiffAE.PARAM_SENTENCE_TYPE,
+                Sentence.class.getName(),
+                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
+                OriginalSentences.class.getName(),
+                SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE,
+                RevisedSentences.class.getName(),
+                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
+                "originalSentences",
+                SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
+                "revisedSentences");
 
-        AnalysisEngineDescription taggerRevised
-                = AnalysisEngineFactory.createEngineDescription(
-                        POSTagger.class,
-                        "opennlp.uima.ModelName",
-                        posModel,
-                        "opennlp.uima.SentenceType",
-                        RevisedSentences.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName(),
-                        "opennlp.uima.POSFeature",
-                        "POS");
+        AnalysisEngineDescription taggerRevised = createEngineDescription(
+                POSTagger.class,
+                "opennlp.uima.ModelName", posModel,
+                "opennlp.uima.SentenceType", RevisedSentences.class.getName(),
+                "opennlp.uima.TokenType", Token.class.getName(),
+                "opennlp.uima.POSFeature", "POS");
 
-        AnalysisEngineDescription taggerOriginal
-                = AnalysisEngineFactory.createEngineDescription(
-                        POSTagger.class,
-                        "opennlp.uima.ModelName",
-                        posModel,
-                        "opennlp.uima.SentenceType",
-                        OriginalSentences.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName(),
-                        "opennlp.uima.POSFeature",
-                        "POS");
+        AnalysisEngineDescription taggerOriginal = createEngineDescription(
+                POSTagger.class,
+                "opennlp.uima.ModelName", posModel,
+                "opennlp.uima.SentenceType", OriginalSentences.class.getName(),
+                "opennlp.uima.TokenType", Token.class.getName(),
+                "opennlp.uima.POSFeature", "POS");
 
-        AnalysisEngineDescription coveredCopierRevised
-                = AnalysisEngineFactory.createEngineDescription(
-                        CoveredCopierAE.class,
-                        CoveredCopierAE.PARAM_CONTAINER_TYPE,
-                        RevisedSentences.class.getCanonicalName(),
-                        CoveredCopierAE.PARAM_CHILD_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
-                        RevisedSentence.class.getCanonicalName());
+        AnalysisEngineDescription copierRevised = createEngineDescription(
+                CoveredCopierAE.class,
+                CoveredCopierAE.PARAM_CONTAINER_TYPE,
+                RevisedSentences.class.getName(),
+                CoveredCopierAE.PARAM_CHILD_TYPE,
+                Sentence.class.getCanonicalName(),
+                CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
+                RevisedSentence.class.getName());
 
-        AnalysisEngineDescription coveredCopierOriginal
-                = AnalysisEngineFactory.createEngineDescription(
-                        CoveredCopierAE.class,
-                        CoveredCopierAE.PARAM_CONTAINER_TYPE,
-                        OriginalSentences.class.getCanonicalName(),
-                        CoveredCopierAE.PARAM_CHILD_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
-                        OriginalSentence.class.getCanonicalName());
+        AnalysisEngineDescription copierOriginal = createEngineDescription(
+                CoveredCopierAE.class,
+                CoveredCopierAE.PARAM_CONTAINER_TYPE,
+                OriginalSentences.class.getCanonicalName(),
+                CoveredCopierAE.PARAM_CHILD_TYPE,
+                Sentence.class.getCanonicalName(),
+                CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
+                OriginalSentence.class.getCanonicalName());
 
-        AnalysisEngineDescription parserRevised
-                = AnalysisEngineFactory.createEngineDescription(
-                        Parser.class,
-                        "opennlp.uima.ModelName",
-                        parserModel,
-                        "opennlp.uima.SentenceType",
-                        RevisedSentence.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName(),
-                        "opennlp.uima.ParseType",
-                        Chunk.class.getCanonicalName(),
-                        "opennlp.uima.TypeFeature",
-                        "label",
-                        "opennlp.uima.ChildrenFeature",
-                        "children");
+        AnalysisEngineDescription parserRevised = createEngineDescription(
+                Parser.class,
+                "opennlp.uima.ModelName", parserModel,
+                "opennlp.uima.SentenceType", RevisedSentence.class.getName(),
+                "opennlp.uima.TokenType", Token.class.getName(),
+                "opennlp.uima.ParseType", Chunk.class.getName(),
+                "opennlp.uima.TypeFeature", "label",
+                "opennlp.uima.ChildrenFeature", "children");
 
-        AnalysisEngineDescription parserOriginal
-                = AnalysisEngineFactory.createEngineDescription(
-                        Parser.class,
-                        "opennlp.uima.ModelName",
-                        parserModel,
-                        "opennlp.uima.SentenceType",
-                        OriginalSentence.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName(),
-                        "opennlp.uima.ParseType",
-                        Chunk.class.getCanonicalName(),
-                        "opennlp.uima.TypeFeature",
-                        "label",
-                        "opennlp.uima.ChildrenFeature",
-                        "children");
+        AnalysisEngineDescription parserOriginal = createEngineDescription(
+                Parser.class,
+                "opennlp.uima.ModelName", parserModel,
+                "opennlp.uima.SentenceType", OriginalSentence.class.getName(),
+                "opennlp.uima.TokenType", Token.class.getName(),
+                "opennlp.uima.ParseType", Chunk.class.getName(),
+                "opennlp.uima.TypeFeature", "label",
+                "opennlp.uima.ChildrenFeature", "children");
 
-        AnalysisEngineDescription wordDiffer
-                = AnalysisEngineFactory.createEngineDescription(
-                        WordDiffAE.class,
-                        WordDiffAE.PARAM_SENTENCE_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        WordDiffAE.PARAM_TOKEN_TYPE,
-                        Token.class.getCanonicalName(),
-                        WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                        OriginalSentences.class.getCanonicalName(),
-                        WordDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                        RevisedSentences.class.getCanonicalName(),
-                        WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE,
-                        OriginalWords.class.getCanonicalName(),
-                        WordDiffAE.PARAM_REVISED_WORDS_TYPE,
-                        RevisedWords.class.getCanonicalName(),
-                        WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
-                        "originalSentences",
-                        WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
-                        "revisedSentences",
-                        WordDiffAE.PARAM_ORIGINAL_WORDS_FEATURE,
-                        "originalWords",
-                        WordDiffAE.PARAM_REVISED_WORDS_FEATURE,
-                        "revisedWords");
+        AnalysisEngineDescription wordDiffer = createEngineDescription(
+                WordDiffAE.class,
+                WordDiffAE.PARAM_SENTENCE_TYPE,
+                Sentence.class.getCanonicalName(),
+                WordDiffAE.PARAM_TOKEN_TYPE,
+                Token.class.getCanonicalName(),
+                WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
+                OriginalSentences.class.getCanonicalName(),
+                WordDiffAE.PARAM_REVISED_SENTENCES_TYPE,
+                RevisedSentences.class.getCanonicalName(),
+                WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE,
+                OriginalWords.class.getCanonicalName(),
+                WordDiffAE.PARAM_REVISED_WORDS_TYPE,
+                RevisedWords.class.getCanonicalName(),
+                WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
+                "originalSentences",
+                WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
+                "revisedSentences",
+                WordDiffAE.PARAM_ORIGINAL_WORDS_FEATURE,
+                "originalWords",
+                WordDiffAE.PARAM_REVISED_WORDS_FEATURE,
+                "revisedWords");
 
-        AnalysisEngineDescription consumerXmi
-                = AnalysisEngineFactory.createEngineDescription(
-                        XmiSerializerCreationAE.class,
-                        XmiSerializerCreationAE.PARAM_OUT_FOLDER,
-                        "out/cas");
+        AnalysisEngineDescription consumerXmi = createEngineDescription(
+                XmiSerializerCreationAE.class,
+                XmiSerializerCreationAE.PARAM_OUT_FOLDER, "out/cas");
 
-        AnalysisEngineDescription resourcePopulator
-                = AnalysisEngineFactory.createEngineDescription(
-                        ResourcePopulatorAE.class,
-                        ResourcePopulatorAE.RES_POS_KEY,
-                        fullPos,
-                        ResourcePopulatorAE.RES_TXT_KEY,
-                        fullTxt);
+        AnalysisEngineDescription resourcePopulator = createEngineDescription(
+                ResourcePopulatorAE.class,
+                ResourcePopulatorAE.RES_POS_KEY, fullPos,
+                ResourcePopulatorAE.RES_TXT_KEY, fullTxt);
 
-        AnalysisEngineDescription txtFilterer
-                = AnalysisEngineFactory.createEngineDescription(
-                        FilterDictAE.class,
-                        FilterDictAE.RES_INPUT_KEY,
-                        fullTxt,
-                        FilterDictAE.RES_OUTPUT_KEY,
-                        filteredTxt);
+        AnalysisEngineDescription txtFilterer = createEngineDescription(
+                FilterDictAE.class,
+                FilterDictAE.RES_INPUT_KEY, fullTxt,
+                FilterDictAE.RES_OUTPUT_KEY, filteredTxt);
 
-        AnalysisEngineDescription posFilterer
-                = AnalysisEngineFactory.createEngineDescription(
-                        FilterDictAE.class,
-                        FilterDictAE.RES_INPUT_KEY,
-                        fullPos,
-                        FilterDictAE.RES_OUTPUT_KEY,
-                        filteredPos);
+        AnalysisEngineDescription posFilterer = createEngineDescription(
+                FilterDictAE.class,
+                FilterDictAE.RES_INPUT_KEY, fullPos,
+                FilterDictAE.RES_OUTPUT_KEY, filteredPos);
 
-        AnalysisEngineDescription fullTxtScorer
-                = AnalysisEngineFactory.createEngineDescription(
-                        ScorerAE.class,
-                        ScorerAE.PARAM_LM_FILENAME,
-                        "out/lm/txt",
-                        ScorerAE.RES_KEY,
-                        fullTxt);
+        AnalysisEngineDescription fullTxtScorer = createEngineDescription(
+                ScorerAE.class,
+                ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
+                ScorerAE.RES_KEY, fullTxt);
 
-        AnalysisEngineDescription fullPosScorer
-                = AnalysisEngineFactory.createEngineDescription(
-                        ScorerAE.class,
-                        ScorerAE.PARAM_LM_FILENAME,
-                        "out/lm/pos",
-                        ScorerAE.RES_KEY,
-                        fullPos);
+        AnalysisEngineDescription fullPosScorer = createEngineDescription(
+                ScorerAE.class,
+                ScorerAE.PARAM_LM_FILENAME, "out/lm/pos",
+                ScorerAE.RES_KEY, fullPos);
 
-        AnalysisEngineDescription filteredTxtScorer
-                = AnalysisEngineFactory.createEngineDescription(
-                        ScorerAE.class,
-                        ScorerAE.PARAM_LM_FILENAME,
-                        "out/lm/txt",
-                        ScorerAE.RES_KEY,
-                        filteredTxt);
+        AnalysisEngineDescription filteredTxtScorer = createEngineDescription(
+                ScorerAE.class,
+                ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
+                ScorerAE.RES_KEY, filteredTxt);
 
-        AnalysisEngineDescription filteredPosScorer
-                = AnalysisEngineFactory.createEngineDescription(
-                        ScorerAE.class,
-                        ScorerAE.PARAM_LM_FILENAME,
-                        "out/lm/pos",
-                        ScorerAE.RES_KEY,
-                        filteredPos);
+        AnalysisEngineDescription filteredPosScorer = createEngineDescription(
+                ScorerAE.class,
+                ScorerAE.PARAM_LM_FILENAME, "out/lm/pos",
+                ScorerAE.RES_KEY, filteredPos);
 
-        AnalysisEngineDescription fullTxtWriter
-                = AnalysisEngineFactory.createEngineDescription(
-                        SaveableWriterAE.class,
-                        SaveableWriterAE.PARAM_FILENAME,
-                        "out/res/fullTxt.xml",
-                        SaveableWriterAE.RES_KEY,
-                        fullTxt);
+        AnalysisEngineDescription fullTxtWriter = createEngineDescription(
+                SaveableWriterAE.class,
+                SaveableWriterAE.PARAM_FILENAME, "out/res/fullTxt.xml",
+                SaveableWriterAE.RES_KEY, fullTxt);
 
-        AnalysisEngineDescription fullPosWriter
-                = AnalysisEngineFactory.createEngineDescription(
-                        SaveableWriterAE.class,
-                        SaveableWriterAE.PARAM_FILENAME,
-                        "out/res/fullPos.xml",
-                        SaveableWriterAE.RES_KEY,
-                        fullPos);
+        AnalysisEngineDescription fullPosWriter = createEngineDescription(
+                SaveableWriterAE.class,
+                SaveableWriterAE.PARAM_FILENAME, "out/res/fullPos.xml",
+                SaveableWriterAE.RES_KEY, fullPos);
 
-        AnalysisEngineDescription filteredTxtWriter
-                = AnalysisEngineFactory.createEngineDescription(
-                        SaveableWriterAE.class,
-                        SaveableWriterAE.PARAM_FILENAME,
-                        "out/res/filteredTxt.xml",
-                        SaveableWriterAE.RES_KEY,
-                        filteredTxt);
+        AnalysisEngineDescription filteredTxtWriter = createEngineDescription(
+                SaveableWriterAE.class,
+                SaveableWriterAE.PARAM_FILENAME, "out/res/filteredTxt.xml",
+                SaveableWriterAE.RES_KEY, filteredTxt);
 
-        AnalysisEngineDescription filteredPosWriter
-                = AnalysisEngineFactory.createEngineDescription(
-                        SaveableWriterAE.class,
-                        SaveableWriterAE.PARAM_FILENAME,
-                        "out/res/filteredPos.xml",
-                        SaveableWriterAE.RES_KEY,
-                        filteredPos);
+        AnalysisEngineDescription filteredPosWriter = createEngineDescription(
+                SaveableWriterAE.class,
+                SaveableWriterAE.PARAM_FILENAME, "out/res/filteredPos.xml",
+                SaveableWriterAE.RES_KEY, filteredPos);
 
         /* The type priority is important especially to retrieve tokens. The
          rest of the order is not accurate but it does not matter.*/
@@ -411,81 +328,52 @@ public class DictCreationPipeline {
                         FixedFlowController.class,
                         FixedFlowController.PARAM_ACTION_AFTER_CAS_MULTIPLIER,
                         "drop"));
-
         builder.add("filter", filter);
-
         builder.add("getter", getter);
-
         builder.add("mediawiki-importer-revised", mw2txtRevised,
                 CAS.NAME_DEFAULT_SOFA, rawRevised);
-
         builder.add("mediawiki-importer-original", mw2txtOriginal,
                 CAS.NAME_DEFAULT_SOFA, rawOriginal);
-
         builder.add("sentence-detector-revised", sentenceDetector,
                 CAS.NAME_DEFAULT_SOFA, textRevised);
-
         builder.add("sentence-detector-original", sentenceDetector,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
-
         builder.add("tokenizer-revised", tokenizer,
                 CAS.NAME_DEFAULT_SOFA, textRevised);
-
         builder.add("tokenizer-original", tokenizer,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
-
         builder.add("sentence-differ", sentenceDiffer,
                 SentenceDiffAE.ORIGINAL_VIEW, textOriginal,
                 SentenceDiffAE.REVISED_VIEW, textRevised);
-
         builder.add("tagger-revised", taggerRevised,
                 CAS.NAME_DEFAULT_SOFA, textRevised);
-
         builder.add("tagger-original", taggerOriginal,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
-
-        builder.add("covered-copier-revised", coveredCopierRevised,
+        builder.add("covered-copier-revised", copierRevised,
                 CAS.NAME_DEFAULT_SOFA, textRevised);
-
-        builder.add("covered-copier-original", coveredCopierOriginal,
+        builder.add("covered-copier-original", copierOriginal,
                 CAS.NAME_DEFAULT_SOFA, textOriginal);
-
 //        builder.add("parser-revised", parserRevised,
 //                CAS.NAME_DEFAULT_SOFA, textRevised);
-//
 //        builder.add("parser-original", parserOriginal,
 //                CAS.NAME_DEFAULT_SOFA, textOriginal);
-//
         builder.add("word-differ", wordDiffer,
                 WordDiffAE.ORIGINAL_VIEW, textOriginal,
                 WordDiffAE.REVISED_VIEW, textRevised);
-
         builder.add("xmi-consumer", consumerXmi);
-
         builder.add("resource-populator", resourcePopulator,
                 ResourcePopulatorAE.ORIGINAL_VIEW, textOriginal,
                 ResourcePopulatorAE.REVISED_VIEW, textRevised);
-
         builder.add("txt-filterer", txtFilterer);
-
         builder.add("pos-filterer", posFilterer);
-
         builder.add("full-txt-scorer", fullTxtScorer);
-
         builder.add("full-pos-scorer", fullPosScorer);
-
         builder.add("filtered-txt-scorer", filteredTxtScorer);
-
         builder.add("filtered-pos-scorer", filteredPosScorer);
-
         builder.add("full-txt-writer", fullTxtWriter);
-
         builder.add("full-pos-writer", fullPosWriter);
-
         builder.add("filtered-txt-writer", filteredTxtWriter);
-
         builder.add("filtered-pos-writer", filteredPosWriter);
-
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
     }
 
