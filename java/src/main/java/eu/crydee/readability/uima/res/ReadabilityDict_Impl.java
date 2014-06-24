@@ -95,11 +95,13 @@ public class ReadabilityDict_Impl
         XMLUtils.nextTag(xsr);
         String originalText = xsr.getElementText();
         XMLUtils.nextTag(xsr);
+        String contextText = xsr.getElementText();
+        XMLUtils.nextTag(xsr);
         List<String> tokens = new ArrayList<>();
         while (XMLUtils.goToNextXBeforeY(xsr, "token", "token-list")) {
             tokens.add(xsr.getElementText());
         }
-        return new Mapped(originalText, tokens);
+        return new Mapped(originalText, contextText, tokens);
     }
 
     @Override
@@ -148,6 +150,9 @@ public class ReadabilityDict_Impl
             throws XMLStreamException {
         xsw.writeStartElement("text");
         xsw.writeCharacters(revision.getText());
+        xsw.writeEndElement();
+        xsw.writeStartElement("context");
+        xsw.writeCharacters(revision.getContext());
         xsw.writeEndElement();
         xsw.writeStartElement("token-list");
         for (String token : revision.getTokens()) {

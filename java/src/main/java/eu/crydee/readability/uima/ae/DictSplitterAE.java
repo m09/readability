@@ -27,7 +27,7 @@ public class DictSplitterAE extends JCasAnnotator_ImplBase {
 
     static private final Logger logger = UIMAFramework.getLogger(
             DictSplitterAE.class);
-    static private final Function<Integer, String> testNamer
+    static public final Function<Integer, String> testNamer
             = i -> "test-" + i + ".xml",
             trainNamer = i -> "train-" + i + ".xml";
 

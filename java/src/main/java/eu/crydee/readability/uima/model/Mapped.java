@@ -6,14 +6,15 @@ import java.util.Objects;
 
 public class Mapped {
 
-    final private String text;
+    final private String text, context;
     final private List<String> tokens;
 
-    public Mapped(String text, List<String> tokens) {
+    public Mapped(String text, String context, List<String> tokens) {
         this.text = text;
         this.tokens = new ImmutableList.Builder<String>()
                 .addAll(tokens)
                 .build();
+        this.context = context;
     }
 
     public String getText() {
@@ -22,6 +23,10 @@ public class Mapped {
 
     public List<String> getTokens() {
         return tokens;
+    }
+
+    public String getContext() {
+        return context;
     }
 
     @Override

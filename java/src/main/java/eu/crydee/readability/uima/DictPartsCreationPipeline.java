@@ -11,7 +11,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 public class DictPartsCreationPipeline {
 
-    private static final int crossValidationFolds = 10;
+    public static final int nParts = 10;
 
     public static void main(String[] args)
             throws ResourceInitializationException,
@@ -33,7 +33,7 @@ public class DictPartsCreationPipeline {
                 ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
                         in),
-                DictSplitterAE.PARAM_N_PARTS, crossValidationFolds,
+                DictSplitterAE.PARAM_N_PARTS, nParts,
                 DictSplitterAE.PARAM_OUT_FOLDER, out));
     }
 }

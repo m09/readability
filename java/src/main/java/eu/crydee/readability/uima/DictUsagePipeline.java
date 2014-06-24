@@ -44,6 +44,15 @@ public class DictUsagePipeline {
             String filePosURI,
             boolean serialize)
             throws ResourceInitializationException {
+        return AnalysisEngineFactory.createEngine(
+                buildAed(fileTxtURI, filePosURI, serialize));
+    }
+
+    public static AnalysisEngineDescription buildAed(
+            String fileTxtURI,
+            String filePosURI,
+            boolean serialize)
+            throws ResourceInitializationException {
         /* Resources descriptions */
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
@@ -138,6 +147,6 @@ public class DictUsagePipeline {
             builder.add(consumerXmi);
         }
 
-        return builder.createAggregate();
+        return builder.createAggregateDescription();
     }
 }
