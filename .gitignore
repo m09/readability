@@ -17,6 +17,7 @@ indented.xml
 /java/out/res/fullTxt.xml
 /java/out/res/filteredPos.xml
 /java/out/res/filteredTxt.xml
+/java/out/res/parts/
 /java/out/res/processed/
 /server/conf/application.conf
 /server/data/
