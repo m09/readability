@@ -62,7 +62,7 @@ public class DictCreationPipeline {
 
         /* View names */
         final String textRevised = "txtRevised",
-                textOriginal = "txtOriginal",
+                txtOriginal = "txtOriginal",
                 htmlRevised = "htmlRevised",
                 htmlOriginal = "htmlOriginal",
                 rawRevised = "revised",
@@ -126,7 +126,7 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription mw2txtOriginal = createEngineDescription(
                 MediaWikiConverterAE.class,
-                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, textOriginal,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, txtOriginal,
                 MediaWikiConverterAE.PARAM_OUT_VIEW_HTML, htmlOriginal,
                 MediaWikiConverterAE.PARAM_LOWERCASE, true);
 
@@ -294,7 +294,7 @@ public class DictCreationPipeline {
 
         /* The type priority is important especially to retrieve tokens. The
          rest of the order is not accurate but it does not matter.*/
-        AggregateBuilder builder = new AggregateBuilder(
+        AggregateBuilder b = new AggregateBuilder(
                 null,
                 TypePrioritiesFactory.createTypePriorities(
                         OriginalSentences.class,
@@ -309,53 +309,38 @@ public class DictCreationPipeline {
                         FixedFlowController.class,
                         FixedFlowController.PARAM_ACTION_AFTER_CAS_MULTIPLIER,
                         "drop"));
-        builder.add("filter", filter);
-        builder.add("getter", getter);
-        builder.add("mediawiki-importer-revised", mw2txtRevised,
-                CAS.NAME_DEFAULT_SOFA, rawRevised);
-        builder.add("mediawiki-importer-original", mw2txtOriginal,
-                CAS.NAME_DEFAULT_SOFA, rawOriginal);
-        builder.add("sentence-detector-revised", sentenceDetector,
-                CAS.NAME_DEFAULT_SOFA, textRevised);
-        builder.add("sentence-detector-original", sentenceDetector,
-                CAS.NAME_DEFAULT_SOFA, textOriginal);
-        builder.add("tokenizer-revised", tokenizer,
-                CAS.NAME_DEFAULT_SOFA, textRevised);
-        builder.add("tokenizer-original", tokenizer,
-                CAS.NAME_DEFAULT_SOFA, textOriginal);
-        builder.add("sentence-differ", sentenceDiffer,
-                SentenceDiffAE.ORIGINAL_VIEW, textOriginal,
+        b.add(filter);
+        b.add(getter);
+        b.add(mw2txtRevised, CAS.NAME_DEFAULT_SOFA, rawRevised);
+        b.add(mw2txtOriginal, CAS.NAME_DEFAULT_SOFA, rawOriginal);
+        b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, txtOriginal);
+        b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, txtOriginal);
+        b.add(sentenceDiffer, SentenceDiffAE.ORIGINAL_VIEW, txtOriginal,
                 SentenceDiffAE.REVISED_VIEW, textRevised);
-        builder.add("tagger-revised", taggerRevised,
-                CAS.NAME_DEFAULT_SOFA, textRevised);
-        builder.add("tagger-original", taggerOriginal,
-                CAS.NAME_DEFAULT_SOFA, textOriginal);
-        builder.add("covered-copier-revised", copierRevised,
-                CAS.NAME_DEFAULT_SOFA, textRevised);
-        builder.add("covered-copier-original", copierOriginal,
-                CAS.NAME_DEFAULT_SOFA, textOriginal);
-//        builder.add("parser-revised", parserRevised,
-//                CAS.NAME_DEFAULT_SOFA, textRevised);
-//        builder.add("parser-original", parserOriginal,
-//                CAS.NAME_DEFAULT_SOFA, textOriginal);
-        builder.add("word-differ", wordDiffer,
-                WordDiffAE.ORIGINAL_VIEW, textOriginal,
+        b.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
+        b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(copierOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
+//        builder.add(parserRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
+//        builder.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, textOriginal);
+        b.add(wordDiffer, WordDiffAE.ORIGINAL_VIEW, txtOriginal,
                 WordDiffAE.REVISED_VIEW, textRevised);
-        builder.add("xmi-consumer", consumerXmi);
-        builder.add("resource-populator", resourcePopulator,
-                ResourcePopulatorAE.ORIGINAL_VIEW, textOriginal,
+        b.add(consumerXmi);
+        b.add(resourcePopulator, ResourcePopulatorAE.ORIGINAL_VIEW, txtOriginal,
                 ResourcePopulatorAE.REVISED_VIEW, textRevised);
-        builder.add("txt-filterer", txtFilterer);
-        builder.add("pos-filterer", posFilterer);
-        builder.add("full-txt-scorer", fullTxtScorer);
-        builder.add("full-pos-scorer", fullPosScorer);
-        builder.add("filtered-txt-scorer", filteredTxtScorer);
-        builder.add("filtered-pos-scorer", filteredPosScorer);
-        builder.add("full-txt-writer", fullTxtWriter);
-        builder.add("full-pos-writer", fullPosWriter);
-        builder.add("filtered-txt-writer", filteredTxtWriter);
-        builder.add("filtered-pos-writer", filteredPosWriter);
-        SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
+        b.add(txtFilterer);
+        b.add(posFilterer);
+        b.add(fullTxtScorer);
+        b.add(fullPosScorer);
+        b.add(filteredTxtScorer);
+        b.add(filteredPosScorer);
+        b.add(fullTxtWriter);
+        b.add(fullPosWriter);
+        b.add(filteredTxtWriter);
+        b.add(filteredPosWriter);
+        SimplePipeline.runPipeline(crd, b.createAggregateDescription());
     }
 
     static private void parseArguments(String[] args) {
