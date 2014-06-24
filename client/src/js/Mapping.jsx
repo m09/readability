@@ -35,7 +35,7 @@ var Mapping = React.createClass({
       return -revisions[ann.revisionsId][0].score[scoreIndex];
     }.bind(this));
     var lis = [];
-    var spanScore = this.props.revs[sortedSpan[0].revisionsId][0]
+    var spanScore = revisions[sortedSpan[0].revisionsId][0]
           .score[scoreIndex];
     _.each(sortedSpan, function(ann) {
       var revs = revisions[ann.revisionsId];
