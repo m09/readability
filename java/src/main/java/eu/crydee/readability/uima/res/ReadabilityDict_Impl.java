@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
@@ -179,6 +180,15 @@ public class ReadabilityDict_Impl
     }
 
     @Override
+    public void addAll(ReadabilityDict o) {
+        for (Entry<Mapped, Map<Mapped, Metrics>> e1 : o.entrySet()) {
+            for (Entry<Mapped, Metrics> e2 : e1.getValue().entrySet()) {
+                add(e1.getKey(), e2.getKey(), e2.getValue().getCount());
+            }
+        }
+    }
+
+    @Override
     public int getTotalCount() {
         return totalCount;
     }
@@ -195,5 +205,10 @@ public class ReadabilityDict_Impl
     @Override
     public Set<Mapped> keySet() {
         return Collections.unmodifiableSet(dict.keySet());
+    }
+
+    @Override
+    public Set<Entry<Mapped, Map<Mapped, Metrics>>> entrySet() {
+        return Collections.unmodifiableSet(dict.entrySet());
     }
 }

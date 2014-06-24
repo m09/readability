@@ -12,9 +12,13 @@ public interface ReadabilityDict extends Saveable {
 
     public void add(Mapped original, Mapped revised, Integer count);
 
+    public void addAll(ReadabilityDict o);
+
     public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original);
 
     public Set<Mapped> keySet();
+
+    public Set<Map.Entry<Mapped, Map<Mapped, Metrics>>> entrySet();
 
     public int getTotalCount();
 }

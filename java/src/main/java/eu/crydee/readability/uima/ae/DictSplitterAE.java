@@ -1,14 +1,35 @@
 package eu.crydee.readability.uima.ae;
 
+import eu.crydee.readability.uima.model.Mapped;
+import eu.crydee.readability.uima.model.Metrics;
 import eu.crydee.readability.uima.res.ReadabilityDict;
+import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.function.Function;
+import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.util.Level;
+import org.apache.uima.util.Logger;
 
 public class DictSplitterAE extends JCasAnnotator_ImplBase {
+
+    static private final Logger logger = UIMAFramework.getLogger(
+            DictSplitterAE.class);
+    static private final Function<Integer, String> testNamer
+            = i -> "test-" + i + ".xml",
+            trainNamer = i -> "train-" + i + ".xml";
 
     static public final String KEY_DICT = "DICT";
     @ExternalResource(key = KEY_DICT)
@@ -20,10 +41,58 @@ public class DictSplitterAE extends JCasAnnotator_ImplBase {
 
     static public final String PARAM_OUT_FOLDER = "OUT_FOLDER";
     @ConfigurationParameter(name = PARAM_OUT_FOLDER, mandatory = true)
-    File outFolder;
+    File outDir;
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
+        // We're only interested in collectionProcessComplete
+    }
 
+    @Override
+    public void collectionProcessComplete()
+            throws AnalysisEngineProcessException {
+        ReadabilityDict[] dicts = new ReadabilityDict[parts];
+        Arrays.setAll(dicts, a -> new ReadabilityDict_Impl());
+        Random random = new Random();
+        for (Entry<Mapped, Map<Mapped, Metrics>> maps : dict.entrySet()) {
+            for (Entry<Mapped, Metrics> e : maps.getValue().entrySet()) {
+                for (int i = 0, c = e.getValue().getCount(); i < c; i++) {
+                    dicts[random.nextInt(parts)].add(maps.getKey(), e.getKey());
+                }
+            }
+        }
+        for (int i = 0; i < parts; i++) {
+            ReadabilityDict test = dicts[i],
+                    train = new ReadabilityDict_Impl();
+            for (int j = 0; j < parts; j++) {
+                if (j == i) {
+                    continue;
+                }
+                train.addAll(dicts[j]);
+            }
+            String cs = StandardCharsets.UTF_8.name();
+            try (PrintStream psTest = new PrintStream(
+                    new File(outDir, testNamer.apply(i)), cs);
+                    PrintStream psTrain = new PrintStream(
+                            new File(outDir, trainNamer.apply(i)), cs)) {
+                test.save(psTest);
+                train.save(psTrain);
+
+            } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                logger.log(
+                        Level.SEVERE,
+                        "couldn't create output file for part "
+                        + i
+                        + " of the output.",
+                        ex);
+                throw new AnalysisEngineProcessException(ex);
+            } catch (Exception ex) {
+                logger.log(
+                        Level.SEVERE,
+                        "couldn't save part " + i + " of the output.",
+                        ex);
+                throw new AnalysisEngineProcessException(ex);
+            }
+        }
     }
 }
