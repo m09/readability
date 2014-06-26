@@ -61,7 +61,7 @@ public class DictCreationPipeline {
         parseArguments(args);
 
         /* View names */
-        final String textRevised = "txtRevised",
+        final String txtRevised = "txtRevised",
                 txtOriginal = "txtOriginal",
                 htmlRevised = "htmlRevised",
                 htmlOriginal = "htmlOriginal",
@@ -120,7 +120,7 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription mw2txtRevised = createEngineDescription(
                 MediaWikiConverterAE.class,
-                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, textRevised,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, txtRevised,
                 MediaWikiConverterAE.PARAM_OUT_VIEW_HTML, htmlRevised,
                 MediaWikiConverterAE.PARAM_LOWERCASE, true);
 
@@ -313,23 +313,23 @@ public class DictCreationPipeline {
         b.add(getter);
         b.add(mw2txtRevised, CAS.NAME_DEFAULT_SOFA, rawRevised);
         b.add(mw2txtOriginal, CAS.NAME_DEFAULT_SOFA, rawOriginal);
-        b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-        b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(sentenceDiffer, SentenceDiffAE.ORIGINAL_VIEW, txtOriginal,
-                SentenceDiffAE.REVISED_VIEW, textRevised);
-        b.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
+                SentenceDiffAE.REVISED_VIEW, txtRevised);
+        b.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-        b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
+        b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(copierOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
 //        builder.add(parserRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
 //        builder.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, textOriginal);
         b.add(wordDiffer, WordDiffAE.ORIGINAL_VIEW, txtOriginal,
-                WordDiffAE.REVISED_VIEW, textRevised);
+                WordDiffAE.REVISED_VIEW, txtRevised);
         b.add(consumerXmi);
         b.add(resourcePopulator, ResourcePopulatorAE.ORIGINAL_VIEW, txtOriginal,
-                ResourcePopulatorAE.REVISED_VIEW, textRevised);
+                ResourcePopulatorAE.REVISED_VIEW, txtRevised);
         b.add(txtFilterer);
         b.add(posFilterer);
         b.add(fullTxtScorer);
