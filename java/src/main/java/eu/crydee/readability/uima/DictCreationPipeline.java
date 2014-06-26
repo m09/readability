@@ -298,11 +298,11 @@ public class DictCreationPipeline {
                 null,
                 TypePrioritiesFactory.createTypePriorities(
                         OriginalSentences.class,
-                        RevisedSentences.class,
-                        OriginalWords.class,
-                        RevisedWords.class,
                         OriginalSentence.class,
+                        OriginalWords.class,
+                        RevisedSentences.class,
                         RevisedSentence.class,
+                        RevisedWords.class,
                         Sentence.class,
                         Token.class),
                 FlowControllerFactory.createFlowControllerDescription(
