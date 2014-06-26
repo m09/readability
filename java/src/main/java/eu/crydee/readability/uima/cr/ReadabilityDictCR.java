@@ -13,6 +13,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.component.ViewCreatorAnnotator;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -29,6 +30,10 @@ public class ReadabilityDictCR extends JCasCollectionReader_ImplBase {
     public static final String KEY_RES = "RES";
     @ExternalResource(key = KEY_RES)
     private ReadabilityDict dict;
+
+    public static final String PARAM_LIMIT = "LIMIT";
+    @ConfigurationParameter(name = PARAM_LIMIT, mandatory = false)
+    Integer limit;
 
     private Iterator<Entry<Mapped, Map<Mapped, Metrics>>> outerIterator;
     private Iterator<Entry<Mapped, Metrics>> innerIterator;
@@ -54,7 +59,6 @@ public class ReadabilityDictCR extends JCasCollectionReader_ImplBase {
         }
         Entry<Mapped, Metrics> e = innerIterator.next();
         Mapped revised = e.getKey();
-        Metrics metrics = e.getValue();
         JCas gold;
         try {
             gold = ViewCreatorAnnotator.createViewSafely(jcas, "gold");
@@ -70,6 +74,9 @@ public class ReadabilityDictCR extends JCasCollectionReader_ImplBase {
     @Override
     public boolean hasNext()
             throws IOException, CollectionException {
+        if (limit != null && n > limit) {
+            return false;
+        }
         if (innerIterator != null) {
             return innerIterator.hasNext() || outerIterator.hasNext();
         }
