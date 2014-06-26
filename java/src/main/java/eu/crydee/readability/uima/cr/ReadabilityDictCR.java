@@ -3,7 +3,6 @@ package eu.crydee.readability.uima.cr;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metrics;
 import eu.crydee.readability.uima.res.ReadabilityDict;
-import eu.crydee.readability.uima.ts.TokenSet;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.component.ViewCreatorAnnotator;
 import org.apache.uima.fit.descriptor.ExternalResource;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
@@ -64,19 +62,9 @@ public class ReadabilityDictCR extends JCasCollectionReader_ImplBase {
             logger.log(Level.SEVERE, "Coudln't create the gold view.", ex);
             throw new CollectionException(ex);
         }
-        initCas(jcas, original);
-        initCas(gold, revised);
+        jcas.setDocumentText(original.getContext());
+        gold.setDocumentText(revised.getContext());
         ++n;
-    }
-
-    private void initCas(JCas jcas, Mapped revision) {
-        jcas.setDocumentText(revision.getText());
-        TokenSet ts = new TokenSet(jcas, 0, revision.getText().length());
-        ts.setTokens(new StringArray(jcas, revision.getTokens().size()));
-        for (int i = 0, s = revision.getTokens().size(); i < s; i++) {
-            ts.setTokens(i, revision.getTokens().get(i));
-        }
-        ts.addToIndexes();
     }
 
     @Override
