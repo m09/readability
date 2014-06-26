@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
+/* First created by JCasGen Thu Jun 26 18:41:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
+ * Updated by JCasGen Thu Jun 26 18:41:12 JST 2014
  * @generated */
 public class Token_Type extends Annotation_Type {
   /** @generated */
@@ -61,6 +61,24 @@ public class Token_Type extends Annotation_Type {
     ll_cas.ll_setStringValue(addr, casFeatCode_POS, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_syllablesNumber;
+  /** @generated */
+  final int     casFeatCode_syllablesNumber;
+  /** @generated */ 
+  public int getSyllablesNumber(int addr) {
+        if (featOkTst && casFeat_syllablesNumber == null)
+      jcas.throwFeatMissing("syllablesNumber", "eu.crydee.readability.uima.ts.Token");
+    return ll_cas.ll_getIntValue(addr, casFeatCode_syllablesNumber);
+  }
+  /** @generated */    
+  public void setSyllablesNumber(int addr, int v) {
+        if (featOkTst && casFeat_syllablesNumber == null)
+      jcas.throwFeatMissing("syllablesNumber", "eu.crydee.readability.uima.ts.Token");
+    ll_cas.ll_setIntValue(addr, casFeatCode_syllablesNumber, v);}
+    
+  
 
 
 
@@ -73,6 +91,10 @@ public class Token_Type extends Annotation_Type {
  
     casFeat_POS = jcas.getRequiredFeatureDE(casType, "POS", "uima.cas.String", featOkTst);
     casFeatCode_POS  = (null == casFeat_POS) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_POS).getCode();
+
+ 
+    casFeat_syllablesNumber = jcas.getRequiredFeatureDE(casType, "syllablesNumber", "uima.cas.Integer", featOkTst);
+    casFeatCode_syllablesNumber  = (null == casFeat_syllablesNumber) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_syllablesNumber).getCode();
 
   }
 }

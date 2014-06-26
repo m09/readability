@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
+/* First created by JCasGen Thu Jun 26 18:41:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -11,8 +11,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
- * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
+ * Updated by JCasGen Thu Jun 26 18:41:12 JST 2014
+ * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictCreationTS.xml
  * @generated */
 public class Token extends Annotation {
   /** @generated
@@ -78,6 +78,24 @@ public class Token extends Annotation {
     if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_POS == null)
       jcasType.jcas.throwFeatMissing("POS", "eu.crydee.readability.uima.ts.Token");
     jcasType.ll_cas.ll_setStringValue(addr, ((Token_Type)jcasType).casFeatCode_POS, v);}    
+   
+    
+  //*--------------*
+  //* Feature: syllablesNumber
+
+  /** getter for syllablesNumber - gets 
+   * @generated */
+  public int getSyllablesNumber() {
+    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_syllablesNumber == null)
+      jcasType.jcas.throwFeatMissing("syllablesNumber", "eu.crydee.readability.uima.ts.Token");
+    return jcasType.ll_cas.ll_getIntValue(addr, ((Token_Type)jcasType).casFeatCode_syllablesNumber);}
+    
+  /** setter for syllablesNumber - sets  
+   * @generated */
+  public void setSyllablesNumber(int v) {
+    if (Token_Type.featOkTst && ((Token_Type)jcasType).casFeat_syllablesNumber == null)
+      jcasType.jcas.throwFeatMissing("syllablesNumber", "eu.crydee.readability.uima.ts.Token");
+    jcasType.ll_cas.ll_setIntValue(addr, ((Token_Type)jcasType).casFeatCode_syllablesNumber, v);}    
   }
 
     

@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu May 15 14:44:53 JST 2014 */
+/* First created by JCasGen Thu Jun 26 18:41:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -9,12 +9,11 @@ import org.apache.uima.cas.impl.FSGenerator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
-import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu May 15 14:44:53 JST 2014
+ * Updated by JCasGen Thu Jun 26 18:41:12 JST 2014
  * @generated */
-public class OriginalSentence_Type extends Annotation_Type {
+public class OriginalSentence_Type extends Sentence_Type {
   /** @generated */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}

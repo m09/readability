@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
+/* First created by JCasGen Thu Jun 26 18:41:12 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas;
@@ -12,7 +12,7 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
+ * Updated by JCasGen Thu Jun 26 18:41:12 JST 2014
  * @generated */
 public class Sentence_Type extends Annotation_Type {
   /** @generated */

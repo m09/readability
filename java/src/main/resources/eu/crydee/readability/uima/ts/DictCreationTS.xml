@@ -46,6 +46,10 @@
                     <name>POS</name>
                     <rangeTypeName>uima.cas.String</rangeTypeName>
                 </featureDescription>
+                <featureDescription>
+                    <name>syllablesNumber</name>
+                    <rangeTypeName>uima.cas.Integer</rangeTypeName>
+                </featureDescription>
             </features>
         </typeDescription>
         <typeDescription>
@@ -77,7 +81,7 @@
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.OriginalSentence</name>
             <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <supertypeName>eu.crydee.readability.uima.ts.Sentence</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.OriginalWords</name>
@@ -104,7 +108,7 @@
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.RevisedSentence</name>
             <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <supertypeName>eu.crydee.readability.uima.ts.Sentence</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.RevisedWords</name>
