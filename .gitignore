@@ -12,6 +12,7 @@ indented.xml
 /java/out/cas/
 /java/out/cas-lm/
 /java/out/cas-usage/
+/java/out/cas-evaluation/
 /java/out/lm/
 /java/out/res/fullPos.xml
 /java/out/res/fullTxt.xml
