@@ -323,8 +323,8 @@ public class DictCreationPipeline {
         b.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(copierOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-//        builder.add(parserRevised, CAS.NAME_DEFAULT_SOFA, textRevised);
-//        builder.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, textOriginal);
+        b.add(parserRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
+        b.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(wordDiffer, WordDiffAE.ORIGINAL_VIEW, txtOriginal,
                 WordDiffAE.REVISED_VIEW, txtRevised);
         b.add(consumerXmi);
