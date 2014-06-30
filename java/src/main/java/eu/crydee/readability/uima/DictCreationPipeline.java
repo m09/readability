@@ -82,10 +82,6 @@ public class DictCreationPipeline {
                 parserM = createExternalResourceDescription(
                         ParserModelResourceImpl.class,
                         "file:opennlp/uima/models/en-parser-chunking.bin"),
-                fullPos = createExternalResourceDescription(
-                        ReadabilityDict_Impl.class, ""),
-                filteredPos = createExternalResourceDescription(
-                        ReadabilityDict_Impl.class, ""),
                 fullTxt = createExternalResourceDescription(
                         ReadabilityDict_Impl.class, ""),
                 filteredTxt = createExternalResourceDescription(
@@ -225,58 +221,32 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription resourcePopulator = createEngineDescription(
                 ResourcePopulatorAE.class,
-                ResourcePopulatorAE.RES_POS_KEY, fullPos,
-                ResourcePopulatorAE.RES_TXT_KEY, fullTxt);
+                ResourcePopulatorAE.RES_KEY, fullTxt);
 
-        AnalysisEngineDescription txtFilterer = createEngineDescription(
+        AnalysisEngineDescription filterer = createEngineDescription(
                 FilterDictAE.class,
                 FilterDictAE.RES_INPUT_KEY, fullTxt,
                 FilterDictAE.RES_OUTPUT_KEY, filteredTxt);
 
-        AnalysisEngineDescription posFilterer = createEngineDescription(
-                FilterDictAE.class,
-                FilterDictAE.RES_INPUT_KEY, fullPos,
-                FilterDictAE.RES_OUTPUT_KEY, filteredPos);
-
-        AnalysisEngineDescription fullTxtScorer = createEngineDescription(
+        AnalysisEngineDescription fullScorer = createEngineDescription(
                 ScorerAE.class,
                 ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
                 ScorerAE.RES_KEY, fullTxt);
 
-        AnalysisEngineDescription fullPosScorer = createEngineDescription(
-                ScorerAE.class,
-                ScorerAE.PARAM_LM_FILENAME, "out/lm/pos",
-                ScorerAE.RES_KEY, fullPos);
-
-        AnalysisEngineDescription filteredTxtScorer = createEngineDescription(
+        AnalysisEngineDescription filteredScorer = createEngineDescription(
                 ScorerAE.class,
                 ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
                 ScorerAE.RES_KEY, filteredTxt);
 
-        AnalysisEngineDescription filteredPosScorer = createEngineDescription(
-                ScorerAE.class,
-                ScorerAE.PARAM_LM_FILENAME, "out/lm/pos",
-                ScorerAE.RES_KEY, filteredPos);
-
-        AnalysisEngineDescription fullTxtWriter = createEngineDescription(
+        AnalysisEngineDescription fullWriter = createEngineDescription(
                 SaveableWriterAE.class,
                 SaveableWriterAE.PARAM_FILENAME, "out/res/fullTxt.xml",
                 SaveableWriterAE.RES_KEY, fullTxt);
 
-        AnalysisEngineDescription fullPosWriter = createEngineDescription(
-                SaveableWriterAE.class,
-                SaveableWriterAE.PARAM_FILENAME, "out/res/fullPos.xml",
-                SaveableWriterAE.RES_KEY, fullPos);
-
-        AnalysisEngineDescription filteredTxtWriter = createEngineDescription(
+        AnalysisEngineDescription filteredWriter = createEngineDescription(
                 SaveableWriterAE.class,
                 SaveableWriterAE.PARAM_FILENAME, "out/res/filteredTxt.xml",
                 SaveableWriterAE.RES_KEY, filteredTxt);
-
-        AnalysisEngineDescription filteredPosWriter = createEngineDescription(
-                SaveableWriterAE.class,
-                SaveableWriterAE.PARAM_FILENAME, "out/res/filteredPos.xml",
-                SaveableWriterAE.RES_KEY, filteredPos);
 
         /* The type priority is important especially to retrieve tokens. The
          rest of the order is not accurate but it does not matter.*/
@@ -316,16 +286,11 @@ public class DictCreationPipeline {
         b.add(consumerXmi);
         b.add(resourcePopulator, ResourcePopulatorAE.ORIGINAL_VIEW, txtOriginal,
                 ResourcePopulatorAE.REVISED_VIEW, txtRevised);
-        b.add(txtFilterer);
-        b.add(posFilterer);
-        b.add(fullTxtScorer);
-        b.add(fullPosScorer);
-        b.add(filteredTxtScorer);
-        b.add(filteredPosScorer);
-        b.add(fullTxtWriter);
-        b.add(fullPosWriter);
-        b.add(filteredTxtWriter);
-        b.add(filteredPosWriter);
+        b.add(filterer);
+        b.add(fullScorer);
+        b.add(filteredScorer);
+        b.add(fullWriter);
+        b.add(filteredWriter);
         SimplePipeline.runPipeline(crd, b.createAggregateDescription());
     }
 

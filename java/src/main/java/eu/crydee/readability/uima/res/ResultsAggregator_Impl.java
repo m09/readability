@@ -1,7 +1,7 @@
 package eu.crydee.readability.uima.res;
 
 import eu.crydee.readability.uima.model.Mapped;
-import eu.crydee.readability.uima.model.Metrics;
+import eu.crydee.readability.uima.model.Metadata;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +29,7 @@ public class ResultsAggregator_Impl
     }
 
     @Override
-    public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original) {
+    public Optional<Map<Mapped, Metadata>> getRevisions(Mapped original) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -39,7 +39,7 @@ public class ResultsAggregator_Impl
     }
 
     @Override
-    public Set<Map.Entry<Mapped, Map<Mapped, Metrics>>> entrySet() {
+    public Set<Map.Entry<Mapped, Map<Mapped, Metadata>>> entrySet() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

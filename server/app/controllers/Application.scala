@@ -2,10 +2,8 @@ package controllers
 
 import com.google.common.collect.TreeMultimap
 import eu.crydee.readability.uima.DictUsagePipeline
-import eu.crydee.readability.uima.ts.PosSuggestion
 import eu.crydee.readability.uima.ts.Revision
 import eu.crydee.readability.uima.ts.TxtRevisions
-import eu.crydee.readability.uima.ts.PosRevisions
 import eu.crydee.readability.uima.ts.Revisions
 import eu.crydee.readability.uima.ts.Rewriting
 import eu.crydee.readability.uima.ts.RewritingSpan
@@ -43,11 +41,9 @@ object Application extends Controller {
 
   private val aeN = DictUsagePipeline buildAe(
     "file:data/fullTxt.xml",
-    "file:data/fullPos.xml",
     false)
   private val aeF = DictUsagePipeline buildAe(
     "file:data/filteredTxt.xml",
-    "file:data/filteredPos.xml",
     false)
 
   implicit val inputReads: Reads[Input] = (
@@ -123,9 +119,6 @@ object Application extends Controller {
       val jcas = ae.newJCas()
       jcas.setDocumentText(data)
       ae.process(jcas)
-      val posSuggs: Iterable[Suggestion] = JCasUtil.select(
-        jcas,
-        classOf[PosSuggestion])
       val txtSuggs: Iterable[Suggestion] = JCasUtil.select(
         jcas,
         classOf[TxtSuggestion])
@@ -135,9 +128,6 @@ object Application extends Controller {
       val txtRevisions: Iterable[Revisions] = JCasUtil.select(
         jcas,
         classOf[TxtRevisions])
-      val posRevisions: Iterable[Revisions] = JCasUtil.select(
-        jcas,
-        classOf[PosRevisions])
       val rewritingsOcc: Rewritings = JCasUtil.selectSingle(
         jcas,
         classOf[RewritingsOcc])
@@ -157,22 +147,12 @@ object Application extends Controller {
         Json.obj(
           "text"        -> jcas.getDocumentText,
           "tokens"      -> tokens,
-          "revisions"   -> Json.obj(
-            "text" -> JsObject(
-              txtRevisions.toSeq map (rs =>
-                rs.getId -> Json.toJson(rs)
-              )
-            ),
-            "pos" -> JsObject(
-              posRevisions.toSeq map (rs =>
-                rs.getId -> Json.toJson(rs)
-              )
+          "revisions"   -> JsObject(
+            txtRevisions.toSeq map (rs =>
+              rs.getId -> Json.toJson(rs)
             )
           ),
-          "annotations" -> Json.obj(
-            "text" -> Json.toJson(txtSuggs),
-            "pos"  -> Json.toJson(posSuggs)
-          ),
+          "annotations" -> Json.toJson(txtSuggs),
           "rewritings" -> Json.arr(
             rewritingsOcc,
             rewritingsLM,

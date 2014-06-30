@@ -280,8 +280,8 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
   },
   render: function() {
     var text = this.props.data.text,
-        anns = this.props.data.annotations.text,
-        revs = this.props.data.revisions.text,
+        anns = this.props.data.annotations,
+        revs = this.props.data.revisions,
         scoreIndex = this.props.weight,
         spans = this.spans(text, anns, revs);
     this.fillSpans(anns, spans, revs);
@@ -322,7 +322,7 @@ var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
         return output;
     },
     render: function() {
-        var revs = this.props.data.revisions.text;
+        var revs = this.props.data.revisions;
         var rewritings = this.props.data.rewritings[this.props.weight];
         var text = this.props.data.text;
         var rows = this.toRows(rewritings, revs, text);
@@ -352,27 +352,15 @@ var Annotator = React.createClass({displayName: 'Annotator',
         noisy: {
           text: "",
           tokens: [],
-          revisions: {
-            text: [],
-            pos: []
-          },
-          annotations: {
-            text: [],
-            pos: []
-          },
+          revisions: [],
+          annotations: [],
           rewritings: []
         },
         filtered: {
           text: "",
           tokens: [],
-          revisions: {
-            text: [],
-            pos: []
-          },
-          annotations: {
-            text: [],
-            pos: []
-          },
+          revisions: [],
+          annotations: [],
           rewritings: []
         }
       },

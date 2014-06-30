@@ -60,10 +60,6 @@ public class EvaluationPipeline {
                         + "txt/"
                         + corpus
                         + DictSplitterAE.trainNamer.apply(fold),
-                        "file:out/res/parts/"
-                        + "pos/"
-                        + corpus
-                        + DictSplitterAE.trainNamer.apply(fold),
                         true);
 
                 AnalysisEngineDescription sylAe = createEngineDescription(

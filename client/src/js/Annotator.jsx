@@ -6,27 +6,15 @@ var Annotator = React.createClass({
         noisy: {
           text: "",
           tokens: [],
-          revisions: {
-            text: [],
-            pos: []
-          },
-          annotations: {
-            text: [],
-            pos: []
-          },
+          revisions: [],
+          annotations: [],
           rewritings: []
         },
         filtered: {
           text: "",
           tokens: [],
-          revisions: {
-            text: [],
-            pos: []
-          },
-          annotations: {
-            text: [],
-            pos: []
-          },
+          revisions: [],
+          annotations: [],
           rewritings: []
         }
       },

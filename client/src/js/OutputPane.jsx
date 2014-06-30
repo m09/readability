@@ -75,8 +75,8 @@ var OutputPane = React.createClass({
   },
   render: function() {
     var text = this.props.data.text,
-        anns = this.props.data.annotations.text,
-        revs = this.props.data.revisions.text,
+        anns = this.props.data.annotations,
+        revs = this.props.data.revisions,
         scoreIndex = this.props.weight,
         spans = this.spans(text, anns, revs);
     this.fillSpans(anns, spans, revs);

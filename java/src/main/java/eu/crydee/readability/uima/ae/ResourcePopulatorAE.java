@@ -31,13 +31,9 @@ public class ResourcePopulatorAE extends JCasAnnotator_ImplBase {
     final static private Logger logger = UIMAFramework.getLogger(
             ResourcePopulatorAE.class);
 
-    final static public String RES_TXT_KEY = "TXT_KEY";
-    @ExternalResource(key = RES_TXT_KEY)
+    final static public String RES_KEY = "KEY";
+    @ExternalResource(key = RES_KEY)
     ReadabilityDict dictTxt;
-
-    final static public String RES_POS_KEY = "POS_KEY";
-    @ExternalResource(key = RES_POS_KEY)
-    ReadabilityDict dictPos;
 
     final static public String ORIGINAL_VIEW = "ORIGINAL_VIEW";
     final static public String REVISED_VIEW = "REVISED_VIEW";
@@ -106,21 +102,15 @@ public class ResourcePopulatorAE extends JCasAnnotator_ImplBase {
                 dictTxt.add(
                         new Mapped(
                                 ow.getCoveredText(),
-                                sentOri,
-                                originalTokens),
-                        new Mapped(
-                                rw.getCoveredText(),
-                                sentRev,
-                                revisedTokens));
-                dictPos.add(
-                        new Mapped(
-                                ow.getCoveredText(),
-                                sentOri,
+                                originalTokens,
                                 originalPOS),
                         new Mapped(
                                 rw.getCoveredText(),
-                                sentRev,
-                                revisedPOS));
+                                revisedTokens,
+                                revisedPOS),
+                        sentOri,
+                        sentRev
+                );
             }
         }
     }

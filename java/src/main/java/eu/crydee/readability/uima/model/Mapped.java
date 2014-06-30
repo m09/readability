@@ -6,15 +6,19 @@ import java.util.Objects;
 
 public class Mapped {
 
-    final private String text, context;
+    final private String text;
     final private List<String> tokens;
+    final private List<String> pos;
 
-    public Mapped(String text, String context, List<String> tokens) {
+    public Mapped(
+            String text,
+            List<String> tokens,
+            List<String> pos) {
         this.text = text;
         this.tokens = new ImmutableList.Builder<String>()
                 .addAll(tokens)
                 .build();
-        this.context = context;
+        this.pos = pos;
     }
 
     public String getText() {
@@ -25,15 +29,15 @@ public class Mapped {
         return tokens;
     }
 
-    public String getContext() {
-        return context;
+    public List<String> getPos() {
+        return pos;
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 71 * hash + Objects.hashCode(this.text);
         hash = 71 * hash + Objects.hashCode(this.tokens);
+        hash = 71 * hash + Objects.hashCode(this.pos);
         return hash;
     }
 
@@ -46,9 +50,7 @@ public class Mapped {
             return false;
         }
         final Mapped other = (Mapped) obj;
-        if (!Objects.equals(this.text, other.text)) {
-            return false;
-        }
-        return Objects.equals(this.tokens, other.tokens);
+        return Objects.equals(this.tokens, other.tokens)
+                && Objects.equals(this.pos, other.pos);
     }
 }

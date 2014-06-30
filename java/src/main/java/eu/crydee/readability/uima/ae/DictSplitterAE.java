@@ -1,7 +1,7 @@
 package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.uima.model.Mapped;
-import eu.crydee.readability.uima.model.Metrics;
+import eu.crydee.readability.uima.model.Metadata;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import java.io.File;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.function.Function;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
@@ -54,10 +55,17 @@ public class DictSplitterAE extends JCasAnnotator_ImplBase {
         ReadabilityDict[] dicts = new ReadabilityDict[parts];
         Arrays.setAll(dicts, a -> new ReadabilityDict_Impl());
         Random random = new Random();
-        for (Entry<Mapped, Map<Mapped, Metrics>> maps : dict.entrySet()) {
-            for (Entry<Mapped, Metrics> e : maps.getValue().entrySet()) {
-                for (int i = 0, c = e.getValue().getCount(); i < c; i++) {
-                    dicts[random.nextInt(parts)].add(maps.getKey(), e.getKey());
+        for (Entry<Mapped, Map<Mapped, Metadata>> maps : dict.entrySet()) {
+            for (Entry<Mapped, Metadata> e : maps.getValue().entrySet()) {
+                for (Pair<String, String> contexts
+                        : e.getValue().getContexts()) {
+                    for (int i = 0, c = e.getValue().getCount(); i < c; i++) {
+                        dicts[random.nextInt(parts)].add(
+                                maps.getKey(),
+                                e.getKey(),
+                                contexts.getLeft(),
+                                contexts.getRight());
+                    }
                 }
             }
         }

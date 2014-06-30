@@ -1,8 +1,9 @@
 package eu.crydee.readability.uima.res;
 
+import com.google.common.collect.Lists;
 import eu.crydee.readability.misc.XMLUtils;
 import eu.crydee.readability.uima.model.Mapped;
-import eu.crydee.readability.uima.model.Metrics;
+import eu.crydee.readability.uima.model.Metadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -19,6 +20,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.resource.DataResource;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -32,7 +34,7 @@ public class ReadabilityDict_Impl
     final static private Logger logger = UIMAFramework.getLogger(
             ReadabilityDict_Impl.class);
 
-    final private Map<Mapped, Map<Mapped, Metrics>> dict = new HashMap<>();
+    final private Map<Mapped, Map<Mapped, Metadata>> dict = new HashMap<>();
     private int totalCount = 0;
 
     @Override
@@ -82,12 +84,15 @@ public class ReadabilityDict_Impl
                 scoreLMWN = Double.parseDouble(
                         xsr.getAttributeValue(null, "scoreLMWN"));
         Mapped revised = parseRevision(xsr);
-        add(rev, revised, count);
-        dict.get(rev).get(revised).setScoreOcc(scoreOcc);
-        dict.get(rev).get(revised).setScoreLM(scoreLM);
-        dict.get(rev).get(revised).setScoreLMW(scoreLMW);
-        dict.get(rev).get(revised).setScoreLMN(scoreLMN);
-        dict.get(rev).get(revised).setScoreLMWN(scoreLMWN);
+        List<Pair<String, String>> contexts = parseContexts(xsr);
+        add(rev, revised, contexts);
+        Metadata m = dict.get(rev).get(revised);
+        m.addContexts(contexts);
+        m.setScoreOcc(scoreOcc);
+        m.setScoreLM(scoreLM);
+        m.setScoreLMW(scoreLMW);
+        m.setScoreLMN(scoreLMN);
+        m.setScoreLMWN(scoreLMWN);
     }
 
     private Mapped parseRevision(XMLStreamReader xsr)
@@ -95,13 +100,28 @@ public class ReadabilityDict_Impl
         XMLUtils.nextTag(xsr);
         String originalText = xsr.getElementText();
         XMLUtils.nextTag(xsr);
-        String contextText = xsr.getElementText();
-        XMLUtils.nextTag(xsr);
         List<String> tokens = new ArrayList<>();
         while (XMLUtils.goToNextXBeforeY(xsr, "token", "token-list")) {
             tokens.add(xsr.getElementText());
         }
-        return new Mapped(originalText, contextText, tokens);
+        List<String> pos = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "pos", "pos-list")) {
+            pos.add(xsr.getElementText());
+        }
+        return new Mapped(originalText, tokens, pos);
+    }
+
+    private List<Pair<String, String>> parseContexts(XMLStreamReader xsr)
+            throws XMLStreamException {
+        List<Pair<String, String>> contexts = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "context", "context-list")) {
+            XMLUtils.nextTag(xsr);
+            String originalContext = xsr.getElementText();
+            XMLUtils.nextTag(xsr);
+            String revisedContext = xsr.getElementText();
+            contexts.add(Pair.of(originalContext, revisedContext));
+        }
+        return contexts;
     }
 
     @Override
@@ -114,28 +134,30 @@ public class ReadabilityDict_Impl
             xsw.writeStartElement("original");
             saveRevision(xsw, original);
             xsw.writeStartElement("revised-list");
-            Map<Mapped, Metrics> revisedMap = dict.get(original);
+            Map<Mapped, Metadata> revisedMap = dict.get(original);
             for (Mapped revised : revisedMap.keySet()) {
+                Metadata m = revisedMap.get(revised);
                 xsw.writeStartElement("revised");
                 xsw.writeAttribute(
                         "count",
-                        String.valueOf(revisedMap.get(revised).getCount()));
+                        String.valueOf(m.getCount()));
                 xsw.writeAttribute(
                         "scoreOcc",
-                        String.valueOf(revisedMap.get(revised).getScoreOcc()));
+                        String.valueOf(m.getScoreOcc()));
                 xsw.writeAttribute(
                         "scoreLM",
-                        String.valueOf(revisedMap.get(revised).getScoreLM()));
+                        String.valueOf(m.getScoreLM()));
                 xsw.writeAttribute(
                         "scoreLMN",
-                        String.valueOf(revisedMap.get(revised).getScoreLMN()));
+                        String.valueOf(m.getScoreLMN()));
                 xsw.writeAttribute(
                         "scoreLMW",
-                        String.valueOf(revisedMap.get(revised).getScoreLMW()));
+                        String.valueOf(m.getScoreLMW()));
                 xsw.writeAttribute(
                         "scoreLMWN",
-                        String.valueOf(revisedMap.get(revised).getScoreLMWN()));
+                        String.valueOf(m.getScoreLMWN()));
                 saveRevision(xsw, revised);
+                saveContextList(xsw, m.getContexts());
                 xsw.writeEndElement();
             }
             xsw.writeEndElement();
@@ -151,9 +173,6 @@ public class ReadabilityDict_Impl
         xsw.writeStartElement("text");
         xsw.writeCharacters(revision.getText());
         xsw.writeEndElement();
-        xsw.writeStartElement("context");
-        xsw.writeCharacters(revision.getContext());
-        xsw.writeEndElement();
         xsw.writeStartElement("token-list");
         for (String token : revision.getTokens()) {
             xsw.writeStartElement("token");
@@ -161,34 +180,74 @@ public class ReadabilityDict_Impl
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
+        xsw.writeStartElement("pos-list");
+        for (String token : revision.getPos()) {
+            xsw.writeStartElement("pos");
+            xsw.writeCharacters(token);
+            xsw.writeEndElement();
+        }
+        xsw.writeEndElement();
+    }
+
+    private void saveContextList(
+            XMLStreamWriter xsw,
+            List<Pair<String, String>> contextsList)
+            throws XMLStreamException {
+        xsw.writeStartElement("context-list");
+        for (Pair<String, String> contexts : contextsList) {
+            xsw.writeStartElement("context");
+            xsw.writeStartElement("original");
+            xsw.writeCharacters(contexts.getLeft());
+            xsw.writeEndElement();
+            xsw.writeStartElement("revised");
+            xsw.writeCharacters(contexts.getRight());
+            xsw.writeEndElement();
+            xsw.writeEndElement();
+        }
+        xsw.writeEndElement();
     }
 
     @Override
-    public void add(Mapped original, Mapped revised, Integer count) {
-        Map<Mapped, Metrics> revisions = dict.get(original);
+    public void add(
+            Mapped original,
+            Mapped revised,
+            List<Pair<String, String>> revisedContexts) {
+        Map<Mapped, Metadata> revisions = dict.get(original);
         if (revisions == null) {
             revisions = new HashMap<>();
             dict.put(original, revisions);
         }
-        Metrics scores = revisions.get(revised);
-        if (scores == null) {
-            scores = new Metrics(0, 0d, 0d, 0d, 0d, 0d);
-            revisions.put(revised, scores);
+        Metadata metadata = revisions.get(revised);
+        if (metadata == null) {
+            metadata = new Metadata();
+            revisions.put(revised, metadata);
         }
-        scores.setCount(scores.getCount() + count);
-        totalCount += count;
+        metadata.addContexts(revisedContexts);
+        totalCount += revisedContexts.size();
     }
 
     @Override
-    public void add(Mapped original, Mapped revised) {
-        add(original, revised, 1);
+    public void add(
+            Mapped original,
+            Mapped revised,
+            String originalContext,
+            String revisedContext) {
+        add(
+                original,
+                revised,
+                Lists.newArrayList(Pair.of(originalContext, revisedContext)));
     }
 
     @Override
     public void addAll(ReadabilityDict o) {
-        for (Entry<Mapped, Map<Mapped, Metrics>> e1 : o.entrySet()) {
-            for (Entry<Mapped, Metrics> e2 : e1.getValue().entrySet()) {
-                add(e1.getKey(), e2.getKey(), e2.getValue().getCount());
+        for (Entry<Mapped, Map<Mapped, Metadata>> e1 : o.entrySet()) {
+            for (Entry<Mapped, Metadata> e2
+                    : e1.getValue().entrySet()) {
+                add(
+                        e1.getKey(),
+                        e2.getKey(),
+                        e2.getValue().getContexts());
+
             }
         }
     }
@@ -199,12 +258,12 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original) {
-        Map<Mapped, Metrics> revisions = dict.get(original);
-        if (dict == null) {
+    public Optional<Map<Mapped, Metadata>> getRevisions(Mapped original) {
+        Map<Mapped, Metadata> revisions = dict.get(original);
+        if (revisions == null) {
             return Optional.empty();
         }
-        return Optional.of(Collections.unmodifiableMap(revisions));
+        return Optional.of(revisions);
     }
 
     @Override
@@ -213,7 +272,7 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public Set<Entry<Mapped, Map<Mapped, Metrics>>> entrySet() {
+    public Set<Entry<Mapped, Map<Mapped, Metadata>>> entrySet() {
         return Collections.unmodifiableSet(dict.entrySet());
     }
 }

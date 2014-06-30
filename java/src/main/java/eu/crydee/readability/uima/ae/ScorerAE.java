@@ -3,7 +3,7 @@ package eu.crydee.readability.uima.ae;
 import edu.berkeley.nlp.lm.NgramLanguageModel;
 import edu.berkeley.nlp.lm.io.LmReaders;
 import eu.crydee.readability.uima.model.Mapped;
-import eu.crydee.readability.uima.model.Metrics;
+import eu.crydee.readability.uima.model.Metadata;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +55,9 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
         double minLMWProba = Double.POSITIVE_INFINITY;
         int totalCount = dict.getTotalCount();
         for (Mapped original : dict.keySet()) {
-            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
+            Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             int originalCount
-                    = revs.values().stream().mapToInt(Metrics::getCount).sum();
+                    = revs.values().stream().mapToInt(Metadata::getCount).sum();
             List<String> tokens = new ArrayList<>();
             tokens.add("<s>");
             tokens.addAll(original.getTokens());
@@ -67,7 +67,7 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             minLMProba = Math.min(minLMProba, lmProba);
             minLMWProba = Math.min(minLMWProba, lmWProba);
             for (Mapped rev : revs.keySet()) {
-                Metrics metric = revs.get(rev);
+                Metadata metric = revs.get(rev);
                 double scoreOcc = Math.log(metric.getCount())
                         - Math.log(totalCount),
                         scoreLM = Math.log(metric.getCount())
@@ -88,9 +88,9 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
         double ambitusLM = highestScoreLM - lowestScoreLM;
         double ambitusLMW = highestScoreLMW - lowestScoreLMW;
         for (Mapped original : dict.keySet()) {
-            Map<Mapped, Metrics> revs = dict.getRevisions(original).get();
+            Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             for (Mapped rev : revs.keySet()) {
-                Metrics metric = revs.get(rev);
+                Metadata metric = revs.get(rev);
                 metric.setScoreLMWN(
                         (metric.getScoreLMW() - lowestScoreLMW)
                         / ambitusLMW);

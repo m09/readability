@@ -30,27 +30,22 @@ public class DictUsagePipeline {
             throws ResourceInitializationException,
             AnalysisEngineProcessException,
             ResourceAccessException {
-        AnalysisEngine ae = buildAe(
-                "file:out/res/filteredTxt.xml",
-                "file:out/res/filteredPos.xml",
-                true);
+        AnalysisEngine ae = buildAe("file:out/res/filteredTxt.xml", true);
         CAS aCas = ae.newCAS();
         aCas.setDocumentText("this, and that!");
         ae.process(aCas);
     }
 
     public static AnalysisEngine buildAe(
-            String fileTxtURI,
-            String filePosURI,
+            String dictURI,
             boolean serialize)
             throws ResourceInitializationException {
         return AnalysisEngineFactory.createEngine(
-                buildAed(fileTxtURI, filePosURI, serialize));
+                buildAed(dictURI, serialize));
     }
 
     public static AnalysisEngineDescription buildAed(
-            String fileTxtURI,
-            String filePosURI,
+            String dictURI,
             boolean serialize)
             throws ResourceInitializationException {
         /* Resources descriptions */
@@ -72,12 +67,7 @@ public class DictUsagePipeline {
         ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        fileTxtURI);
-
-        ExternalResourceDescription dictPos
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        ReadabilityDict_Impl.class,
-                        filePosURI);
+                        dictURI);
 
         /* Analysis engines */
         AnalysisEngineDescription sentenceDetector
@@ -113,10 +103,8 @@ public class DictUsagePipeline {
         AnalysisEngineDescription mapper
                 = AnalysisEngineFactory.createEngineDescription(
                         MapperAE.class,
-                        MapperAE.RES_TXT,
+                        MapperAE.RES_KEY,
                         dictTxt,
-                        MapperAE.RES_POS,
-                        dictPos,
                         MapperAE.PARAM_LIMIT,
                         10);
 

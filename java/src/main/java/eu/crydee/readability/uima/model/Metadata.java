@@ -1,35 +1,32 @@
 package eu.crydee.readability.uima.model;
 
-public class Metrics {
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 
-    private int count;
-    private double scoreOcc,
-            scoreLM,
-            scoreLMW,
-            scoreLMN,
-            scoreLMWN;
+public class Metadata {
 
-    public Metrics(
-            int count,
-            double scoreOcc,
-            double scoreLM,
-            double scoreLMW,
-            double scoreLMN,
-            double scoreLMWN) {
-        this.count = count;
-        this.scoreOcc = scoreOcc;
-        this.scoreLM = scoreLM;
-        this.scoreLMW = scoreLMW;
-        this.scoreLMN = scoreLMN;
-        this.scoreLMWN = scoreLMWN;
+    private final List<Pair<String, String>> contexts = new ArrayList<>();
+    private double scoreOcc = 0d,
+            scoreLM = 0d,
+            scoreLMW = 0d,
+            scoreLMN = 0d,
+            scoreLMWN = 0d;
+
+    public List<Pair<String, String>> getContexts() {
+        return contexts;
+    }
+
+    public void addContext(String originalContext, String revisedContext) {
+        this.contexts.add(Pair.of(originalContext, revisedContext));
+    }
+
+    public void addContexts(List<Pair<String, String>> contexts) {
+        this.contexts.addAll(contexts);
     }
 
     public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
+        return contexts.size();
     }
 
     public double getScoreOcc() {
