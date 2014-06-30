@@ -1,4 +1,6 @@
 *~
+\#*#
+.#*
 dbpedia*
 papers/
 target/
@@ -36,3 +38,6 @@ indented.xml
 /report/*.org
 /report/*.pdf
 /report/*.toc
+/report/*.bbl
+/report/*.bib.bak
+/report/*.blg
