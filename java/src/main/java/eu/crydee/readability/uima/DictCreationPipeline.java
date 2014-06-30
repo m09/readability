@@ -31,6 +31,7 @@ import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
 import opennlp.uima.tokenize.TokenizerModelResourceImpl;
+import opennlp.uima.util.UimaUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.OptionBuilder;
@@ -138,41 +139,36 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription sentenceDetector = createEngineDescription(
                 SentenceDetector.class,
-                "opennlp.uima.ModelName", sentenceM,
-                "opennlp.uima.SentenceType", Sentence.class.getCanonicalName());
+                UimaUtil.MODEL_PARAMETER, sentenceM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getCanonicalName());
 
         AnalysisEngineDescription tokenizer = createEngineDescription(
                 Tokenizer.class,
-                "opennlp.uima.ModelName", tokenM,
-                "opennlp.uima.SentenceType", Sentence.class.getCanonicalName(),
-                "opennlp.uima.TokenType", Token.class.getCanonicalName());
+                UimaUtil.MODEL_PARAMETER, tokenM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getCanonicalName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getCanonicalName());
 
         AnalysisEngineDescription sentenceDiffer = createEngineDescription(
                 SentenceDiffAE.class,
-                SentenceDiffAE.PARAM_SENTENCE_TYPE,
-                Sentence.class.getName(),
-                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                OriginalSentences.class.getName(),
-                SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                RevisedSentences.class.getName(),
-                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
-                "originalSentences",
-                SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
-                "revisedSentences");
+                SentenceDiffAE.PARAM_SENTENCE_TYPE, Sentence.class.getName(),
+                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE, OriginalSentences.class.getName(),
+                SentenceDiffAE.PARAM_REVISED_SENTENCES_TYPE, RevisedSentences.class.getName(),
+                SentenceDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE, "originalSentences",
+                SentenceDiffAE.PARAM_REVISED_SENTENCES_FEATURE, "revisedSentences");
 
         AnalysisEngineDescription taggerRevised = createEngineDescription(
                 POSTagger.class,
-                "opennlp.uima.ModelName", posM,
-                "opennlp.uima.SentenceType", RevisedSentences.class.getName(),
-                "opennlp.uima.TokenType", Token.class.getName(),
-                "opennlp.uima.POSFeature", "POS");
+                UimaUtil.MODEL_PARAMETER, posM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, RevisedSentences.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                UimaUtil.POS_FEATURE_PARAMETER, "POS");
 
         AnalysisEngineDescription taggerOriginal = createEngineDescription(
                 POSTagger.class,
-                "opennlp.uima.ModelName", posM,
-                "opennlp.uima.SentenceType", OriginalSentences.class.getName(),
-                "opennlp.uima.TokenType", Token.class.getName(),
-                "opennlp.uima.POSFeature", "POS");
+                UimaUtil.MODEL_PARAMETER, posM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, OriginalSentences.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                UimaUtil.POS_FEATURE_PARAMETER, "POS");
 
         AnalysisEngineDescription copierRevised = createEngineDescription(
                 CoveredCopierAE.class,
@@ -194,44 +190,34 @@ public class DictCreationPipeline {
 
         AnalysisEngineDescription parserRevised = createEngineDescription(
                 Parser.class,
-                "opennlp.uima.ModelName", parserM,
-                "opennlp.uima.SentenceType", RevisedSentence.class.getName(),
-                "opennlp.uima.TokenType", Token.class.getName(),
-                "opennlp.uima.ParseType", Chunk.class.getName(),
-                "opennlp.uima.TypeFeature", "label",
-                "opennlp.uima.ChildrenFeature", "children");
+                UimaUtil.MODEL_PARAMETER, parserM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, RevisedSentence.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                Parser.PARSE_TYPE_PARAMETER, Chunk.class.getName(),
+                Parser.TYPE_FEATURE_PARAMETER, "label",
+                Parser.CHILDREN_FEATURE_PARAMETER, "children");
 
         AnalysisEngineDescription parserOriginal = createEngineDescription(
                 Parser.class,
-                "opennlp.uima.ModelName", parserM,
-                "opennlp.uima.SentenceType", OriginalSentence.class.getName(),
-                "opennlp.uima.TokenType", Token.class.getName(),
-                "opennlp.uima.ParseType", Chunk.class.getName(),
-                "opennlp.uima.TypeFeature", "label",
-                "opennlp.uima.ChildrenFeature", "children");
+                UimaUtil.MODEL_PARAMETER, parserM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, OriginalSentence.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                Parser.PARSE_TYPE_PARAMETER, Chunk.class.getName(),
+                Parser.TYPE_FEATURE_PARAMETER, "label",
+                Parser.CHILDREN_FEATURE_PARAMETER, "children");
 
         AnalysisEngineDescription wordDiffer = createEngineDescription(
                 WordDiffAE.class,
-                WordDiffAE.PARAM_SENTENCE_TYPE,
-                Sentence.class.getCanonicalName(),
-                WordDiffAE.PARAM_TOKEN_TYPE,
-                Token.class.getCanonicalName(),
-                WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE,
-                OriginalSentences.class.getCanonicalName(),
-                WordDiffAE.PARAM_REVISED_SENTENCES_TYPE,
-                RevisedSentences.class.getCanonicalName(),
-                WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE,
-                OriginalWords.class.getCanonicalName(),
-                WordDiffAE.PARAM_REVISED_WORDS_TYPE,
-                RevisedWords.class.getCanonicalName(),
-                WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE,
-                "originalSentences",
-                WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE,
-                "revisedSentences",
-                WordDiffAE.PARAM_ORIGINAL_WORDS_FEATURE,
-                "originalWords",
-                WordDiffAE.PARAM_REVISED_WORDS_FEATURE,
-                "revisedWords");
+                WordDiffAE.PARAM_SENTENCE_TYPE, Sentence.class.getName(),
+                WordDiffAE.PARAM_TOKEN_TYPE, Token.class.getName(),
+                WordDiffAE.PARAM_ORIGINAL_SENTENCES_TYPE, OriginalSentences.class.getName(),
+                WordDiffAE.PARAM_REVISED_SENTENCES_TYPE, RevisedSentences.class.getName(),
+                WordDiffAE.PARAM_ORIGINAL_WORDS_TYPE, OriginalWords.class.getName(),
+                WordDiffAE.PARAM_REVISED_WORDS_TYPE, RevisedWords.class.getName(),
+                WordDiffAE.PARAM_ORIGINAL_SENTENCES_FEATURE, "originalSentences",
+                WordDiffAE.PARAM_REVISED_SENTENCES_FEATURE, "revisedSentences",
+                WordDiffAE.PARAM_ORIGINAL_WORDS_FEATURE, "originalWords",
+                WordDiffAE.PARAM_REVISED_WORDS_FEATURE, "revisedWords");
 
         AnalysisEngineDescription consumerXmi = createEngineDescription(
                 XmiSerializerCreationAE.class,
@@ -323,8 +309,8 @@ public class DictCreationPipeline {
         b.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(copierOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-        b.add(parserRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
-        b.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
+//        b.add(parserRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
+//        b.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(wordDiffer, WordDiffAE.ORIGINAL_VIEW, txtOriginal,
                 WordDiffAE.REVISED_VIEW, txtRevised);
         b.add(consumerXmi);
