@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.res.ResultAggregator;
+import eu.crydee.readability.uima.res.ResultsAggregator;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
@@ -15,7 +15,7 @@ public class FleschAE extends JCasAnnotator_ImplBase {
 
     final static public String RES_AGGREGATOR = "AGGREGATOR";
     @ExternalResource(key = RES_AGGREGATOR)
-    private ResultAggregator ra;
+    private ResultsAggregator ra;
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {

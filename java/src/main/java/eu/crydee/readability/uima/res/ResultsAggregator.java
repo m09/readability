@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface ResultAggregator extends Saveable {
+public interface ResultsAggregator extends Saveable {
 
     public void add(Mapped original, Mapped revised);
 
     public void add(Mapped original, Mapped revised, Integer count);
 
-    public void addAll(ResultAggregator o);
+    public void addAll(ResultsAggregator o);
 
     public Optional<Map<Mapped, Metrics>> getRevisions(Mapped original);
 

@@ -1,10 +1,12 @@
 package eu.crydee.readability.uima;
 
 import eu.crydee.readability.uima.ae.DictSplitterAE;
+import eu.crydee.readability.uima.ae.FleschAE;
 import eu.crydee.readability.uima.ae.SyllableCounterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
 import eu.crydee.readability.uima.cr.ReadabilityDictCR;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
+import eu.crydee.readability.uima.res.ResultsAggregator_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.io.IOException;
@@ -41,6 +43,12 @@ public class EvaluationPipeline {
                                 + corpus
                                 + DictSplitterAE.testNamer.apply(fold));
 
+                ExternalResourceDescription resultsAggregator
+                        = createExternalResourceDescription(
+                                "resultsAggregator",
+                                ResultsAggregator_Impl.class,
+                                "");
+
                 CollectionReader cr
                         = CollectionReaderFactory.createReader(
                                 ReadabilityDictCR.class,
@@ -64,6 +72,11 @@ public class EvaluationPipeline {
                         Token.class.getName(),
                         SyllableCounterAE.PARAM_TOKEN_FEATURE,
                         "syllablesNumber");
+
+                AnalysisEngineDescription fleschAe = createEngineDescription(
+                        FleschAE.class,
+                        FleschAE.RES_AGGREGATOR,
+                        resultsAggregator);
 
                 AnalysisEngineDescription consumerAe = createEngineDescription(
                         XmiSerializerUsageAE.class,
