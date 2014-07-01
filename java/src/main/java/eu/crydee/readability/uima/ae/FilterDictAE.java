@@ -23,12 +23,15 @@ public class FilterDictAE extends JCasAnnotator_ImplBase {
     public void collectionProcessComplete()
             throws AnalysisEngineProcessException {
         for (Mapped o : inputDict.keySet()) {
+            if (o.getTokens().size() > 5) {
+                continue;
+            }
             Map<Mapped, Metadata> revisedMap = inputDict.getRevisions(o).get();
             for (Mapped r : revisedMap.keySet()) {
-                if (r.getTokens().size() <= o.getTokens().size()
-                        && o.getTokens().size() < 4) {
-                    outputDict.add(o, r, revisedMap.get(r).getContexts());
+                if (r.getTokens().size() > 5) {
+                    continue;
                 }
+                outputDict.add(o, r, revisedMap.get(r).getContexts());
             }
         }
     }
