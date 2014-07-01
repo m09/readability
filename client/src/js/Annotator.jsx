@@ -26,7 +26,7 @@ var Annotator = React.createClass({
     };
   },
   fetchData: function(corpus) {
-    var text = jQuery(this.refs.input.getDOMNode()).text();
+    var text = jQuery("#input").val();
     if (text === this.state.lastText) {
       if (this.state.fetched[corpus]) return;
     } else this.setState({ fetched: { noisy: false, filtered: false } });
@@ -92,10 +92,9 @@ var Annotator = React.createClass({
             </ul>
             
             <section className="tab-content">
-            <InputPane ref="input"
-            active={this.state.tab === 'input'
-                    ? true
-                    : false}/>
+            <InputPane active={this.state.tab === 'input'
+                               ? true
+                               : false}/>
             <OutputPane id="analysis"
             weight={this.state.weight}
             data={this.state.corpus === 'noisy'

@@ -9,17 +9,19 @@ var RewritingsPane = React.createClass({
                 var rev = revs[r.revisionsId][r.revisionsIndex];
                 if (r.begin > p) {
                     rewritten.push(
-                        <span>{text.substring(p, r.begin)}</span>);
+                        <span>{htmlForTextWithEmbeddedNewlines(
+                          text.substring(p, r.begin))}</span>);
                 }
                 rewritten.push(
                     <span className="text-primary"
                           style={{textDecoration: "underline"}}>
-                        {rev.text}
+                        {htmlForTextWithEmbeddedNewlines(rev.text)}
                     </span>);
                 p = r.end;
             }.bind(this));
             if (p < text.length - 1) {
-                rewritten.push(text.substring(p, text.length));
+                rewritten = rewritten.concat(htmlForTextWithEmbeddedNewlines(
+                  text.substring(p, text.length)));
             }
             output.push(<tr><td>{top.score}</td><td>{rewritten}</td></tr>);
         }.bind(this));

@@ -68,7 +68,8 @@ var OutputPane = React.createClass({
                     text={text.substring(span[0], span[1])}/>);
         f = !f;
       } else {
-        output.push(text.substring(span[0], span[1]));
+        output = output.concat(htmlForTextWithEmbeddedNewlines(
+          text.substring(span[0], span[1])));
       }
     }.bind(this));
     return output;

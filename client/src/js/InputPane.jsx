@@ -4,7 +4,12 @@ var InputPane = React.createClass({
     return (<section className={this.props.active
                                 ? "tab-pane active"
                                 : "tab-pane"}
-            contentEditable="true" style={{minHeight: "200px"}}>
-            this, and that!</section>);
+                     style={{height: "300px"}}>
+            <textarea id="input"
+                      style={{width: "100%",
+                              height: "100%"}}>
+            this, and that!
+            </textarea>
+            </section>);
   }
 });
