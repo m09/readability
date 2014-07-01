@@ -1,7 +1,9 @@
 package eu.crydee.readability.uima.ae;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
+import eu.crydee.ahocorasick.AhoCorasick;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metadata;
 import eu.crydee.readability.uima.res.ReadabilityDict;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -47,66 +50,83 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     @ConfigurationParameter(name = PARAM_LIMIT, mandatory = false)
     private Integer limit;
 
-    final private SetMultimap<List<String>, Pair<Mapped, Metadata>> byTxt
-            = HashMultimap.create();
+//    final private SetMultimap<List<String>, Pair<Mapped, Metadata>> byTxt
+//            = HashMultimap.create();
+    private Entry<Mapped, Map<Mapped, Metadata>>[] mappedArray;
+
+    private AhoCorasick<Pair<String, String>> ac;
 
     @Override
     public void initialize(UimaContext context)
             throws ResourceInitializationException {
         super.initialize(context);
-        for (Mapped original : dict.keySet()) {
-            List<String> tokens = original.getTokens();
-            Map<Mapped, Metadata> revisedMap
-                    = dict.getRevisions(original).get();
-            for (Mapped revised : revisedMap.keySet()) {
-                Pair<Mapped, Metadata> pair
-                        = Pair.of(revised, revisedMap.get(revised));
-                byTxt.put(tokens, pair);
+        mappedArray = new Entry[dict.entrySet().size()];
+        List<Pair<String, String>[]> patterns = new ArrayList<>();
+        int k = -1;
+        for (Entry<Mapped, Map<Mapped, Metadata>> e : dict.entrySet()) {
+            ++k;
+            Mapped original = e.getKey();
+            List<String> tokens = original.getTokens(), pos = original.getPos();
+            int size = tokens.size();
+            if (size != pos.size()) {
+                continue;
             }
+            Pair<String, String>[] pattern = new Pair[size];
+            for (int i = 0, s = tokens.size(); i < s; ++i) {
+                pattern[i] = Pair.of(tokens.get(i), pos.get(i));
+            }
+            mappedArray[k] = e;
+            patterns.add(pattern);
+//            Map<Mapped, Metadata> revisedM = dict.getRevisions(original).get();
+//            for (Mapped revised : revisedM.keySet()) {
+//                Pair<Mapped, Metadata> pair
+//                        = Pair.of(revised, revised.get(revised));
+//                byTxt.put(tokens, pair);
+//            }
         }
+        ac = new AhoCorasick<>(patterns);
     }
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         List<Token> tokens
                 = new ArrayList<>(JCasUtil.select(jcas, Token.class));
-        List<String> txtTokens = tokens.stream()
-                .map(Token::getCoveredText)
-                .collect(Collectors.toList());
         List<Pair<Integer, Integer>> positions = tokens.stream()
                 .map(t -> Pair.of(t.getBegin(), t.getEnd()))
                 .collect(Collectors.toList());
-        for (List<String> suggestionTokens : byTxt.keySet()) {
-            int width = suggestionTokens.size();
-            Set<Pair<Mapped, Metadata>> revisedSet
-                    = byTxt.get(suggestionTokens);
-            List<Integer> starts = getSublistIndices(
-                    txtTokens,
-                    suggestionTokens);
-            if (starts.isEmpty()) {
-                continue;
-            }
+        Pair<String, String>[] text = tokens.stream()
+                .map(t -> Pair.of(t.getCoveredText(), t.getPOS()))
+                .toArray(length -> new Pair[length]);
+        SetMultimap<Integer, Integer> suggestions = ac.search(text, true);
+        for (Integer mappedIndex : suggestions.keySet()) {
+            Map<Mapped, Metadata> revisedMap
+                    = mappedArray[mappedIndex].getValue();
+            Set<Integer> ends = suggestions.get(mappedIndex);
+            int width = mappedArray[mappedIndex].getKey().getTokens().size();
+            Set<Entry<Mapped, Metadata>> revisedSet;
             if (limit != null) {
-                List<Pair<Mapped, Metadata>> a
-                        = getTop(revisedSet, Metadata::getScoreOcc, limit),
-                        b = getTop(revisedSet, Metadata::getScoreLM, limit),
-                        c = getTop(revisedSet, Metadata::getScoreLMN, limit),
-                        d = getTop(revisedSet, Metadata::getScoreLMW, limit),
-                        e = getTop(revisedSet, Metadata::getScoreLMWN, limit);
+                List<Entry<Mapped, Metadata>> a
+                        = getTop(revisedMap, Metadata::getScoreOcc, limit),
+                        b = getTop(revisedMap, Metadata::getScoreLM, limit),
+                        c = getTop(revisedMap, Metadata::getScoreLMN, limit),
+                        d = getTop(revisedMap, Metadata::getScoreLMW, limit),
+                        e = getTop(revisedMap, Metadata::getScoreLMWN, limit);
                 revisedSet = new HashSet<>(a);
                 revisedSet.addAll(b);
                 revisedSet.addAll(c);
                 revisedSet.addAll(d);
                 revisedSet.addAll(e);
+            } else {
+                revisedSet = revisedMap.entrySet();
             }
             Revisions revisions = new TxtRevisions(jcas);
             revisions.setId(UUID.randomUUID().toString());
             revisions.setRevisions(new FSArray(jcas, revisedSet.size()));
             int k = -1;
-            for (Pair<Mapped, Metadata> pair : revisedSet) {
+            for (Entry<Mapped, Metadata> entry : revisedSet) {
                 ++k;
-                Mapped mapped = pair.getKey();
-                Metadata metrics = pair.getRight();
+                Mapped mapped = entry.getKey();
+                Metadata metrics = entry.getValue();
                 String[] toks = mapped.getTokens().toArray(new String[0]);
                 StringArray saToks = new StringArray(jcas, toks.length);
                 saToks.copyFromArray(toks, 0, 0, toks.length);
@@ -123,9 +143,9 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 revisions.setRevisions(k, revision);
             }
             revisions.addToIndexes();
-            for (Integer i : starts) {
-                int begin = positions.get(i).getLeft(),
-                        end = positions.get(i + width - 1).getRight();
+            for (Integer i : ends) {
+                int begin = positions.get(i - width + 1).getLeft(),
+                        end = positions.get(i).getRight();
                 Suggestion suggestion;
                 suggestion = new TxtSuggestion(jcas, begin, end);
                 suggestion.setRevisions(revisions);
@@ -134,13 +154,13 @@ public class MapperAE extends JCasAnnotator_ImplBase {
         }
     }
 
-    private static List<Pair<Mapped, Metadata>> getTop(
-            Set<Pair<Mapped, Metadata>> s,
+    private static List<Entry<Mapped, Metadata>> getTop(
+            Map<Mapped, Metadata> m,
             Function<Metadata, Double> scoreGetter,
             int n) {
-        return s.stream()
-                .sorted((Pair<Mapped, Metadata> o1,
-                                Pair<Mapped, Metadata> o2)
+        return m.entrySet().stream()
+                .sorted((Entry<Mapped, Metadata> o1,
+                                Entry<Mapped, Metadata> o2)
                         -> Double.compare(
                                 scoreGetter.apply(o2.getValue()),
                                 scoreGetter.apply(o1.getValue())))
