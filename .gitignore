@@ -41,3 +41,4 @@ indented.xml
 /report/*.bbl
 /report/*.bib.bak
 /report/*.blg
+/report/*.out
