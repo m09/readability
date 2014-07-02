@@ -6,6 +6,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{bbold}
 \usepackage[hyperref]{xcolor}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -22,9 +23,15 @@
 \newcommand\sew{\textsc{Simple English Wikipedia}}
 \newcommand\tableref[1]{\hyperref[#1]{Table \ref*{#1}}}
 \newcommand\figureref[1]{\hyperref[#1]{Figure \ref*{#1}}}
+\newcommand\sectionref[1]{\hyperref[#1]{Section \ref*{#1}}}
 \newcommand\maps[1]{\xrightarrow{\mathcal{#1}}}
 \newcommand\card[1]{\lvert #1 \rvert}
 \newcommand\suchthat{\, \middle| \,}
+\newcommand\given{\, \middle| \,}
+\newcommand\proba[2][]{P_{#1} \left( #2 \right)}
+
+\DeclareMathOperator*{\argmin}{\arg\,\min}
+\DeclareMathOperator*{\argmax}{\arg\,\max}
 
 \renewcommand\chaptername{Section}
 \renewcommand\thechapter{\Roman{chapter}}
@@ -82,22 +89,20 @@
 
 \chapter{Acknowledgments}
 
-I would like to start those acknowledgments with Greg who has to bear
-with me for the whole period of this internship. I am grateful for
-having a friend around during this internship in Japan, both to enjoy
-the trip and discuss many things over the course of those five months.
+I would like to thank Aizawa-sensei and Katsu-san for their precious
+help before our arrival to Japan, and their support during our stay.
 
-I also thank Aizawa-sensei and Katsu-san for their precious help
-before our arrival to Japan, and their support during our stay.
-
-I wouldn't have been able to conduct this internship without the
+I also wouldn't have been able to conduct this internship without the
 scientific advising of Aizawa-sensei and Pascual-san, I thank them for
 all their good insight, even though I am convinced I didn't make the
 best of it.
 
-Finally I would like to thank Colin de la Higuera for helping from far
-away. It was very nice to have someone responsive to discuss the
-internship when I wanted to.
+It was also very nice to have someone to discuss ideas with when I
+wanted to, I thank Colin de la Higuera for that.
+
+Finally I would like to thank Fujinuma-san for being so nice with me
+during the internship and for showing me so many thing, from Japanese
+culture to technically interesting things.
 
 \chapter{Laboratory presentation}
 
@@ -403,7 +408,7 @@ parsing annotations and is proposed in an XML format to optimize
 re-usability.
 
 \section{Lexical enhancements}
-\label{sec:rewriting}
+\label{sec:lexical-enhancements}
 
 With this corpus at our disposal, we next define a way to use it as a
 lexical dictionary. The goal is to allow authors to pick simpler words
@@ -435,32 +440,98 @@ follows, $p_w$ begin the part of speech of $w$:
   \right\}
 \end{equation*}
 
-We then introduce scores, so that it becomes possible to distinguish between
-good and bad lexical enhancements with a precise metric.
+We then introduce scores, so that it becomes possible to distinguish
+between good and bad lexical enhancements with a precise metric. To
+ease further discussion, we now introduce some probabilities. The
+probability of a mapping $w \maps{D} r$ is:
 
-The first one, named $S^{Occ}$, is a log of the basic count of
+\begin{equation*}
+  \proba{w \maps{D} r} = \frac{\card{w \maps{D} r}}{\card{\_ \maps{D} \_}}
+\end{equation*}
+
+The probability of $w \maps{D} r$ given $w$ is:
+
+\begin{equation*}
+  \proba{w \maps{D} r \given w} = \frac{\card{w \maps{D} r}}{\card{w \maps{D} \_}}
+\end{equation*}
+
+The first one, named $S_{occ}$, is a log of the basic count of
 occurrences of a precise lexical enhancement in our dictionary. We
 define it in precise terms as:
 
-\begin{align*}
-  S_{w → r}^{Occ} & = \log\frac{\card{w \maps{D} r}}{\card{\_ \maps{D} \_}} \\
-  & = \log(\card{w \maps{D} r}) - \log(\card{\_ \maps{D} \_})
-\end{align*}
+\begin{equation*}
+  S_{occ}(w \maps{D} r) = \log \proba{w \maps{D} r}
+\end{equation*}
 
 This score is still too basic for our needs. Its main shortcoming is
-that it outlines mainly punctuation rewritings. But punctuation
-rewriting is too linked to syntax to be performed so bluntly, without
-taking any context into account are without considering any parse
-information. The following scores try to fix this punctuation focus to
-turn it into a lexical focus.
+that it outlines mainly punctuation and tool-words rewritings. Those
+are mainly linked to syntax and can't be handled by a purely lexical
+rewriting system at any acceptable level of performance. The following
+scores try to fix this punctuation and tool-words focus to turn it
+into a lexical focus.
 
-To accomplish this shift, we use a language model. In our experiments
-it was trained at the bi-gram level although we would have trained it
-at a tri-gram level if it wasn't for a lack of memory on the machine
-used to enhance the overall robustness of the scores.
+To accomplish this shift, we define the quality of a rewriting of $w$
+into $r$ as the probability of a human rewriting $w$ into $r$. To
+approximate this quantity, we use a language model. By combining a
+language model to the information we have in our corpus, it is
+possible to derive a measure close to this probability. The language
+model we used was trained at a bi-gram level but would have been
+trained at a tri-gram level if it was not for the lack of memory of
+the machine used.
+
+The score $S_{LM}$ captures the above definition, with $\proba[lm]{w}$ the
+language model probability of $w$:
+
+\begin{equation*}
+  S_{LM}(w \maps{D} r) = \log \frac{\proba{w \maps{D} r \given
+      w}}{\proba[lm]{w}}
+\end{equation*}
+
+Note that while this score has some nice properties regarding the
+quality of rewritings we defined above, it is not the log of a
+probability, which is not a problem to compare rewritings but might
+very well be to use those rewritings in a broader framework, for
+example when performing the automatic rewriting of a text, we will
+later see how we cope with those issues.
 
 \section{Automatic rewriting of texts}
 \label{sec:rewriting}
+
+To rewrite automatically texts, we use weighted finite-state
+transducers that consider the scores defined
+in \sectionref{sec:lexical-enhancements} as weights to rewrite any
+input text.
+
+We define a finite-state transducer over a semi-ring $(\mathbb{K},
+\mathbb{1}, \mathbb{0}, \otimes, \oplus)$ (that we will use to combine
+the outputs of a score function) as an 8-tuple that follows the
+definition given by \cite{mohri2004weighted}: $T = (\Sigma, \Delta, Q,
+I, F, E, \lambda, \rho)$ where $\Sigma$ is the finite input alphabet
+of the transducer; $\Delta$ is the finite output alphabet; $Q$ is a
+finite set of states; $I \subseteq Q$ the set of initial states; $F
+\subseteq Q$ the set of final states; $E \subseteq Q \times (\Sigma
+\cup \{\varepsilon\}) \times (\Delta \cup \{\varepsilon\}) \times
+\mathbb{K} \times Q$ a finite set of transitions; $λ : I \rightarrow
+S$ the initial weight function; and $ρ : F \rightarrow \mathbb{K}$ the
+final weight function mapping $F$ to $\mathbb{K}$.
+
+We construct such a transducer for a given input text of $n$ tokens
+noted $t_1 \dots t_{n}$ as follows, where $\mathcal{T}$ is the set of
+all tokens in written English, and $\mathcal{S} : \mathcal{D}
+\rightarrow \mathbb{K}$ is the score we use, with its semi-ring
+$(\mathbb{K}, \mathbb{1}, \mathbb{0}, \otimes, \oplus)$ attached:
+
+\begin{align*}
+  \Sigma & = \mathcal{T} \\
+  \Delta & = \mathcal{T} \\
+  Q & = \left\{ q_i \suchthat 0 \leq i \leq n \right\} \\
+  I & = \{ q_0 \} \\
+  F & = \{ q_n \} \\
+  E & = \left\{ (q_{i - 1}, t_i, r, s, q_i) \suchthat t_i
+    \maps{D} r \land s = \mathcal{S}\left(\ t_i \maps{D} r \right)\right\} \\
+  I & : x \mapsto \mathbb{1} \\
+  F & : x \mapsto \mathbb{1} \\
+\end{align*}
 
 \section{Fine-grained readability analysis framework}
 \label{sec:framework}
