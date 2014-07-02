@@ -1,7 +1,5 @@
 package eu.crydee.readability.uima.ae;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import eu.crydee.ahocorasick.AhoCorasick;
 import eu.crydee.readability.uima.model.Mapped;
@@ -50,8 +48,6 @@ public class MapperAE extends JCasAnnotator_ImplBase {
     @ConfigurationParameter(name = PARAM_LIMIT, mandatory = false)
     private Integer limit;
 
-//    final private SetMultimap<List<String>, Pair<Mapped, Metadata>> byTxt
-//            = HashMultimap.create();
     private Entry<Mapped, Map<Mapped, Metadata>>[] mappedArray;
 
     private AhoCorasick<Pair<String, String>> ac;
@@ -77,12 +73,6 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             }
             mappedArray[k] = e;
             patterns.add(pattern);
-//            Map<Mapped, Metadata> revisedM = dict.getRevisions(original).get();
-//            for (Mapped revised : revisedM.keySet()) {
-//                Pair<Mapped, Metadata> pair
-//                        = Pair.of(revised, revised.get(revised));
-//                byTxt.put(tokens, pair);
-//            }
         }
         ac = new AhoCorasick<>(patterns);
     }
@@ -166,19 +156,5 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                                 scoreGetter.apply(o1.getValue())))
                 .limit(n)
                 .collect(Collectors.toList());
-    }
-
-    private List<Integer> getSublistIndices(
-            List<String> source,
-            List<String> target) {
-        List<Integer> result = new ArrayList<>();
-        for (int i = 0, s = source.size(), t = target.size(), d = s - t;
-                i < d;
-                i++) {
-            if (source.subList(i, i + t).equals(target)) {
-                result.add(i);
-            }
-        }
-        return result;
     }
 }
