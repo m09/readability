@@ -97,12 +97,12 @@ scientific advising of Aizawa-sensei and Pascual-san, I thank them for
 all their good insight, even though I am convinced I didn't make the
 best of it.
 
-It was also very nice to have someone to discuss ideas with when I
-wanted to, I thank Colin de la Higuera for that.
+It was also very nice to have someone exterior to discuss ideas with
+when I wanted to, I thank Colin de la Higuera for that.
 
 Finally I would like to thank Fujinuma-san for being so nice with me
-during the internship and for showing me so many thing, from Japanese
-culture to technically interesting things.
+during the internship and for showing me so many things, ranging from
+Japanese culture to scientific projects.
 
 \chapter{Laboratory presentation}
 
@@ -455,12 +455,12 @@ The probability of $w \maps{D} r$ given $w$ is:
   \proba{w \maps{D} r \given w} = \frac{\card{w \maps{D} r}}{\card{w \maps{D} \_}}
 \end{equation*}
 
-The first one, named $S_{occ}$, is a log of the basic count of
-occurrences of a precise lexical enhancement in our dictionary. We
+The first one, named $\mathcal{S}_{occ}$, is a log of the basic count
+of occurrences of a precise lexical enhancement in our dictionary. We
 define it in precise terms as:
 
 \begin{equation*}
-  S_{occ}(w \maps{D} r) = \log \proba{w \maps{D} r}
+  \mathcal{S}_{occ}(w \maps{D} r) = \log \proba{w \maps{D} r}
 \end{equation*}
 
 This score is still too basic for our needs. Its main shortcoming is
@@ -479,11 +479,11 @@ model we used was trained at a bi-gram level but would have been
 trained at a tri-gram level if it was not for the lack of memory of
 the machine used.
 
-The score $S_{LM}$ captures the above definition, with $\proba[lm]{w}$ the
-language model probability of $w$:
+The score $\mathcal{S}_{lm}$ captures the above definition, with
+$\proba[lm]{w}$ the language model probability of $w$:
 
 \begin{equation*}
-  S_{LM}(w \maps{D} r) = \log \frac{\proba{w \maps{D} r \given
+  \mathcal{S}_{lm}(w \maps{D} r) = \log \frac{\proba{w \maps{D} r \given
       w}}{\proba[lm]{w}}
 \end{equation*}
 
@@ -503,7 +503,7 @@ in \sectionref{sec:lexical-enhancements} as weights to rewrite any
 input text.
 
 We define a finite-state transducer over a semi-ring $(\mathbb{K},
-\mathbb{1}, \mathbb{0}, \otimes, \oplus)$ (that we will use to combine
+\oplus, \otimes, \mathbb{0}, \mathbb{1})$ (that we will use to combine
 the outputs of a score function) as an 8-tuple that follows the
 definition given by \cite{mohri2004weighted}: $T = (\Sigma, \Delta, Q,
 I, F, E, \lambda, \rho)$ where $\Sigma$ is the finite input alphabet
@@ -512,14 +512,14 @@ finite set of states; $I \subseteq Q$ the set of initial states; $F
 \subseteq Q$ the set of final states; $E \subseteq Q \times (\Sigma
 \cup \{\varepsilon\}) \times (\Delta \cup \{\varepsilon\}) \times
 \mathbb{K} \times Q$ a finite set of transitions; $λ : I \rightarrow
-S$ the initial weight function; and $ρ : F \rightarrow \mathbb{K}$ the
-final weight function mapping $F$ to $\mathbb{K}$.
+\mathbb{K}$ the initial weight function; and $ρ : F \rightarrow
+\mathbb{K}$ the final weight function mapping $F$ to $\mathbb{K}$.
 
 We construct such a transducer for a given input text of $n$ tokens
 noted $t_1 \dots t_{n}$ as follows, where $\mathcal{T}$ is the set of
 all tokens in written English, and $\mathcal{S} : \mathcal{D}
 \rightarrow \mathbb{K}$ is the score we use, with its semi-ring
-$(\mathbb{K}, \mathbb{1}, \mathbb{0}, \otimes, \oplus)$ attached:
+$(\mathbb{K}, \oplus, \otimes, \mathbb{0}, \mathbb{1})$ attached:
 
 \begin{align*}
   \Sigma & = \mathcal{T} \\
@@ -532,6 +532,73 @@ $(\mathbb{K}, \mathbb{1}, \mathbb{0}, \otimes, \oplus)$ attached:
   I & : x \mapsto \mathbb{1} \\
   F & : x \mapsto \mathbb{1} \\
 \end{align*}
+
+Now, we can define semi-rings to use with the constructed
+transducer. We mainly consider two use-cases, each of them requiring a
+different semi-ring:
+
+\begin{figure}[H]
+  \centering
+  \begin{enumerate}
+  \item from the transducer and an input text, calculate the top $n$
+    transductions. This is the classical task we aim for in
+    statistical machine translation;
+  \item from the transducer and an input text, get an idea of how the
+    system rewrites the text at a certain level of confidence.
+  \end{enumerate}
+  
+  \caption{Use-cases of text rewriting}
+\label{fig:use-cases}
+\end{figure}
+
+The motivation for the second use-case is maybe not clear at
+first. The reason for its existence is that, even for a very long
+text, a top 100 of the rewritings might very well return 100 different
+single token modifications while we would want to see the complete
+text rewritten at once at a certain level of confidence. The Negative
+MiniMax semi-ring below allows us to obtain this threshold effect
+while the Negative Log semi-ring allows us to compute precise tops,
+and is the log equivalent of the $(\mathbb{R}, +, *, 0, 1)$ semi-ring
+for probabilities.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{rccccc}
+    \toprule
+    Semiring & $\mathbb{K}$ & $\oplus$ & $\otimes$ & $\mathbb{0}$ & $\mathbb{1}$
+    \\
+    \midrule
+    Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+_{\log}$ & $+$ & $-\infty$ & $0$ \\
+    Negative MinMax & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\min$ & $\max$ & 0 & $-\infty$ \\
+  \end{tabular}
+  \caption{Interesting semi-rings for $\mathcal{S}_{occ}$}
+  \label{tab:semi-rings}
+\end{table}
+
+We can almost directly use those semi-rings with the
+$\mathcal{S}_{lm}$ score function. But since it is not the log of a
+probability, we don't have the guarantee that for any $w \maps{D} r$,
+$\mathcal{S}_{lm}\left( w \maps{D} r \right) \in \left]-\infty,
+  0\right]$. To fix this problem, we normalize all the scores
+$\mathcal{S}_{lm}$ as follows:
+
+\[
+\mathcal{S}_{lmn} \left( w \maps{D} r \right)
+= \mathcal{S}_{lm} \left( w \maps{D} r \right)
+- \argmax_{w' \maps{D} r'} \mathcal{S}_{lm} \left(w' \maps{D} r' \right)
+\]
+
+The $\mathcal{S}_{lmn}$ function can be used with the semi-rings we
+defined for $\mathcal{S}_{occ}$.
+
+It is now possible to address the two use-cases mentioned in
+\figureref{fig:use-cases} by using the Viterbi algorithm
+\cite{forney1973viterbi} with Negative Log as semi-ring for the first
+use-case and Negative MinMax for the second.
+
+The next section details how we built a framework to get interesting
+feedback on both the rewriting and the lexical enhancement
+approaches.
 
 \section{Fine-grained readability analysis framework}
 \label{sec:framework}
