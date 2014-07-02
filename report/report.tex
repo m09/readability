@@ -1,15 +1,18 @@
-\documentclass[a4paper, 11pt]{scrreprt}
+\documentclass[a4paper, 11pt, onepage]{scrreprt}
 
 \usepackage{fontspec}
 \setmainfont{Linux Libertine O}
 \usepackage{polyglossia}
+\usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage[hyperref]{xcolor}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{wrapfig}
 \usepackage{float}
+\usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{numprint}
 \usepackage{hyperref}
@@ -19,6 +22,9 @@
 \newcommand\sew{\textsc{Simple English Wikipedia}}
 \newcommand\tableref[1]{\hyperref[#1]{Table \ref*{#1}}}
 \newcommand\figureref[1]{\hyperref[#1]{Figure \ref*{#1}}}
+\newcommand\maps[1]{\xrightarrow{\mathcal{#1}}}
+\newcommand\card[1]{\lvert #1 \rvert}
+\newcommand\suchthat{\, \middle| \,}
 
 \renewcommand\chaptername{Section}
 \renewcommand\thechapter{\Roman{chapter}}
@@ -43,16 +49,19 @@
     % ----------------------------------------------------------------
     \vspace{1.5cm}
     {\large
-      \textbf{Author:} \textsc{Hugo Mougard}
-      \hfill
-      \textbf{Advisor:} \textsc{Akiko Aizawa}}\\[5pt]
+    \begin{tabularx}{\textwidth}{lXll}
+      \textbf{Author:} & \textsc{Hugo Mougard} &
+      \textbf{Director:} & \textsc{Akiko Aizawa} \\
+      \textbf{Tutor:} & \textsc{Colin de la Higuera} &
+      \textbf{Advisor:} & \textsc{Pascual Martínez-Gomez} \\
+    \end{tabularx}}\\[5pt]
     % ----------------------------------------------------------------
     \vfill
     \parbox{0pt}{\large \begin{tabbing}
         \textbf{Sending institution:} \= National Institute of Informatics \kill
-        \textbf{Sending institution:} \> Université de Nantes, France \\
-        \textbf{Hosting institution:} \> National Institute of
-        Informatics, Japan \\
+        \textbf{Sending institution:} \> \textsc{Université de Nantes, France} \\
+        \textbf{Hosting institution:} \> \textsc{National Institute of
+        Informatics, Japan} \\
       \end{tabbing}}
     \vfill
     {\LARGE ATAL Master 2 internship report}
@@ -142,7 +151,9 @@ sentence are readable or non readable, and for which reasons.
 \chapter{Prior art}
 \label{sec:sota}
 
-Readability as been studied extensively. The first works in this area
+\section{Early works and readability formulas}
+\label{sec:early-works-and-formulas}
+Readability has been studied extensively. The first works in this area
 date back to more than a century ago: in 1893, Sherman published a
 book \cite{sherman1893analytics} where he compared modern English and
 English spoken four centuries before with considerations that are very
@@ -181,14 +192,45 @@ using the same variables as either Flesch or Dale and Chall
 \cite{mclaughlin1969smog, kincaid1975derivation,
   chall1995readability}.
 
-Despite their useful applications, readability formula are not
-perfect. Some works have detailed their problems convincingly, such as
-\cite{bailin2001linguistic}
+Despite their useful applications, readability formulas are not
+perfect. Some works have detailed their problems convincingly
+\cite{duffy1985readability, schriver2000readability}. Among the most
+important problems is using sentence length to model syntactic
+complexity: of the following sentences, (1.) is often considered
+easier to understand than (2.), despite being lengthier:
+\begin{enumerate}
+\item The mouse ate the cheese, and then the rat ate the mouse, and
+  after that, the cat ate the rat and died.
+\item The cat that ate the rat that ate the mouse that ate the cheese
+  died.
+\end{enumerate}
+Another important problem is modeling word complexity by word length,
+which doesn't consider the fact that affixes are known to readers, so
+very long words can be simple, and some short words are, in contrary,
+relatively not known: curr (to make a murmuring sound), is not well
+known, while reinventing is actually easy to understand for most early
+readers because re- and -ing are commun affixes and invent is well
+known.
 
-More recently, from 2006 onwards, \sew has been
-rightly seen as an important resource for readability studies. Many
-scientists have used it to compute parallel corpora of readable their
-hard-to-read counterparts sentences.
+Finally, the fact that many formulas only consider short windows of a
+text to estimate its readability make them not reliable without
+repetition of the measure at several points in a text and an averaging
+(which is what Dale \& Chall does by default).
+
+To address those shortcomings, scientists have recently proposed
+machine learning based approaches. The next section details those
+works.
+
+\section{Machine Learning approaches}
+\label{sec:ml-approaches}
+
+More recently, from 2006 onwards, \sew has been rightly seen as an
+important resource for readability studies. Many scientists have used
+it to compute parallel corpora of readable their hard-to-read
+counterparts sentences.
+
+\section{Readability research using \wiki}
+\label{sec:wiki-approaches}
 
 \chapter{Work}
 \label{cha:work}
@@ -213,24 +255,57 @@ Details on those three main axes follow.
 \section{Automatic readability parallel corpus creation}
 \label{sec:corpus}
 
-Machine learning approaches have an enormous need for data. Moreover,
-they often require a lengthy and costly annotation process. For this
-reason, researchers in every domain using machine learning invest time
-finding clever techniques to automatically obtain annotated corpora.
+Most machine learning approaches efficiencies are directly dependent
+on the amount of data at their disposal. Those approaches are used in
+more scientific domains every day for their effectiveness. This is
+what led people to describe data efficiency as “unreasonable”
+\cite{halevy2009unreasonable}. In this context, it seems that being
+able to gather automatically data is of utmost importance. Moreover,
+raw data is often not enough. Most techniques require a lengthy and
+costly annotation process. For this reason, researchers in every
+domain using machine learning invest time finding clever techniques to
+automatically obtain annotated corpora.
 
 In readability, such a clever technique is to leverage the power of
 \wiki, and in particular \sew. To do so, mainly two techniques have
 been used: the first is to use the articles present both in the
 regular \ew{} and in \sew{} and use their comparison as a starting
-point to build a parallel corpus. The second is to use the revision
-history of \sew. In this work we use the second approach.
+point to build a parallel corpus. This approach has been used with
+great success in \cite{zhu-bernhard-gurevych:2010:PAPERS} and has
+resulted in the
+PWKP-108016\footnote{\url{https://www.ukp.tu-darmstadt.de/data/sentence-simplification/simple-complex-sentence-pairs/}}
+dataset.The second is to use the revision history of \sew, as
+showcased in \cite{yatskar2010sake}. In this work we use the second
+approach.
 
-When editing \sew, contributors have the possibility to write a commit
+The main rationale behind not using the existing PWKP-108016 corpus
+and instead making one of our own is that we believe the technique
+used to automatically construct the corpus from a revision history is
+a general process and can therefore be extended to many data sources
+beyond \wiki. Those possible extensions include many of the processes
+of the professional publishing world. If shown to be efficient, big
+corpora could be gathered from journalists, writers, scientists, etc.
+In contrary, it has been shown to be extremely hard to find good
+comparable corpora outside of \wiki{} and some restricted institution
+publications such as the European Parliament \cite{koehn2005europarl},
+which makes the first approach hard to generalize. Finally, the
+outputs made public by \cite{yatskar2010sake} are of high quality but
+limited in quantity and do not incorporate some important features
+such that the original sentence from which pairs were extracted, nor
+does this release include any code to manipulate the files.
+
+To build automatically our corpus, we leverage the fact that when
+editing \sew, contributors have the possibility to write a commit
 message, so that other people can quickly browse history and guess the
-role of a particular commit. Using a method close to the
-\textsc{Simpl} approach presented in \cite{yatskar2010sake}, we use
-those commits to detect readability-oriented modifications. An example
-of such modification can be found in \figureref{fig:dan-kelly}.
+role of a particular commit. This allows us to automatically detect if
+a particular commit was intended to fix a readability issue or was
+serving another purpose (improving the content of the article,
+cleaning the wiki, vandalizing, …). This usage of metadata is not
+novel, it was used in the \textsc{Simpl} approach presented in
+\cite{yatskar2010sake}. Though, we fine-tune the heuristic used to
+address some problems encountered in this article and to harden the
+process. An example of readability edit can be seen in
+\figureref{fig:dan-kelly}.
 
 \begin{figure}[H]
   \centering
@@ -240,9 +315,9 @@ of such modification can be found in \figureref{fig:dan-kelly}.
   \label{fig:dan-kelly}
 \end{figure}
 
-However, unlike previous work, we use a very strict heuristic to
-reduce the (already important) noise of such a method: we only
-consider edits with commit messages $m$ so that:
+The heuristic we use to gather edits is extremely simple: once
+stripped of the category information, we only consider edits with
+commit messages $m$ so that:
 
 \[
 m \in \left\{\text{“simplify”}, \text{“simplifying”},
@@ -257,10 +332,6 @@ we can consider the commit messages of
 purposes, one of which will bring noise (the wikification). Commit \#2
 contains one of the matching terms, but we should not consider
 it. It's not clear if commit \#3 tries to address readability or not.
-
-Furthermore, we determined by an empirical study that those commits
-represented an important part of the commits we might have retrieved
-with a broader rule, so we simply did not consider them.
 
 \begin{table}[H]
   \centering
@@ -279,38 +350,187 @@ with a broader rule, so we simply did not consider them.
   \label{tab:problematic-commits}
 \end{table}
 
+Furthermore, we determined by an empirical study that those commits
+represented an important part of the commits we might have retrieved
+with a broader rule, so we simply did not consider them.
+
 The next step for the creation of the corpus is to compute the precise
-edit that the contributor made. To do so, we use the uimaFIT
-framework\footnote{\url{https://uima.apache.org/uimafit.html}},
-OpenNLP preprocessing components
-\footnote{\url{https://opennlp.apache.org/}} and jgit's diff
-utility\footnote{\url{http://www.eclipse.org/jgit/}} to compute the
-difference between the pre- and post- interesting commit versions of
-the an article.
+edit that the contributor made. To do so, we tokenize and sentence
+split both the original version of the article and its revision using
+OpenNLP\footnote{\url{https://opennlp.apache.org/}}. Then, we use
+Myers' alignment algorithm \cite{myers1988optimal} to compute optimal
+alignments at the world and sentence levels. We rely on the
+implementation proposed by
+jgit\footnote{\url{http://www.eclipse.org/jgit/}}.
 
-The precise pipeline is available on
-github\footnote{\url{https://github.com/m09/readability}} and is freely
-re-usable.
+The goal being to obtain a re-usable corpus, we propose the complete
+pipeline on
+github\footnote{\url{https://github.com/m09/readability}}. It is
+freely re-usable.
 
-The obtained unfiltered corpus has \numprint{43753} entries. When
-filtered to only consider revisions of 5 words at most, to match the
-policy used in \cite{yatskar2010sake}, the number of entries is
-reduced to \numprint{23507}.
+The obtained corpus has important noise problems. A quick glance at
+\tableref{tab:problematic-edits} is sufficient to understand that some
+edits are not readability edits, but either alignment deficiencies or
+edits serving complementary roles. When filtered to only consider
+revisions of 5 words at most, to match the policy used in
+\cite{yatskar2010sake}, the number of entries is reduced to
+\numprint{23507}.
 
-\section{Fine-grained readability analysis framework}
-\label{sec:framework}
+\begin{table}[H]
+  \centering
+  \caption{Problematic edits}
+  \begin{tabular}{rp{6cm}p{6cm}}
+    \toprule
+    \# & Original version & Revised version \\
+    \midrule
+    1 & , and & . she also used them in her arguments about \\
+    \addlinespace
+    2 & 2010 federal election, is russell matheson, a member & size\\
+  \end{tabular}
+  \label{tab:problematic-edits}
+\end{table}
 
-Having a parallel corpus available, the next question was to properly
-analyze any result derived from it. To properly do that, we went on
-and created a web demonstration of an effective visualization of
-transformations possible with the corpus.
+unfiltered corpus has \numprint{43753} entries. However,
+it has important noise problems. A quick glance at
+\tableref{tab:problematic-edits} is sufficient to understand that some
+edits are not readability edits, but either alignment deficiencies or
+edits serving complementary roles. When filtered to only consider
+revisions of 5 words at most, to match the policy used in
+\cite{yatskar2010sake}, the number of entries is reduced to
+\numprint{23507}.
+The resulting resource is enriched with part-of-speech, and syntactic
+parsing annotations and is proposed in an XML format to optimize
+re-usability.
+
+\section{Lexical enhancements}
+\label{sec:rewriting}
+
+With this corpus at our disposal, we next define a way to use it as a
+lexical dictionary. The goal is to allow authors to pick simpler words
+than the ones they used, in an efficient manner. In what follows, we
+will denote multiset of all rewritings of $x$ in $y$ in $\mathcal{D}$
+by $x \maps{D} y$ a,d we will use $\_$ as a joker to denote any word.
+
+The first approach and the most basic one, given a dictionary
+$\mathcal{D}$ and for a word $w$, is to propose as lexical rewriting
+candidates the set $R_w$ such that:
+
+\[
+R_w = \left\{r \suchthat w \maps{D} r\right\}
+\]
+
+But obviously, while this approach will have a important recall, it
+will be extremely noisy and will not be of any real help to an author,
+the time lost cruising through the noise outweighing the benefits of
+the correct lexical enhancements.
+
+A first improvement is to use the part of speeches available in the
+corpus to make sure they match. That will already somewhat reduce
+lexical ambiguity. That allows us to refine the definition of $R_w$ as
+follows, $p_w$ begin the part of speech of $w$:
+
+\begin{equation*}
+  R_w = \left\{
+    r \suchthat u \maps{D} r \land u = w \land p_u = p_w
+  \right\}
+\end{equation*}
+
+We then introduce scores, so that it becomes possible to distinguish between
+good and bad lexical enhancements with a precise metric.
+
+The first one, named $S^{Occ}$, is a log of the basic count of
+occurrences of a precise lexical enhancement in our dictionary. We
+define it in precise terms as:
+
+\begin{align*}
+  S_{w → r}^{Occ} & = \log\frac{\card{w \maps{D} r}}{\card{\_ \maps{D} \_}} \\
+  & = \log(\card{w \maps{D} r}) - \log(\card{\_ \maps{D} \_})
+\end{align*}
+
+This score is still too basic for our needs. Its main shortcoming is
+that it outlines mainly punctuation rewritings. But punctuation
+rewriting is too linked to syntax to be performed so bluntly, without
+taking any context into account are without considering any parse
+information. The following scores try to fix this punctuation focus to
+turn it into a lexical focus.
+
+To accomplish this shift, we use a language model. In our experiments
+it was trained at the bi-gram level although we would have trained it
+at a tri-gram level if it wasn't for a lack of memory on the machine
+used to enhance the overall robustness of the scores.
 
 \section{Automatic rewriting of texts}
 \label{sec:rewriting}
 
+\section{Fine-grained readability analysis framework}
+\label{sec:framework}
+
+Having a parallel corpus available, the next question was how to
+properly investigate fine-grained readability by using it.
+
+The first and most obvious use of such a resource is to perform
+lexical enhancements based on the one made in the \sew{} edits, in
+similar fashion to \cite{yatskar2010sake}.
+
+When working with noisy data and large corpora, properly estimating if
+a lexical mapping is worth anything, we propose a web demo so that an
+investigator can look up the effect of a mexical mapping system on any
+text quickly and efficiently \figureref{fig:ui} shows what the system
+looks like at the time of this writing.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ui}
+  \caption{\textsc{Readability Lab} interface}
+  \label{fig:ui}
+\end{figure}
+
+Our answer
+
+ any result derived from it. To properly do that, we
+went on and created a web demonstration of an effective visualization
+of transformations possible with the corpus.
+
+One of the major problems when trying to use such a dictionnary is to
+efficiently search for 
+
 \chapter{Open source contributions}
 \label{cha:oss-contribs}
 
+During this internship I had the opportunity to contribute to the open
+source natural language processing community. What follows is a list
+of those contributions.
+
+\section{Enhancements of existing software}
+\label{sec:enhancements}
+
+\begin{itemize}
+\item
+  \href{https://bugs.eclipse.org/bugs/show_bug.cgi?id=433163}{Wikitext
+    parser bug filing}
+\item \href{https://issues.apache.org/jira/browse/OPENNLP-676}{OpenNLP
+    POSTagger bug filing with patch}
+\item \href{https://issues.apache.org/jira/browse/UIMA-3913}{uimaFIT
+    enhancement proposal}
+\end{itemize}
+
+\section{uimaFIT components}
+\label{sec:uimafit-components}
+
+\begin{itemize}
+\item sentence alignment analysis engine, using Myers' algorithm
+\item word alignment analysis engine, using yet again Myers' algorithm
+\item \href{https://berkeleylm.googlecode.com/}{BerkeleyLM} uimaFIT
+  wrapper
+\item readability formulas uimaFIT calculator
+\end{itemize}
+
+\section{Miscellaneous}
+\label{sec:misc-software}
+\begin{itemize}
+\item Wikimedia PostgreSQL importer
+\item Generic implementation of Aho-Corasick
+\end{itemize}
 
 \chapter{Conclusions  et perspectives}
 
