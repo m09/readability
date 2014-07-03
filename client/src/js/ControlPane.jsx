@@ -37,25 +37,25 @@ var ControlPane = React.createClass({
                            ? 'btn btn-default active'
                            : 'btn btn-default'}
       onClick={this.props.callbackWeight.bind(this, 1)}>
-        LM
+        LMN
       </button>
         <button className={this.props.weight === 2
                            ? 'btn btn-default active'
                            : 'btn btn-default'}
       onClick={this.props.callbackWeight.bind(this, 2)}>
-        LMN
+        LMWN
       </button>
         <button className={this.props.weight === 3
                            ? 'btn btn-default active'
                            : 'btn btn-default'}
       onClick={this.props.callbackWeight.bind(this, 3)}>
-        LMW
+        LMCN
       </button>
         <button className={this.props.weight === 4
                            ? 'btn btn-default active'
                            : 'btn btn-default'}
       onClick={this.props.callbackWeight.bind(this, 4)}>
-        LMWN
+        LMCWN
       </button>
         </div>
         </div>

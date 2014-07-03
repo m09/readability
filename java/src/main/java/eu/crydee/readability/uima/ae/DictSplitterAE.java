@@ -59,13 +59,11 @@ public class DictSplitterAE extends JCasAnnotator_ImplBase {
             for (Entry<Mapped, Metadata> e : maps.getValue().entrySet()) {
                 for (Pair<String, String> contexts
                         : e.getValue().getContexts()) {
-                    for (int i = 0, c = e.getValue().getCount(); i < c; i++) {
-                        dicts[random.nextInt(parts)].add(
-                                maps.getKey(),
-                                e.getKey(),
-                                contexts.getLeft(),
-                                contexts.getRight());
-                    }
+                    dicts[random.nextInt(parts)].add(
+                            maps.getKey(),
+                            e.getKey(),
+                            contexts.getLeft(),
+                            contexts.getRight());
                 }
             }
         }

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import eu.crydee.readability.misc.XMLUtils;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metadata;
+import eu.crydee.readability.uima.model.Score;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -73,26 +74,22 @@ public class ReadabilityDict_Impl
     private void addRevised(XMLStreamReader xsr, Mapped rev)
             throws XMLStreamException {
         Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
-        Double scoreOcc = Double.parseDouble(
-                xsr.getAttributeValue(null, "scoreOcc")),
-                scoreLM = Double.parseDouble(
-                        xsr.getAttributeValue(null, "scoreLM")),
-                scoreLMW = Double.parseDouble(
-                        xsr.getAttributeValue(null, "scoreLMW")),
-                scoreLMN = Double.parseDouble(
-                        xsr.getAttributeValue(null, "scoreLMN")),
-                scoreLMWN = Double.parseDouble(
-                        xsr.getAttributeValue(null, "scoreLMWN"));
+        Map<Score, Double> scores = new HashMap<>();
+        for (Score score : Score.values()) {
+            scores.put(
+                    score,
+                    Double.parseDouble(xsr.getAttributeValue(
+                                    null,
+                                    "score" + score.toString())));
+        }
         Mapped revised = parseRevision(xsr);
         List<Pair<String, String>> contexts = parseContexts(xsr);
         add(rev, revised, contexts);
         Metadata m = dict.get(rev).get(revised);
         m.addContexts(contexts);
-        m.setScoreOcc(scoreOcc);
-        m.setScoreLM(scoreLM);
-        m.setScoreLMW(scoreLMW);
-        m.setScoreLMN(scoreLMN);
-        m.setScoreLMWN(scoreLMWN);
+        for (Entry<Score, Double> e : scores.entrySet()) {
+            m.setScore(e.getKey(), e.getValue());
+        }
     }
 
     private Mapped parseRevision(XMLStreamReader xsr)
@@ -141,21 +138,12 @@ public class ReadabilityDict_Impl
                 xsw.writeAttribute(
                         "count",
                         String.valueOf(m.getCount()));
-                xsw.writeAttribute(
-                        "scoreOcc",
-                        String.valueOf(m.getScoreOcc()));
-                xsw.writeAttribute(
-                        "scoreLM",
-                        String.valueOf(m.getScoreLM()));
-                xsw.writeAttribute(
-                        "scoreLMN",
-                        String.valueOf(m.getScoreLMN()));
-                xsw.writeAttribute(
-                        "scoreLMW",
-                        String.valueOf(m.getScoreLMW()));
-                xsw.writeAttribute(
-                        "scoreLMWN",
-                        String.valueOf(m.getScoreLMWN()));
+                Score[] scores = Score.values();
+                for (Score score : scores) {
+                    xsw.writeAttribute(
+                            "score" + score.toString(),
+                            String.valueOf(m.getScore(score)));
+                }
                 saveRevision(xsw, revised);
                 saveContextList(xsw, m.getContexts());
                 xsw.writeEndElement();

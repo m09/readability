@@ -449,10 +449,10 @@ probability of a mapping $w \maps{D} r$ is:
   \proba{w \maps{D} r} = \frac{\card{w \maps{D} r}}{\card{\_ \maps{D} \_}}
 \end{equation*}
 
-The probability of $w \maps{D} r$ given $w$ is:
+The probability of $w \maps{D} r$ given $w \maps{D} \_$ is:
 
 \begin{equation*}
-  \proba{w \maps{D} r \given w} = \frac{\card{w \maps{D} r}}{\card{w \maps{D} \_}}
+  \proba{w \maps{D} r \given w \maps{D} \_} = \frac{\card{w \maps{D} r}}{\card{w \maps{D} \_}}
 \end{equation*}
 
 The first one, named $\mathcal{S}_{occ}$, is a log of the basic count
@@ -479,12 +479,13 @@ model we used was trained at a bi-gram level but would have been
 trained at a tri-gram level if it was not for the lack of memory of
 the machine used.
 
-The score $\mathcal{S}_{lm}$ captures the above definition, with
-$\proba[lm]{w}$ the language model probability of $w$:
+The score $\mathcal{S}_{lm}$ is one way to capture the above
+definition, with $\proba[lm]{w}$ the language model probability of
+$w$:
 
 \begin{equation*}
-  \mathcal{S}_{lm}(w \maps{D} r) = \log \frac{\proba{w \maps{D} r \given
-      w}}{\proba[lm]{w}}
+  \mathcal{S}_{lm}(w \maps{D} r) = \log \frac{\proba{w \maps{D} r}}%
+  {\proba[lm]{w}}
 \end{equation*}
 
 Note that while this score has some nice properties regarding the

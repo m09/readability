@@ -4,6 +4,7 @@ import edu.berkeley.nlp.lm.NgramLanguageModel;
 import edu.berkeley.nlp.lm.io.LmReaders;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metadata;
+import eu.crydee.readability.uima.model.Score;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
                 highestScoreLMW = Double.NEGATIVE_INFINITY;
         double minLMProba = Double.POSITIVE_INFINITY;
         double minLMWProba = Double.POSITIVE_INFINITY;
-        int totalCount = dict.getTotalCount();
+        double logTotalCount = Math.log(dict.getTotalCount());
         for (Mapped original : dict.keySet()) {
             Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             int originalCount
@@ -69,36 +70,46 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             for (Mapped rev : revs.keySet()) {
                 Metadata metric = revs.get(rev);
                 double scoreOcc = Math.log(metric.getCount())
-                        - Math.log(totalCount),
+                        - logTotalCount,
                         scoreLM = Math.log(metric.getCount())
-                        - Math.log(originalCount)
+                        - logTotalCount
                         - lmProba,
                         scoreLMW = Math.log(metric.getCount())
+                        - logTotalCount
+                        - lmWProba,
+                        scoreLMC = Math.log(metric.getCount())
+                        - Math.log(originalCount)
+                        - lmProba,
+                        scoreLMCW = Math.log(metric.getCount())
                         - Math.log(originalCount)
                         - lmWProba;
-                lowestScoreLM = Math.min(scoreLM, lowestScoreLM);
-                highestScoreLM = Math.max(scoreLM, highestScoreLM);
-                lowestScoreLMW = Math.min(scoreLMW, lowestScoreLMW);
-                highestScoreLMW = Math.max(scoreLMW, highestScoreLMW);
-                metric.setScoreOcc(scoreOcc);
-                metric.setScoreLM(scoreLM);
-                metric.setScoreLMW(scoreLMW);
+                lowestScoreLM = Math.min(scoreLMC, lowestScoreLM);
+                highestScoreLM = Math.max(scoreLMC, highestScoreLM);
+                lowestScoreLMW = Math.min(scoreLMCW, lowestScoreLMW);
+                highestScoreLMW = Math.max(scoreLMCW, highestScoreLMW);
+                metric.setScore(Score.OCC, scoreOcc);
+                metric.setScore(Score.LMN, scoreLM);
+                metric.setScore(Score.LMWN, scoreLMW);
+                metric.setScore(Score.LMCN, scoreLMC);
+                metric.setScore(Score.LMCWN, scoreLMCW);
             }
         }
-        double ambitusLM = highestScoreLM - lowestScoreLM;
-        double ambitusLMW = highestScoreLMW - lowestScoreLMW;
         for (Mapped original : dict.keySet()) {
             Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             for (Mapped rev : revs.keySet()) {
                 Metadata metric = revs.get(rev);
-                metric.setScoreLMWN(
-                        (metric.getScoreLMW() - lowestScoreLMW)
-                        / ambitusLMW);
-                metric.setScoreLMN(
-                        (metric.getScoreLM() - lowestScoreLM)
-                        / ambitusLM);
-                metric.setScoreLM(metric.getScoreLM() + minLMProba);
-                metric.setScoreLMW(metric.getScoreLMW() + minLMWProba);
+                metric.setScore(
+                        Score.LMN,
+                        metric.getScore(Score.LMN) + minLMProba);
+                metric.setScore(
+                        Score.LMWN,
+                        metric.getScore(Score.LMWN) + minLMWProba);
+                metric.setScore(
+                        Score.LMCN,
+                        metric.getScore(Score.LMCN) + minLMProba);
+                metric.setScore(
+                        Score.LMCWN,
+                        metric.getScore(Score.LMCWN) + minLMWProba);
             }
         }
     }

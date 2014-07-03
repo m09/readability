@@ -4,6 +4,7 @@ import com.google.common.collect.SetMultimap;
 import eu.crydee.ahocorasick.AhoCorasick;
 import eu.crydee.readability.uima.model.Mapped;
 import eu.crydee.readability.uima.model.Metadata;
+import eu.crydee.readability.uima.model.Score;
 import eu.crydee.readability.uima.res.ReadabilityDict;
 import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Revisions;
@@ -95,17 +96,12 @@ public class MapperAE extends JCasAnnotator_ImplBase {
             int width = mappedArray[mappedIndex].getKey().getTokens().size();
             Set<Entry<Mapped, Metadata>> revisedSet;
             if (limit != null) {
-                List<Entry<Mapped, Metadata>> a
-                        = getTop(revisedMap, Metadata::getScoreOcc, limit),
-                        b = getTop(revisedMap, Metadata::getScoreLM, limit),
-                        c = getTop(revisedMap, Metadata::getScoreLMN, limit),
-                        d = getTop(revisedMap, Metadata::getScoreLMW, limit),
-                        e = getTop(revisedMap, Metadata::getScoreLMWN, limit);
-                revisedSet = new HashSet<>(a);
-                revisedSet.addAll(b);
-                revisedSet.addAll(c);
-                revisedSet.addAll(d);
-                revisedSet.addAll(e);
+                List<List<Entry<Mapped, Metadata>>> tops = new ArrayList<>();
+                for (Score s : Score.values()) {
+                    tops.add(getTop(revisedMap, m -> m.getScore(s), limit));
+                }
+                revisedSet = new HashSet<>();
+                tops.forEach(top -> revisedSet.addAll(top));
             } else {
                 revisedSet = revisedMap.entrySet();
             }
@@ -123,12 +119,11 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 Revision revision = new Revision(jcas);
                 revision.setTokens(saToks);
                 revision.setCount(metrics.getCount());
-                revision.setScore(new DoubleArray(jcas, 5));
-                revision.setScore(0, metrics.getScoreOcc());
-                revision.setScore(1, metrics.getScoreLM());
-                revision.setScore(2, metrics.getScoreLMN());
-                revision.setScore(3, metrics.getScoreLMW());
-                revision.setScore(4, metrics.getScoreLMWN());
+                Score[] scores = Score.values();
+                revision.setScore(new DoubleArray(jcas, scores.length));
+                for (int i = 0; i < scores.length; i++) {
+                    revision.setScore(i, metrics.getScore(scores[i]));
+                }
                 revision.setText(mapped.getText());
                 revisions.setRevisions(k, revision);
             }
