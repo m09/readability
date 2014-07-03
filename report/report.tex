@@ -603,18 +603,17 @@ approaches.
 \section{Fine-grained readability analysis framework}
 \label{sec:framework}
 
-Having a parallel corpus available, the next question was how to
-properly investigate fine-grained readability by using it.
+Considering that automatic evaluation of readability rewriting and
+lexical enhancement is a very hard task, we then focused on producing
+a high quality testing environment to be able to quickly assess
+manually the quality of an approach. It was also the occasion to
+expose those results to other programs by creating a server that could
+easily be used by any other tool-chain.
 
-The first and most obvious use of such a resource is to perform
-lexical enhancements based on the one made in the \sew{} edits, in
-similar fashion to \cite{yatskar2010sake}.
-
-When working with noisy data and large corpora, properly estimating if
-a lexical mapping is worth anything, we propose a web demo so that an
-investigator can look up the effect of a mexical mapping system on any
-text quickly and efficiently \figureref{fig:ui} shows what the system
-looks like at the time of this writing.
+We used \href{http://www.playframework.com/}{Play Framework} and
+\href{https://facebook.github.io/react/}{React} to create a web client
+that satisfies the constraints exposed above. \figureref{fig:ui} shows
+an example usage.
 
 \begin{figure}[H]
   \centering
@@ -622,15 +621,6 @@ looks like at the time of this writing.
   \caption{\textsc{Readability Lab} interface}
   \label{fig:ui}
 \end{figure}
-
-Our answer
-
- any result derived from it. To properly do that, we
-went on and created a web demonstration of an effective visualization
-of transformations possible with the corpus.
-
-One of the major problems when trying to use such a dictionnary is to
-efficiently search for 
 
 \chapter{Open source contributions}
 \label{cha:oss-contribs}
