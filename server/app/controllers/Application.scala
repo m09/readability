@@ -2,6 +2,7 @@ package controllers
 
 import com.google.common.collect.TreeMultimap
 import eu.crydee.readability.uima.DictUsagePipeline
+import eu.crydee.readability.uima.model.Score
 import eu.crydee.readability.uima.ts.Revision
 import eu.crydee.readability.uima.ts.TxtRevisions
 import eu.crydee.readability.uima.ts.Revisions
@@ -114,6 +115,10 @@ object Application extends Controller {
     }
   }
 
+  implicit val scoreWrites = new Writes[Score] {
+    def writes(s: Score): JsValue = JsString(s.toString)
+  }
+
   def annotate = Action(parse.json) { request =>
     def work(data: String, ae: AnalysisEngine) = {
       val jcas = ae.newJCas()
@@ -145,6 +150,7 @@ object Application extends Controller {
         classOf[RewritingsLMWN])
       Ok(
         Json.obj(
+          "scores"      -> Json.toJson(Score.values),
           "text"        -> jcas.getDocumentText,
           "tokens"      -> tokens,
           "revisions"   -> JsObject(

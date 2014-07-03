@@ -1,6 +1,14 @@
 /** @jsx React.DOM */
 var ControlPane = React.createClass({
   render: function() {
+    var buttons = _.map(this.props.scores, function(s, i, l) {
+        return <button className={this.props.weight === i
+                           ? 'btn btn-default active'
+                           : 'btn btn-default'}
+      onClick={this.props.callbackWeight.bind(this, i)}>
+        {l[i]}
+      </button>;
+    }.bind(this));
     return (
         <section className="settings">
         <div className="row">
@@ -25,38 +33,9 @@ var ControlPane = React.createClass({
         </div>
         </div>
         <div className="col-sm-6">
-        Weight:&nbsp;
+        {_.isEmpty(buttons) ? "" : "Weight: "}
         <div className="btn-group btn-group-xs">
-        <button className={this.props.weight === 0
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, 0)}>
-        Occ
-      </button>
-        <button className={this.props.weight === 1
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, 1)}>
-        LMN
-      </button>
-        <button className={this.props.weight === 2
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, 2)}>
-        LMWN
-      </button>
-        <button className={this.props.weight === 3
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, 3)}>
-        LMCN
-      </button>
-        <button className={this.props.weight === 4
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, 4)}>
-        LMCWN
-      </button>
+        {buttons}
         </div>
         </div>
         </div>

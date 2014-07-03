@@ -150,6 +150,14 @@ var Mapping = React.createClass({displayName: 'Mapping',
 /** @jsx React.DOM */
 var ControlPane = React.createClass({displayName: 'ControlPane',
   render: function() {
+    var buttons = _.map(this.props.scores, function(s, i, l) {
+        return React.DOM.button( {className:this.props.weight === i
+                           ? 'btn btn-default active'
+                           : 'btn btn-default',
+      onClick:this.props.callbackWeight.bind(this, i)}, 
+        l[i]
+      );
+    }.bind(this));
     return (
         React.DOM.section( {className:"settings"}, 
         React.DOM.div( {className:"row"}, 
@@ -174,38 +182,9 @@ var ControlPane = React.createClass({displayName: 'ControlPane',
         )
         ),
         React.DOM.div( {className:"col-sm-6"}, 
-        "Weight: ",
+        _.isEmpty(buttons) ? "" : "Weight: ",
         React.DOM.div( {className:"btn-group btn-group-xs"}, 
-        React.DOM.button( {className:this.props.weight === 0
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, 0)}, 
-        "Occ"
-      ),
-        React.DOM.button( {className:this.props.weight === 1
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, 1)}, 
-        "LMN"
-      ),
-        React.DOM.button( {className:this.props.weight === 2
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, 2)}, 
-        "LMWN"
-      ),
-        React.DOM.button( {className:this.props.weight === 3
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, 3)}, 
-        "LMCN"
-      ),
-        React.DOM.button( {className:this.props.weight === 4
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, 4)}, 
-        "LMCWN"
-      )
+        buttons
         )
         )
         )
@@ -380,6 +359,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
     return {
       data: {
         noisy: {
+          scores: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -387,6 +367,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
           rewritings: []
         },
         filtered: {
+          scores: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -442,6 +423,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
             ControlPane(
             {weight:this.state.weight,
             corpus:this.state.corpus,
+            scores:this.state.data[this.state.corpus].scores,
             callbackWeight:this.controlCallbackWeight,
             callbackCorpus:this.controlCallbackCorpus}),
             React.DOM.ul( {className:"nav nav-tabs nav-justified"}, 

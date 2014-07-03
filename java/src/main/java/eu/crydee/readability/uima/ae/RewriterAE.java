@@ -39,9 +39,9 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         process(jcas, RewritingsOcc.class, 0, new LogWeight());
         process(jcas, RewritingsLM.class, 1, new LogWeight());
-        process(jcas, RewritingsLMN.class, 2, new ProbaWeight());
+        process(jcas, RewritingsLMN.class, 2, new LogWeight());
         process(jcas, RewritingsLMW.class, 3, new LogWeight());
-        process(jcas, RewritingsLMWN.class, 4, new ProbaWeight());
+        process(jcas, RewritingsLMWN.class, 4, new LogWeight());
     }
 
     private void process(

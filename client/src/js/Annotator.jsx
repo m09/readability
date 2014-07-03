@@ -4,6 +4,7 @@ var Annotator = React.createClass({
     return {
       data: {
         noisy: {
+          scores: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -11,6 +12,7 @@ var Annotator = React.createClass({
           rewritings: []
         },
         filtered: {
+          scores: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -66,6 +68,7 @@ var Annotator = React.createClass({
             <ControlPane
             weight={this.state.weight}
             corpus={this.state.corpus}
+            scores={this.state.data[this.state.corpus].scores}
             callbackWeight={this.controlCallbackWeight}
             callbackCorpus={this.controlCallbackCorpus}/>
             <ul className="nav nav-tabs nav-justified">
