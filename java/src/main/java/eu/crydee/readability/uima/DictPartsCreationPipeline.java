@@ -18,10 +18,8 @@ public class DictPartsCreationPipeline {
             AnalysisEngineProcessException,
             ResourceAccessException {
         AggregateBuilder b = new AggregateBuilder();
-        addAE(b, "file:out/res/fullPos.xml", "out/res/parts/pos/full");
-        addAE(b, "file:out/res/fullTxt.xml", "out/res/parts/txt/full");
-        addAE(b, "file:out/res/filteredPos.xml", "out/res/parts/pos/filtered");
-        addAE(b, "file:out/res/filteredTxt.xml", "out/res/parts/txt/filtered");
+        addAE(b, "file:out/res/fullTxt.xml", "out/res/parts/full");
+        addAE(b, "file:out/res/filteredTxt.xml", "out/res/parts/filtered");
         b.createAggregate().collectionProcessComplete();
     }
 
