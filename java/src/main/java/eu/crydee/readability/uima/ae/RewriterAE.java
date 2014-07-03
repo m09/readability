@@ -1,7 +1,6 @@
 package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.uima.model.LogWeight;
-import eu.crydee.readability.uima.model.ProbaWeight;
 import eu.crydee.readability.uima.model.Transducer;
 import eu.crydee.readability.uima.model.Transducer.Span;
 import eu.crydee.readability.uima.model.Weight;
