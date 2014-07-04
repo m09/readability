@@ -1,21 +1,17 @@
 package eu.crydee.readability.uima.ae;
 
 import eu.crydee.readability.uima.model.LogWeight;
+import eu.crydee.readability.uima.model.Score;
 import eu.crydee.readability.uima.model.Transducer;
 import eu.crydee.readability.uima.model.Transducer.Span;
 import eu.crydee.readability.uima.model.Weight;
+import eu.crydee.readability.uima.ts.AllRewritings;
 import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Rewriting;
 import eu.crydee.readability.uima.ts.RewritingSpan;
 import eu.crydee.readability.uima.ts.Rewritings;
-import eu.crydee.readability.uima.ts.RewritingsLMn;
-import eu.crydee.readability.uima.ts.RewritingsLMwn;
-import eu.crydee.readability.uima.ts.RewritingsLMcn;
-import eu.crydee.readability.uima.ts.RewritingsLMcwn;
-import eu.crydee.readability.uima.ts.RewritingsOcc;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.uima.UIMAFramework;
@@ -24,7 +20,6 @@ import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
-import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
 public class RewriterAE extends JCasAnnotator_ImplBase {
@@ -36,16 +31,25 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        process(jcas, RewritingsOcc.class, 0, new LogWeight());
-        process(jcas, RewritingsLMn.class, 1, new LogWeight());
-        process(jcas, RewritingsLMwn.class, 2, new LogWeight());
-        process(jcas, RewritingsLMcn.class, 3, new LogWeight());
-        process(jcas, RewritingsLMcwn.class, 4, new LogWeight());
+        int size = Score.values().length;
+        AllRewritings ar = new AllRewritings(
+                jcas,
+                0,
+                jcas.getDocumentText().length());
+        ar.setAllRewritings(new FSArray(jcas, size));
+        for (int i = 0; i < size; ++i) {
+            process(jcas, ar, 0, new LogWeight());
+            process(jcas, ar, 1, new LogWeight());
+            process(jcas, ar, 2, new LogWeight());
+            process(jcas, ar, 3, new LogWeight());
+            process(jcas, ar, 4, new LogWeight());
+        }
+        ar.addToIndexes();
     }
 
     private void process(
             JCas jcas,
-            Class<? extends Rewritings> rewritingsClass,
+            AllRewritings ar,
             int scoreIndex,
             Weight weight)
             throws AnalysisEngineProcessException {
@@ -74,23 +78,7 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
         }
         Set<Entry<Double, Span[]>> topRewritings
                 = transitions.top(LIMIT).entries();
-        Rewritings rewritings;
-        try {
-            rewritings = rewritingsClass
-                    .getConstructor(JCas.class, int.class, int.class)
-                    .newInstance(jcas, 0, txtLength);
-        } catch (NoSuchMethodException |
-                SecurityException |
-                InstantiationException |
-                IllegalAccessException |
-                IllegalArgumentException |
-                InvocationTargetException ex) {
-            logger.log(
-                    Level.SEVERE,
-                    "couldn't create Rewritings annotation.",
-                    ex);
-            throw new AnalysisEngineProcessException(ex);
-        }
+        Rewritings rewritings = new Rewritings(jcas, 0, txtLength);
         rewritings.setRewritings(new FSArray(jcas, topRewritings.size()));
         int j = 0;
         for (Entry<Double, Span[]> e : topRewritings) {
@@ -107,6 +95,6 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
             }
             rewritings.setRewritings(j++, r);
         }
-        rewritings.addToIndexes();
+        ar.setAllRewritings(scoreIndex, rewritings);
     }
 }

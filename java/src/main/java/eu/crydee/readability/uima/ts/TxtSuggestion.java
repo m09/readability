@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Mon Jun 23 12:39:02 JST 2014 */
+/* First created by JCasGen Fri Jul 04 14:40:28 JST 2014 */
 package eu.crydee.readability.uima.ts;
 
 import org.apache.uima.jcas.JCas; 
@@ -10,7 +10,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 
 /** 
- * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
+ * Updated by JCasGen Fri Jul 04 14:40:28 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
 public class TxtSuggestion extends Suggestion {

@@ -3,17 +3,13 @@ package controllers
 import com.google.common.collect.TreeMultimap
 import eu.crydee.readability.uima.DictUsagePipeline
 import eu.crydee.readability.uima.model.Score
+import eu.crydee.readability.uima.ts.AllRewritings
 import eu.crydee.readability.uima.ts.Revision
 import eu.crydee.readability.uima.ts.TxtRevisions
 import eu.crydee.readability.uima.ts.Revisions
 import eu.crydee.readability.uima.ts.Rewriting
 import eu.crydee.readability.uima.ts.RewritingSpan
 import eu.crydee.readability.uima.ts.Rewritings
-import eu.crydee.readability.uima.ts.RewritingsOcc
-import eu.crydee.readability.uima.ts.RewritingsLM
-import eu.crydee.readability.uima.ts.RewritingsLMN
-import eu.crydee.readability.uima.ts.RewritingsLMW
-import eu.crydee.readability.uima.ts.RewritingsLMWN
 import eu.crydee.readability.uima.ts.Suggestion
 import eu.crydee.readability.uima.ts.Token
 import eu.crydee.readability.uima.ts.TxtSuggestion
@@ -115,6 +111,15 @@ object Application extends Controller {
     }
   }
 
+  implicit val allRewritingsWrites = new Writes[AllRewritings] {
+    def writes(allRewritings: AllRewritings): JsValue = {
+      val s = allRewritings.getAllRewritings.size
+      JsArray(
+        (0 until s) map (i => Json.toJson(allRewritings.getAllRewritings(i)))
+      )
+    }
+  }
+
   implicit val scoreWrites = new Writes[Score] {
     def writes(s: Score): JsValue = JsString(s.toString)
   }
@@ -133,21 +138,9 @@ object Application extends Controller {
       val txtRevisions: Iterable[Revisions] = JCasUtil.select(
         jcas,
         classOf[TxtRevisions])
-      val rewritingsOcc: Rewritings = JCasUtil.selectSingle(
+      val allRewritings: AllRewritings = JCasUtil.selectSingle(
         jcas,
-        classOf[RewritingsOcc])
-      val rewritingsLM: Rewritings = JCasUtil.selectSingle(
-        jcas,
-        classOf[RewritingsLM])
-      val rewritingsLMN: Rewritings = JCasUtil.selectSingle(
-        jcas,
-        classOf[RewritingsLMN])
-      val rewritingsLMW: Rewritings = JCasUtil.selectSingle(
-        jcas,
-        classOf[RewritingsLMW])
-      val rewritingsLMWN: Rewritings = JCasUtil.selectSingle(
-        jcas,
-        classOf[RewritingsLMWN])
+        classOf[AllRewritings])
       Ok(
         Json.obj(
           "scores"      -> Json.toJson(Score.values),
@@ -159,13 +152,7 @@ object Application extends Controller {
             )
           ),
           "annotations" -> Json.toJson(txtSuggs),
-          "rewritings" -> Json.arr(
-            rewritingsOcc,
-            rewritingsLM,
-            rewritingsLMN,
-            rewritingsLMW,
-            rewritingsLMWN
-          )
+          "rewritings" -> Json.toJson(allRewritings)
         )
       ).withHeaders(headers : _*)
     }

@@ -6,6 +6,19 @@
     <vendor/>
     <types>
         <typeDescription>
+            <name>eu.crydee.readability.uima.ts.AllRewritings</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>allRewritings</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                    <elementType>eu.crydee.readability.uima.ts.Rewritings</elementType>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
             <name>eu.crydee.readability.uima.ts.Rewritings</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
@@ -17,31 +30,6 @@
                     <elementType>eu.crydee.readability.uima.ts.Rewriting</elementType>
                 </featureDescription>
             </features>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsOcc</name>
-            <description/>
-            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMn</name>
-            <description/>
-            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMwn</name>
-            <description/>
-            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMcn</name>
-            <description/>
-            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
-        </typeDescription>
-        <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMcwn</name>
-            <description/>
-            <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>
         <typeDescription>
             <name>eu.crydee.readability.uima.ts.RewritingSpan</name>
