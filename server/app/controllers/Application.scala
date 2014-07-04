@@ -189,7 +189,7 @@ object Application extends Controller {
 
   def headers = List(
     "Access-Control-Allow-Origin" -> "*",
-    "Access-Control-Allow-Methods" -> "POST",
+    "Access-Control-Allow-Methods" -> "OPTIONS, POST",
     "Access-Control-Max-Age" -> "360",
     "Access-Control-Allow-Headers" -> "Origin, Content-Type, Accept"
   )
