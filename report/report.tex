@@ -254,23 +254,29 @@ works.
 
 Readability assessment can be seen as a supervised classification
 task. To predict the required grade to understand a given input text,
-\cite{callanlanguage} use a unigram language model of each target
+\cite{collins2004language} use a unigram language model of each target
 grade in order to see which one is the most likely to generate the
 input.
 
 \cite{schwarm2005reading} improve on this approach by using a trigram
 model instead of a unigram model. They also incorporate classical
 readability features by using a SVM with the perplexity scores of the
-language models as features along with readability scores in various
-formulas and syntactic features.
+language models as features along with readability formula scores and
+various syntactic features.
 
-In 2008, Pitler and Nenkova conduct a study where they use complex
-features to measure the possible improvements yet to achieve in
-machine learning approached \cite{pitler2008revisiting}. Those include
-discourse relations, entity coherence, syntactic and lexical
-features. They notice possible improvements but conclude that until
-robust automatic method to obtain those metrics exist, it is unlikely
-that those improvements will be usable in a large scale system.
+In 2008, Pitler and Nenkova conduct a study where they further
+investigate the use of complex features to feed machine learning
+readability approaches \cite{pitler2008revisiting}. They study
+features such as discourse relations and entity coherence together
+with advanced syntactic and lexical features. They notice possible
+improvements but conclude that until robust automatic method to obtain
+the more advanced features exist, it is unlikely that people will
+succeed in using them in a large scale, automated system.
+
+With machine learning approaches becoming successful, gathering data
+became a crucial point of readability research. In the next section we
+see how researchers have used \wiki{} to conduct their machine
+learning research in readability.
 
 \section{Readability research using \wiki}
 \label{sec:wiki-approaches}
@@ -321,9 +327,9 @@ A timeline of the work done finishes this introduction:
 Machine learning approaches are used more and more and in a wide range
 of scientific domains for their effectiveness. Most of the time, the
 more data you have, the best your results will be, up to an extent
-that people to described data efficiency as “unreasonable”
+that people described data efficiency as “unreasonable”
 \cite{halevy2009unreasonable}. In this context, it seems that being
-able to gather automatically data is of utmost importance. Moreover,
+able to automatically gather data is of utmost importance. Moreover,
 raw data is often not enough. Most techniques require a lengthy and
 costly annotation process. For this reason, researchers in every
 domain using machine learning invest time finding clever techniques to
@@ -470,7 +476,7 @@ With this corpus at our disposal, we next define a way to use it as a
 lexical dictionary. The goal is to allow authors to pick simpler words
 than the ones they used, in an efficient manner. In what follows, we
 will denote multiset of all rewritings of $x$ in $y$ in $\mathcal{D}$
-by $x \maps{D} y$ a,d we will use $\_$ as a wildcard to denote any
+by $x \maps{D} y$ and we will use $\_$ as a wildcard to denote any
 word.
 
 The first approach and the most basic one, given a dictionary
@@ -578,7 +584,7 @@ The scores $\mathcal{S}_{LM}$ and $\mathcal{S}_{LMc}$ already have
 nice qualities to model different definitions of good rewritings. But
 as they stand, the lengthier the word being rewritten, the better the
 score of its rewriting, almost regardless of whether or not the
-rewriting is a good lexical rewriting or not. This happens because the
+rewriting is a good lexical rewriting. This happens because the
 language model probability of a $(n+1)$-gram is almost always an order
 of magnitude lower than the language model probability of a
 $n$-gram.
@@ -652,8 +658,8 @@ follows the common definition used by \cite{mohri2004weighted}: $T =
 \item $E \subseteq Q \times (\Sigma \cup \{\varepsilon\}) \times
   (\Delta \cup \{\varepsilon\}) \times \mathbb{K} \times Q$ a finite
   set of transitions;
-\item $λ : I \rightarrow \mathbb{K}$ the initial weight function;
-\item $ρ : F \rightarrow \mathbb{K}$ the final weight function mapping
+\item $\lambda : I \rightarrow \mathbb{K}$ the initial weight function;
+\item $\rho : F \rightarrow \mathbb{K}$ the final weight function mapping
   $F$ to $\mathbb{K}$.
 \end{itemize}
 Such a transducer over a semi-ring $(\mathbb{K}, \oplus, \otimes,
@@ -672,8 +678,8 @@ score we use, $\mathbb{K}$ being the set of the semi-ring:
 \item $E = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
     \land w = t_i \land p_w = p_i \land s = \mathcal{S}\left(\ t_i
       \maps{D} r \right)\right\}$;
-\item $I : x \mapsto \mathbb{1}$;
-\item $F : x \mapsto \mathbb{1}$.
+\item $\lambda : x \mapsto \mathbb{1}$;
+\item $\rho : x \mapsto \mathbb{1}$.
 \end{itemize}
 Now, we can define semi-rings to use with the constructed
 transducer. We mainly consider two use-cases, each of them requiring a
@@ -694,10 +700,11 @@ different semi-ring:
 \end{figure}
 
 The motivation for the second use-case is maybe not clear at
-first. The reason for its existence is that, even for a very long
-text, a top 100 of the rewritings might very well return 100 different
-single token modifications while we would want to see the complete
-text rewritten at once at a certain level of confidence.
+first. The reason it needs to be separated from use-case (1.) is that,
+even for a very long text, the top 100 scores of the rewritings will
+likely correspond to 100 different single token modifications.  while we
+would want to see the complete text rewritten at once at a certain
+level of confidence.
 
 We define the semi-rings in \tableref{tab:semi-rings} for the
 $S_{OCC}$ score function. The Negative MaxMin semi-ring allows us to
@@ -709,6 +716,8 @@ probabilities.
 
 \begin{table}[H]
   \centering
+  \caption{Interesting semi-rings for our score functions, where
+    $a +_{\log} b = \log\left(e^a + e^b\right)$}
   \begin{tabular}{rccccc}
     \toprule
     Semiring & $\mathbb{K}$ & $\oplus$ & $\otimes$ & $\mathbb{0}$ & $\mathbb{1}$
@@ -717,8 +726,6 @@ probabilities.
     Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+_{\log}$ & $+$ & $-\infty$ & $0$ \\
     Negative MaxMin & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\max$ & $\min$ & $-\infty$ & $0$ \\
   \end{tabular}
-  \caption{Interesting semi-rings for our score functions, where
-    $a +_{\log} b = \log\left(e^a + e^b\right)$}
   \label{tab:semi-rings}
 \end{table}
 
