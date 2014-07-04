@@ -6,8 +6,6 @@ import eu.crydee.readability.uima.cr.CurrentCR;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.util.Optional;
-import opennlp.uima.postag.POSModelResourceImpl;
-import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
@@ -48,7 +46,7 @@ public class FrequencyCreationPipeline {
                             Sentence.class,
                             Token.class),
                     LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                    "out/lm/tmp/txt",
+                    "out/lm/tmp",
                     LanguageModelMakerAE.PARAM_OUT_FILE,
                     "out/lm/txt",
                     LanguageModelMakerAE.PARAM_SKIP_EXTRACTION,
@@ -71,11 +69,6 @@ public class FrequencyCreationPipeline {
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
                         "file:opennlp/uima/models/en-sent.bin");
-
-        ExternalResourceDescription posModel
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        POSModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-pos-maxent.bin");
 
         /* Collection reader */
         CollectionReaderDescription crd;
@@ -121,18 +114,6 @@ public class FrequencyCreationPipeline {
                         "opennlp.uima.TokenType",
                         Token.class.getCanonicalName());
 
-        AnalysisEngineDescription tagger
-                = AnalysisEngineFactory.createEngineDescription(
-                        POSTagger.class,
-                        "opennlp.uima.ModelName",
-                        posModel,
-                        "opennlp.uima.SentenceType",
-                        Sentence.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
-                        Token.class.getCanonicalName(),
-                        "opennlp.uima.POSFeature",
-                        "POS");
-
         AnalysisEngineDescription lmMakerTxt
                 = AnalysisEngineFactory.createEngineDescription(
                         LanguageModelMakerAE.class,
@@ -141,23 +122,9 @@ public class FrequencyCreationPipeline {
                         LanguageModelMakerAE.PARAM_TOKEN_TYPE,
                         Token.class.getCanonicalName(),
                         LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                        "out/lm/tmp/txt",
+                        "out/lm/tmp",
                         LanguageModelMakerAE.PARAM_OUT_FILE,
                         "out/lm/txt");
-
-        AnalysisEngineDescription lmMakerPos
-                = AnalysisEngineFactory.createEngineDescription(
-                        LanguageModelMakerAE.class,
-                        LanguageModelMakerAE.PARAM_SENTENCE_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        LanguageModelMakerAE.PARAM_TOKEN_TYPE,
-                        Token.class.getCanonicalName(),
-                        LanguageModelMakerAE.PARAM_TOKEN_FEATURE,
-                        "POS",
-                        LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                        "out/lm/tmp/pos",
-                        LanguageModelMakerAE.PARAM_OUT_FILE,
-                        "out/lm/pos");
 
         AggregateBuilder builder = new AggregateBuilder(
                 null,
@@ -171,11 +138,7 @@ public class FrequencyCreationPipeline {
                 CAS.NAME_DEFAULT_SOFA, text);
         builder.add(tokenizer,
                 CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(tagger,
-                CAS.NAME_DEFAULT_SOFA, text);
         builder.add(lmMakerTxt,
-                CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(lmMakerPos,
                 CAS.NAME_DEFAULT_SOFA, text);
 
         SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
