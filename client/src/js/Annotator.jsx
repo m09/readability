@@ -33,18 +33,24 @@ var Annotator = React.createClass({
       if (this.state.fetched[corpus]) return;
     } else this.setState({ fetched: { noisy: false, filtered: false } });
     this.setState({lastText: text});
+    var overlay = jQuery('<div id="overlay">' +
+          '<img id="loading" src="img/ajax-loader.gif">' +
+          '</div>');
+    overlay.appendTo(jQuery(this.refs.container.getDOMNode()));
     jQuery.ajax({
       type: 'POST',
       url: this.props.url,
       contentType: 'application/json; charset=UTF-8',
       data: JSON.stringify({ data: text, dict: corpus })
-    }).done(function(data) {
+    }).done(function(overlay, data) {
+      console.log(overlay);
       var dataMergeable = jQuery.extend({}, this.state.data);
       dataMergeable[corpus] = data;
       var fetchedMergeable = jQuery.extend({}, this.state.fetched);
       fetchedMergeable[corpus] = true;
       this.setState( { data: dataMergeable, fetched: fetchedMergeable } );
-    }.bind(this));
+      overlay.remove();
+    }.bind(this, overlay));
   },
   controlCallbackWeight: function(weight) {
     this.setState({weight: weight});
@@ -64,7 +70,7 @@ var Annotator = React.createClass({
     this.setState({tab: tab});
   },
   render: function() {
-    return (<section className="container" style={{minHeight: "300px"}}>
+    return (<section ref="container" className="container" style={{minHeight: "300px"}}>
             <ControlPane
             weight={this.state.weight}
             corpus={this.state.corpus}
