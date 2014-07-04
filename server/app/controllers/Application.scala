@@ -39,12 +39,8 @@ case object Filtered extends Dict
 
 object Application extends Controller {
 
-  private val aeN = DictUsagePipeline buildAe(
-    "file:data/fullTxt.xml",
-    false)
-  private val aeF = DictUsagePipeline buildAe(
-    "file:data/filteredTxt.xml",
-    false)
+  private val aeN = DictUsagePipeline buildAe(false, false)
+  private val aeF = DictUsagePipeline buildAe(true, false)
 
   implicit val inputReads: Reads[Input] = (
     (JsPath \ "data").read[String] and

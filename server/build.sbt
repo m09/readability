@@ -1,4 +1,4 @@
-name := "server"
+name := "readability-server"
 
 version := "1.0-SNAPSHOT"
 

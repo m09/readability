@@ -1,0 +1,1 @@
+web: target/universal/stage/bin/readability-server -Dhttp.port=${PORT}

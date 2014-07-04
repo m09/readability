@@ -29,6 +29,7 @@ indented.xml
 /server/project/target
 /server/target
 /transducers
+/uima-server/out
 /docear
 /report/auto
 /report/*.aux

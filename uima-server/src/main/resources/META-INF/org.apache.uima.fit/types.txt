@@ -1,0 +1,1 @@
+classpath*:eu/crydee/readability/uima/ts/*.xml
