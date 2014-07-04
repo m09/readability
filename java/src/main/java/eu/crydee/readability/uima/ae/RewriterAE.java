@@ -1,15 +1,16 @@
 package eu.crydee.readability.uima.ae;
 
-import eu.crydee.readability.uima.model.LogWeight;
 import eu.crydee.readability.uima.model.Score;
+import eu.crydee.readability.uima.model.Semiring;
 import eu.crydee.readability.uima.model.Transducer;
 import eu.crydee.readability.uima.model.Transducer.Span;
 import eu.crydee.readability.uima.model.Weight;
-import eu.crydee.readability.uima.ts.AllRewritings;
+import eu.crydee.readability.uima.ts.RewritingsByScoreThenSemiring;
 import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Rewriting;
 import eu.crydee.readability.uima.ts.RewritingSpan;
 import eu.crydee.readability.uima.ts.Rewritings;
+import eu.crydee.readability.uima.ts.RewritingsBySemiring;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
 import java.util.Map.Entry;
@@ -31,28 +32,32 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
 
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        int size = Score.values().length;
-        AllRewritings ar = new AllRewritings(
+        int scoreSize = Score.values().length,
+                semiringSize = Semiring.values().length;
+        RewritingsByScoreThenSemiring rbsts = new RewritingsByScoreThenSemiring(
                 jcas,
                 0,
                 jcas.getDocumentText().length());
-        ar.setAllRewritings(new FSArray(jcas, size));
-        for (int i = 0; i < size; ++i) {
-            process(jcas, ar, 0, new LogWeight());
-            process(jcas, ar, 1, new LogWeight());
-            process(jcas, ar, 2, new LogWeight());
-            process(jcas, ar, 3, new LogWeight());
-            process(jcas, ar, 4, new LogWeight());
+        rbsts.setRewritingsByScoreThenSemiring(new FSArray(jcas, scoreSize));
+        for (int i = 0; i < scoreSize; ++i) {
+            RewritingsBySemiring rbs = new RewritingsBySemiring(jcas);
+            rbs.setRewritingsBySemiring(new FSArray(jcas, semiringSize));
+            for (int j = 0; j < semiringSize; ++j) {
+                rbs.setRewritingsBySemiring(
+                        j,
+                        process(jcas, i, j));
+            }
+            rbsts.setRewritingsByScoreThenSemiring(i, rbs);
         }
-        ar.addToIndexes();
+        rbsts.addToIndexes();
     }
 
-    private void process(
+    private Rewritings process(
             JCas jcas,
-            AllRewritings ar,
             int scoreIndex,
-            Weight weight)
+            int semiringIndex)
             throws AnalysisEngineProcessException {
+        Weight weight = Semiring.values()[semiringIndex];
         Transducer transitions = new Transducer(weight);
         int previousEnd = 0, txtLength = jcas.getDocumentText().length();
         for (Token token : JCasUtil.select(jcas, Token.class)) {
@@ -95,6 +100,6 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
             }
             rewritings.setRewritings(j++, r);
         }
-        ar.setAllRewritings(scoreIndex, rewritings);
+        return rewritings;
     }
 }

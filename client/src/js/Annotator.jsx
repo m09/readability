@@ -5,6 +5,7 @@ var Annotator = React.createClass({
       data: {
         noisy: {
           scores: [],
+          semirings: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -13,6 +14,7 @@ var Annotator = React.createClass({
         },
         filtered: {
           scores: [],
+          semirings: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -21,6 +23,7 @@ var Annotator = React.createClass({
         }
       },
       weight: 0,
+      semiring: 0,
       corpus: 'filtered',
       tab: 'input',
       lastText: "",
@@ -43,7 +46,6 @@ var Annotator = React.createClass({
       contentType: 'application/json; charset=UTF-8',
       data: JSON.stringify({ data: text, dict: corpus })
     }).done(function(overlay, data) {
-      console.log(overlay);
       var dataMergeable = jQuery.extend({}, this.state.data);
       dataMergeable[corpus] = data;
       var fetchedMergeable = jQuery.extend({}, this.state.fetched);
@@ -52,15 +54,20 @@ var Annotator = React.createClass({
       overlay.remove();
     }.bind(this, overlay));
   },
-  controlCallbackWeight: function(weight) {
-    this.setState({weight: weight});
+  controlCallbackWeight: function(e) {
+    this.setState({weight: e.target.options.selectedIndex});
   },
-  controlCallbackCorpus: function(corpus) {
+  controlCallbackCorpus: function(e) {
+    var index = e.target.options.selectedIndex;
+    var corpus = e.target.options[index].value;
     this.setState({corpus: corpus});
     if (this.state.tab === 'analysis'
         || this.state.tab === 'rewritings') {
       this.fetchData(corpus);
     }
+  },
+  controlCallbackSemiring: function(e) {
+    this.setState({semiring: e.target.options.selectedIndex});
   },
   activateOutputTab: function(tab) {
     this.fetchData(this.state.corpus);
@@ -75,8 +82,11 @@ var Annotator = React.createClass({
             weight={this.state.weight}
             corpus={this.state.corpus}
             scores={this.state.data[this.state.corpus].scores}
+            semirings={this.state.data[this.state.corpus].semirings}
             callbackWeight={this.controlCallbackWeight}
-            callbackCorpus={this.controlCallbackCorpus}/>
+            callbackCorpus={this.controlCallbackCorpus}
+            callbackSemiring={this.controlCallbackSemiring}
+            tab={this.state.tab}/>
             <ul className="nav nav-tabs nav-justified">
             <li className={this.state.tab === 'input' ? 'active' : ''}>
             <a href="#"
@@ -114,6 +124,7 @@ var Annotator = React.createClass({
                     : false}/>
             <RewritingsPane id="rewritings"
             weight={this.state.weight}
+            semiring={this.state.semiring}
             data={this.state.corpus === 'noisy'
                   ? this.state.data.noisy
                   : this.state.data.filtered}

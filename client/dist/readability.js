@@ -150,42 +150,38 @@ var Mapping = React.createClass({displayName: 'Mapping',
 /** @jsx React.DOM */
 var ControlPane = React.createClass({displayName: 'ControlPane',
   render: function() {
-    var buttons = _.map(this.props.scores, function(s, i, l) {
-        return React.DOM.button( {className:this.props.weight === i
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackWeight.bind(this, i)}, 
-        l[i]
-      );
+    var optionsWeight = _.map(this.props.scores, function(s) {
+        return React.DOM.option(null, s);
+    }.bind(this));
+    var optionsSR = _.map(this.props.semirings, function(s) {
+        return React.DOM.option(null, s);
     }.bind(this));
     return (
         React.DOM.section( {className:"settings"}, 
         React.DOM.div( {className:"row"}, 
-        React.DOM.div( {className:"col-sm-2"}, 
+        React.DOM.div( {className:"col-sm-3"}, 
         "Settings:"
       ),
-        React.DOM.div( {className:"col-sm-4"}, 
+        React.DOM.div( {className:"col-sm-3"}, 
         "Corpus: ",
-        React.DOM.div( {className:"btn-group btn-group-xs"}, 
-        React.DOM.button( {className:this.props.corpus === 'filtered'
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackCorpus.bind(null, 'filtered')}, 
-        "Filtered"
-      ),
-        React.DOM.button( {className:this.props.corpus === 'noisy'
-                           ? 'btn btn-default active'
-                           : 'btn btn-default',
-      onClick:this.props.callbackCorpus.bind(null, 'noisy')}, 
-        "Noisy"
-      )
+        React.DOM.select( {onChange:this.props.callbackCorpus}, 
+        React.DOM.option( {value:"filtered"}, "Filtered"),
+        React.DOM.option( {value:"noisy"}, "Noisy")
         )
         ),
-        React.DOM.div( {className:"col-sm-6"}, 
-        _.isEmpty(buttons) ? "" : "Weight: ",
-        React.DOM.div( {className:"btn-group btn-group-xs"}, 
-        buttons
-        )
+        React.DOM.div( {className:"col-sm-3"}, 
+        (_.isEmpty(optionsWeight) || this.props.tab === 'input') ? "" : [
+          "Weight: ",
+            React.DOM.select( {onChange:this.props.callbackWeight}, ",",
+          optionsWeight
+          )]
+        ),
+        React.DOM.div( {className:"col-sm-3"}, 
+        (this.props.tab !== 'rewritings' || _.isEmpty(optionsSR)) ? "" : [
+          "Semiring: ",
+            React.DOM.select( {onChange:this.props.callbackSemiring}, ",",
+          optionsSR
+          )]
         )
         )
         )
@@ -303,54 +299,57 @@ var OutputPane = React.createClass({displayName: 'OutputPane',
 
 /** @jsx React.DOM */
 var RewritingsPane = React.createClass({displayName: 'RewritingsPane',
-    toRows: function(tops, revs, text) {
-        var output = [];
-        _.map(tops, function(top) {
-            var p = 0;
-            var rewritten = [];
-            _.each(top.revisions, function(r) {
-                var rev = revs[r.revisionsId][r.revisionsIndex];
-                if (r.begin > p) {
-                    rewritten.push(
-                        React.DOM.span(null, htmlForTextWithEmbeddedNewlines(
-                          text.substring(p, r.begin))));
-                }
-                rewritten.push(
-                    React.DOM.span( {className:"text-primary",
-                          style:{textDecoration: "underline"}}, 
-                        htmlForTextWithEmbeddedNewlines(rev.text)
-                    ));
-                p = r.end;
-            }.bind(this));
-            if (p < text.length - 1) {
-                rewritten = rewritten.concat(htmlForTextWithEmbeddedNewlines(
-                  text.substring(p, text.length)));
-            }
-            output.push(React.DOM.tr(null, React.DOM.td(null, top.score),React.DOM.td(null, rewritten)));
-        }.bind(this));
-        return output;
-    },
-    render: function() {
-        var revs = this.props.data.revisions;
-        var rewritings = this.props.data.rewritings[this.props.weight];
-        var text = this.props.data.text;
-        var rows = this.toRows(rewritings, revs, text);
-        return (React.DOM.section( {id:this.props.id, className:this.props.active
-                                                         ? "tab-pane active"
-                                                         : "tab-pane"}, 
-                React.DOM.table( {className:"table table-striped table-condensed"}, 
-                React.DOM.thead(null, 
-                React.DOM.tr(null, 
-                React.DOM.th(null, "Score"),
-                React.DOM.th(null, "Rewriting")
-                )
-                ),
-                React.DOM.tbody(null, 
-                rows
-                )
-                )
-                ));
+  toRows: function(tops, revs, text) {
+    var output = [];
+    _.map(tops, function(top) {
+      var p = 0;
+      var rewritten = [];
+      _.each(top.revisions, function(r) {
+        var rev = revs[r.revisionsId][r.revisionsIndex];
+        if (r.begin > p) {
+          rewritten.push(
+              React.DOM.span(null, htmlForTextWithEmbeddedNewlines(
+                text.substring(p, r.begin))));
+        }
+        rewritten.push(
+            React.DOM.span( {className:"text-primary",
+          style:{textDecoration: "underline"}}, 
+            htmlForTextWithEmbeddedNewlines(rev.text)
+          ));
+        p = r.end;
+      }.bind(this));
+      if (p < text.length - 1) {
+        rewritten = rewritten.concat(htmlForTextWithEmbeddedNewlines(
+          text.substring(p, text.length)));
+      }
+      output.push(React.DOM.tr(null, React.DOM.td(null, top.score),React.DOM.td(null, rewritten)));
+    }.bind(this));
+    return output;
+  },
+  render: function() {
+    if (_.isEmpty(this.props.data.rewritings)) {
+      return React.DOM.section(null);
     }
+    var revs = this.props.data.revisions;
+    var rewritings = this.props.data.rewritings[this.props.weight][this.props.semiring];
+    var text = this.props.data.text;
+    var rows = this.toRows(rewritings, revs, text);
+    return (React.DOM.section( {id:this.props.id, className:this.props.active
+                                                   ? "tab-pane active"
+                                                   : "tab-pane"}, 
+            React.DOM.table( {className:"table table-striped table-condensed"}, 
+            React.DOM.thead(null, 
+            React.DOM.tr(null, 
+            React.DOM.th(null, "Score"),
+            React.DOM.th(null, "Rewriting")
+            )
+            ),
+            React.DOM.tbody(null, 
+            rows
+            )
+            )
+            ));
+  }
 });
 
 /** @jsx React.DOM */
@@ -360,6 +359,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
       data: {
         noisy: {
           scores: [],
+          semirings: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -368,6 +368,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
         },
         filtered: {
           scores: [],
+          semirings: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -376,6 +377,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
         }
       },
       weight: 0,
+      semiring: 0,
       corpus: 'filtered',
       tab: 'input',
       lastText: "",
@@ -398,7 +400,6 @@ var Annotator = React.createClass({displayName: 'Annotator',
       contentType: 'application/json; charset=UTF-8',
       data: JSON.stringify({ data: text, dict: corpus })
     }).done(function(overlay, data) {
-      console.log(overlay);
       var dataMergeable = jQuery.extend({}, this.state.data);
       dataMergeable[corpus] = data;
       var fetchedMergeable = jQuery.extend({}, this.state.fetched);
@@ -407,15 +408,20 @@ var Annotator = React.createClass({displayName: 'Annotator',
       overlay.remove();
     }.bind(this, overlay));
   },
-  controlCallbackWeight: function(weight) {
-    this.setState({weight: weight});
+  controlCallbackWeight: function(e) {
+    this.setState({weight: e.target.options.selectedIndex});
   },
-  controlCallbackCorpus: function(corpus) {
+  controlCallbackCorpus: function(e) {
+    var index = e.target.options.selectedIndex;
+    var corpus = e.target.options[index].value;
     this.setState({corpus: corpus});
     if (this.state.tab === 'analysis'
         || this.state.tab === 'rewritings') {
       this.fetchData(corpus);
     }
+  },
+  controlCallbackSemiring: function(e) {
+    this.setState({semiring: e.target.options.selectedIndex});
   },
   activateOutputTab: function(tab) {
     this.fetchData(this.state.corpus);
@@ -430,8 +436,11 @@ var Annotator = React.createClass({displayName: 'Annotator',
             {weight:this.state.weight,
             corpus:this.state.corpus,
             scores:this.state.data[this.state.corpus].scores,
+            semirings:this.state.data[this.state.corpus].semirings,
             callbackWeight:this.controlCallbackWeight,
-            callbackCorpus:this.controlCallbackCorpus}),
+            callbackCorpus:this.controlCallbackCorpus,
+            callbackSemiring:this.controlCallbackSemiring,
+            tab:this.state.tab}),
             React.DOM.ul( {className:"nav nav-tabs nav-justified"}, 
             React.DOM.li( {className:this.state.tab === 'input' ? 'active' : ''}, 
             React.DOM.a( {href:"#",
@@ -469,6 +478,7 @@ var Annotator = React.createClass({displayName: 'Annotator',
                     : false}),
             RewritingsPane( {id:"rewritings",
             weight:this.state.weight,
+            semiring:this.state.semiring,
             data:this.state.corpus === 'noisy'
                   ? this.state.data.noisy
                   : this.state.data.filtered,

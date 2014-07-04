@@ -1,42 +1,38 @@
 /** @jsx React.DOM */
 var ControlPane = React.createClass({
   render: function() {
-    var buttons = _.map(this.props.scores, function(s, i, l) {
-        return <button className={this.props.weight === i
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackWeight.bind(this, i)}>
-        {l[i]}
-      </button>;
+    var optionsWeight = _.map(this.props.scores, function(s) {
+        return <option>{s}</option>;
+    }.bind(this));
+    var optionsSR = _.map(this.props.semirings, function(s) {
+        return <option>{s}</option>;
     }.bind(this));
     return (
         <section className="settings">
         <div className="row">
-        <div className="col-sm-2">
+        <div className="col-sm-3">
         Settings:
       </div>
-        <div className="col-sm-4">
+        <div className="col-sm-3">
         Corpus:&nbsp;
-        <div className="btn-group btn-group-xs">
-        <button className={this.props.corpus === 'filtered'
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackCorpus.bind(null, 'filtered')}>
-        Filtered
-      </button>
-        <button className={this.props.corpus === 'noisy'
-                           ? 'btn btn-default active'
-                           : 'btn btn-default'}
-      onClick={this.props.callbackCorpus.bind(null, 'noisy')}>
-        Noisy
-      </button>
+        <select onChange={this.props.callbackCorpus}>
+        <option value="filtered">Filtered</option>
+        <option value="noisy">Noisy</option>
+        </select>
         </div>
+        <div className="col-sm-3">
+        {(_.isEmpty(optionsWeight) || this.props.tab === 'input') ? "" : [
+          "Weight: ",
+            <select onChange={this.props.callbackWeight}>,
+          {optionsWeight}
+          </select>]}
         </div>
-        <div className="col-sm-6">
-        {_.isEmpty(buttons) ? "" : "Weight: "}
-        <div className="btn-group btn-group-xs">
-        {buttons}
-        </div>
+        <div className="col-sm-3">
+        {(this.props.tab !== 'rewritings' || _.isEmpty(optionsSR)) ? "" : [
+          "Semiring: ",
+            <select onChange={this.props.callbackSemiring}>,
+          {optionsSR}
+          </select>]}
         </div>
         </div>
         </section>

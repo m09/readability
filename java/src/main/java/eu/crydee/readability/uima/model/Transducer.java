@@ -7,6 +7,7 @@ import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Revisions;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -133,21 +134,29 @@ public class Transducer {
     }
 
     public TreeMultimap<Double, Span[]> top(int n) {
-        SortedMap<Integer, TreeMultimap<Double, Span[]>> bests
+        SortedMap<Integer, TreeMultimap<Double, Cell[]>> bests
                 = new TreeMap<>();
-        TreeMultimap<Double, Span[]> initial
+        TreeMultimap<Double, Cell[]> initial
                 = TreeMultimap.create(weight.reversed(), Ordering.allEqual());
-        initial.put(weight.getUnit(), new Span[0]);
+        initial.put(weight.getUnit(), new Cell[0]);
         bests.put(0, initial);
         int current = 1;
         SortedMap<Integer, SortedSetMultimap<Integer, Cell>> tail
                 = byStarts.tailMap(current);
         while (!tail.isEmpty()) {
             current = tail.firstKey();
-            TreeMultimap<Double, Span[]> currentBests
+            TreeMultimap<Double, Cell[]> currentBests
                     = TreeMultimap.create(
                             weight.reversed(),
-                            Ordering.allEqual());
+                            (Cell[] c1, Cell[] c2) -> {
+                                return Double.compare(
+                                        Arrays.stream(c1)
+                                        .mapToDouble(c -> c.score)
+                                        .sum(),
+                                        Arrays.stream(c2)
+                                        .mapToDouble(c -> c.score)
+                                        .sum());
+                            });
             for (Integer leadingToCurrent : byEnds.get(current)) {
                 if (!bests.containsKey(leadingToCurrent)) {
                     throw new IllegalStateException(
@@ -169,14 +178,14 @@ public class Transducer {
                 SortedSet<Cell> transitions
                         = starts.get(current);
                 for (Cell trans : transitions) {
-                    for (Entry<Double, Span[]> start
+                    for (Entry<Double, Cell[]> start
                             : bests.get(leadingToCurrent).entries()) {
                         if (trans.id.isPresent()) {
                             currentBests.put(
                                     weight.mul(start.getKey(), trans.score),
                                     ArrayUtils.add(
                                             start.getValue(),
-                                            trans.id.get()));
+                                            trans));
                         } else {
                             currentBests.put(
                                     weight.mul(start.getKey(), trans.score),
@@ -186,12 +195,12 @@ public class Transducer {
                 }
             }
             int i = 0;
-            TreeMultimap<Double, Span[]> toPut
+            TreeMultimap<Double, Cell[]> toPut
                     = TreeMultimap.create(weight.reversed(),
                             Ordering.allEqual());
             outer:
             for (Double w : currentBests.keySet()) {
-                for (Span[] revisions : currentBests.get(w)) {
+                for (Cell[] revisions : currentBests.get(w)) {
                     if (i >= n) {
                         break outer;
                     }
@@ -207,11 +216,13 @@ public class Transducer {
                 = TreeMultimap.create(weight.reversed(),
                         Ordering.allEqual());
         int i = 0;
-        TreeMultimap<Double, Span[]> last
+        TreeMultimap<Double, Cell[]> last
                 = bests.get(bests.lastKey());
         for (Double score : last.keySet()) {
-            for (Span[] revisions : last.get(score)) {
-                result.put(score, revisions);
+            for (Cell[] revisions : last.get(score)) {
+                Span[] spans = new Span[revisions.length];
+                Arrays.setAll(spans, k -> revisions[k].id.get());
+                result.put(score, spans);
             }
         }
         return result;

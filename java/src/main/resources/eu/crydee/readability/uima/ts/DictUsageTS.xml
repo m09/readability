@@ -6,12 +6,25 @@
     <vendor/>
     <types>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.AllRewritings</name>
+            <name>eu.crydee.readability.uima.ts.RewritingsByScoreThenSemiring</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
             <features>
                 <featureDescription>
-                    <name>allRewritings</name>
+                    <name>rewritingsByScoreThenSemiring</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                    <elementType>eu.crydee.readability.uima.ts.RewritingsBySemiring</elementType>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.ts.RewritingsBySemiring</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>rewritingsBySemiring</name>
                     <description/>
                     <rangeTypeName>uima.cas.FSArray</rangeTypeName>
                     <elementType>eu.crydee.readability.uima.ts.Rewritings</elementType>

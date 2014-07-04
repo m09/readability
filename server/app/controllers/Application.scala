@@ -3,7 +3,10 @@ package controllers
 import com.google.common.collect.TreeMultimap
 import eu.crydee.readability.uima.DictUsagePipeline
 import eu.crydee.readability.uima.model.Score
-import eu.crydee.readability.uima.ts.AllRewritings
+import eu.crydee.readability.uima.model.Semiring
+import eu.crydee.readability.uima.model.Weight
+import eu.crydee.readability.uima.ts.RewritingsBySemiring
+import eu.crydee.readability.uima.ts.RewritingsByScoreThenSemiring
 import eu.crydee.readability.uima.ts.Revision
 import eu.crydee.readability.uima.ts.TxtRevisions
 import eu.crydee.readability.uima.ts.Revisions
@@ -111,17 +114,32 @@ object Application extends Controller {
     }
   }
 
-  implicit val allRewritingsWrites = new Writes[AllRewritings] {
-    def writes(allRewritings: AllRewritings): JsValue = {
-      val s = allRewritings.getAllRewritings.size
+  implicit val rbsWrites = new Writes[RewritingsBySemiring] {
+    def writes(rbs: RewritingsBySemiring): JsValue = {
+      val s = rbs.getRewritingsBySemiring.size
       JsArray(
-        (0 until s) map (i => Json.toJson(allRewritings.getAllRewritings(i)))
+        (0 until s) map (i => Json.toJson(
+          rbs.getRewritingsBySemiring(i)))
+      )
+    }
+  }
+
+  implicit val rbstsWrites = new Writes[RewritingsByScoreThenSemiring] {
+    def writes(rbsts: RewritingsByScoreThenSemiring): JsValue = {
+      val s = rbsts.getRewritingsByScoreThenSemiring.size
+      JsArray(
+        (0 until s) map (i => Json.toJson(
+          rbsts.getRewritingsByScoreThenSemiring(i)))
       )
     }
   }
 
   implicit val scoreWrites = new Writes[Score] {
     def writes(s: Score): JsValue = JsString(s.toString)
+  }
+
+  implicit val weightWrites = new Writes[Weight] {
+    def writes(w: Weight): JsValue = JsString(w.toString)
   }
 
   def annotate = Action(parse.json) { request =>
@@ -138,12 +156,13 @@ object Application extends Controller {
       val txtRevisions: Iterable[Revisions] = JCasUtil.select(
         jcas,
         classOf[TxtRevisions])
-      val allRewritings: AllRewritings = JCasUtil.selectSingle(
+      val rbsts: RewritingsByScoreThenSemiring = JCasUtil.selectSingle(
         jcas,
-        classOf[AllRewritings])
+        classOf[RewritingsByScoreThenSemiring])
       Ok(
         Json.obj(
           "scores"      -> Json.toJson(Score.values),
+          "semirings"   -> Json.toJson(Semiring.values),
           "text"        -> jcas.getDocumentText,
           "tokens"      -> tokens,
           "revisions"   -> JsObject(
@@ -152,7 +171,7 @@ object Application extends Controller {
             )
           ),
           "annotations" -> Json.toJson(txtSuggs),
-          "rewritings" -> Json.toJson(allRewritings)
+          "rewritings" -> Json.toJson(rbsts)
         )
       ).withHeaders(headers : _*)
     }
