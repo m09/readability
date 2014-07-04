@@ -13,12 +13,12 @@ import org.apache.uima.jcas.cas.TOP_Type;
  * Updated by JCasGen Mon Jun 23 12:39:02 JST 2014
  * XML source: /mnt/data/work/readability/java/src/main/resources/eu/crydee/readability/uima/ts/DictUsageTS.xml
  * @generated */
-public class RewritingsLMN extends Rewritings {
+public class RewritingsLMwn extends Rewritings {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(RewritingsLMN.class);
+  public final static int typeIndexID = JCasRegistry.register(RewritingsLMwn.class);
   /** @generated
    * @ordered 
    */
@@ -30,23 +30,23 @@ public class RewritingsLMN extends Rewritings {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected RewritingsLMN() {/* intentionally empty block */}
+  protected RewritingsLMwn() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public RewritingsLMN(int addr, TOP_Type type) {
+  public RewritingsLMwn(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public RewritingsLMN(JCas jcas) {
+  public RewritingsLMwn(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public RewritingsLMN(JCas jcas, int begin, int end) {
+  public RewritingsLMwn(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);

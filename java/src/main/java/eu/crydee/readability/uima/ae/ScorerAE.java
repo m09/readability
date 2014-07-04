@@ -88,10 +88,10 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
                 lowestScoreLMW = Math.min(scoreLMCW, lowestScoreLMW);
                 highestScoreLMW = Math.max(scoreLMCW, highestScoreLMW);
                 metric.setScore(Score.OCC, scoreOcc);
-                metric.setScore(Score.LMN, scoreLM);
-                metric.setScore(Score.LMWN, scoreLMW);
-                metric.setScore(Score.LMCN, scoreLMC);
-                metric.setScore(Score.LMCWN, scoreLMCW);
+                metric.setScore(Score.LMn, scoreLM);
+                metric.setScore(Score.LMwn, scoreLMW);
+                metric.setScore(Score.LMcn, scoreLMC);
+                metric.setScore(Score.LMcwn, scoreLMCW);
             }
         }
         for (Mapped original : dict.keySet()) {
@@ -99,17 +99,17 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             for (Mapped rev : revs.keySet()) {
                 Metadata metric = revs.get(rev);
                 metric.setScore(
-                        Score.LMN,
-                        metric.getScore(Score.LMN) + minLMProba);
+                        Score.LMn,
+                        metric.getScore(Score.LMn) + minLMProba);
                 metric.setScore(
-                        Score.LMWN,
-                        metric.getScore(Score.LMWN) + minLMWProba);
+                        Score.LMwn,
+                        metric.getScore(Score.LMwn) + minLMWProba);
                 metric.setScore(
-                        Score.LMCN,
-                        metric.getScore(Score.LMCN) + minLMProba);
+                        Score.LMcn,
+                        metric.getScore(Score.LMcn) + minLMProba);
                 metric.setScore(
-                        Score.LMCWN,
-                        metric.getScore(Score.LMCWN) + minLMWProba);
+                        Score.LMcwn,
+                        metric.getScore(Score.LMcwn) + minLMWProba);
             }
         }
     }

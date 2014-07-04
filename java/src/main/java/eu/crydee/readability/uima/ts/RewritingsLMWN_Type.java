@@ -25,17 +25,17 @@ public class RewritingsLMWN_Type extends Rewritings_Type {
   			   // Return eq fs instance if already created
   		     FeatureStructure fs = RewritingsLMWN_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new RewritingsLMWN(addr, RewritingsLMWN_Type.this);
+  		       fs = new RewritingsLMcwn(addr, RewritingsLMWN_Type.this);
   			   RewritingsLMWN_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new RewritingsLMWN(addr, RewritingsLMWN_Type.this);
+        } else return new RewritingsLMcwn(addr, RewritingsLMWN_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = RewritingsLMWN.typeIndexID;
+  public final static int typeIndexID = RewritingsLMcwn.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")

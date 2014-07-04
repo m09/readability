@@ -24,22 +24,22 @@
             <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLM</name>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMn</name>
             <description/>
             <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMN</name>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMwn</name>
             <description/>
             <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMW</name>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMcn</name>
             <description/>
             <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>
         <typeDescription>
-            <name>eu.crydee.readability.uima.ts.RewritingsLMWN</name>
+            <name>eu.crydee.readability.uima.ts.RewritingsLMcwn</name>
             <description/>
             <supertypeName>eu.crydee.readability.uima.ts.Rewritings</supertypeName>
         </typeDescription>

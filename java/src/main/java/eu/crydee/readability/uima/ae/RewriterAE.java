@@ -8,10 +8,10 @@ import eu.crydee.readability.uima.ts.Revision;
 import eu.crydee.readability.uima.ts.Rewriting;
 import eu.crydee.readability.uima.ts.RewritingSpan;
 import eu.crydee.readability.uima.ts.Rewritings;
-import eu.crydee.readability.uima.ts.RewritingsLM;
-import eu.crydee.readability.uima.ts.RewritingsLMN;
-import eu.crydee.readability.uima.ts.RewritingsLMW;
-import eu.crydee.readability.uima.ts.RewritingsLMWN;
+import eu.crydee.readability.uima.ts.RewritingsLMn;
+import eu.crydee.readability.uima.ts.RewritingsLMwn;
+import eu.crydee.readability.uima.ts.RewritingsLMcn;
+import eu.crydee.readability.uima.ts.RewritingsLMcwn;
 import eu.crydee.readability.uima.ts.RewritingsOcc;
 import eu.crydee.readability.uima.ts.Token;
 import eu.crydee.readability.uima.ts.TxtSuggestion;
@@ -37,10 +37,10 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         process(jcas, RewritingsOcc.class, 0, new LogWeight());
-        process(jcas, RewritingsLM.class, 1, new LogWeight());
-        process(jcas, RewritingsLMN.class, 2, new LogWeight());
-        process(jcas, RewritingsLMW.class, 3, new LogWeight());
-        process(jcas, RewritingsLMWN.class, 4, new LogWeight());
+        process(jcas, RewritingsLMn.class, 1, new LogWeight());
+        process(jcas, RewritingsLMwn.class, 2, new LogWeight());
+        process(jcas, RewritingsLMcn.class, 3, new LogWeight());
+        process(jcas, RewritingsLMcwn.class, 4, new LogWeight());
     }
 
     private void process(
