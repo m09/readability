@@ -1,21 +1,23 @@
 package controllers
 
 import com.google.common.collect.TreeMultimap
-import eu.crydee.readability.uima.DictUsagePipeline
-import eu.crydee.readability.uima.model.Score
-import eu.crydee.readability.uima.model.Semiring
-import eu.crydee.readability.uima.model.Weight
-import eu.crydee.readability.uima.ts.RewritingsBySemiring
-import eu.crydee.readability.uima.ts.RewritingsByScoreThenSemiring
-import eu.crydee.readability.uima.ts.Revision
-import eu.crydee.readability.uima.ts.TxtRevisions
-import eu.crydee.readability.uima.ts.Revisions
-import eu.crydee.readability.uima.ts.Rewriting
-import eu.crydee.readability.uima.ts.RewritingSpan
-import eu.crydee.readability.uima.ts.Rewritings
-import eu.crydee.readability.uima.ts.Suggestion
-import eu.crydee.readability.uima.ts.Token
-import eu.crydee.readability.uima.ts.TxtSuggestion
+import eu.crydee.readability.corpus.FilteredCorpusPath
+import eu.crydee.readability.corpus.FullCorpusPath
+import eu.crydee.readability.uima.server.DictUsageAEBuilder
+import eu.crydee.readability.uima.core.model.Score
+import eu.crydee.readability.uima.core.ts.Token
+import eu.crydee.readability.uima.server.model.Semiring
+import eu.crydee.readability.uima.server.model.Weight
+import eu.crydee.readability.uima.server.ts.RewritingsBySemiring
+import eu.crydee.readability.uima.server.ts.RewritingsByScoreThenSemiring
+import eu.crydee.readability.uima.server.ts.Revision
+import eu.crydee.readability.uima.server.ts.TxtRevisions
+import eu.crydee.readability.uima.server.ts.Revisions
+import eu.crydee.readability.uima.server.ts.Rewriting
+import eu.crydee.readability.uima.server.ts.RewritingSpan
+import eu.crydee.readability.uima.server.ts.Rewritings
+import eu.crydee.readability.uima.server.ts.Suggestion
+import eu.crydee.readability.uima.server.ts.TxtSuggestion
 import java.util.Map.Entry
 import java.util.UUID
 import org.apache.uima.analysis_engine.AnalysisEngine
@@ -39,8 +41,8 @@ case object Filtered extends Dict
 
 object Application extends Controller {
 
-  private val aeN = DictUsagePipeline buildAe(false, false)
-  private val aeF = DictUsagePipeline buildAe(true, false)
+  private val aeN = DictUsageAEBuilder buildAe(FullCorpusPath.path, false)
+  private val aeF = DictUsageAEBuilder buildAe(FilteredCorpusPath.path, false)
 
   implicit val inputReads: Reads[Input] = (
     (JsPath \ "data").read[String] and
