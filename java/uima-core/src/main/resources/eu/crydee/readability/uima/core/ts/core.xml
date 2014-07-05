@@ -25,5 +25,20 @@
                 </featureDescription>
             </features>
         </typeDescription>
+        <typeDescription>
+            <name>eu.crydee.readability.uima.core.ts.Chunk</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>label</name>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>children</name>
+                    <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
     </types>
 </typeSystemDescription>

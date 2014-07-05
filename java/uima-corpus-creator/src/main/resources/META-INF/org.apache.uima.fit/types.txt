@@ -1,1 +1,1 @@
-classpath*:eu/crydee/readability/uima/ts/*.xml
+classpath*:eu/crydee/readability/uima/corpuscreator/ts/corpuscreator.xml

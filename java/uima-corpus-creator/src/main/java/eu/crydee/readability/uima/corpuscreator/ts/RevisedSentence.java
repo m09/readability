@@ -1,7 +1,7 @@
 
 
-/* First created by JCasGen Sat Jul 05 16:30:40 JST 2014 */
-package eu.crydee.readability.uima.core.ts;
+/* First created by JCasGen Sat Jul 05 16:29:21 JST 2014 */
+package eu.crydee.readability.uima.corpuscreator.ts;
 
 import org.apache.uima.jcas.JCas; 
 import org.apache.uima.jcas.JCasRegistry;
@@ -11,15 +11,15 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Sat Jul 05 16:30:40 JST 2014
- * XML source: /mnt/data/work/readability/java/uima-core/src/main/resources/eu/crydee/readability/uima/core/ts/core.xml
+ * Updated by JCasGen Sat Jul 05 16:29:21 JST 2014
+ * XML source: /mnt/data/work/readability/java/uima-corpus-creator/src/main/resources/eu/crydee/readability/uima/ts/corpuscreator.xml
  * @generated */
-public class Sentence extends Annotation {
+public class RevisedSentence extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(Sentence.class);
+  public final static int typeIndexID = JCasRegistry.register(RevisedSentence.class);
   /** @generated
    * @ordered 
    */
@@ -31,23 +31,23 @@ public class Sentence extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected Sentence() {/* intentionally empty block */}
+  protected RevisedSentence() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated */
-  public Sentence(int addr, TOP_Type type) {
+  public RevisedSentence(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
   /** @generated */
-  public Sentence(JCas jcas) {
+  public RevisedSentence(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
   /** @generated */  
-  public Sentence(JCas jcas, int begin, int end) {
+  public RevisedSentence(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
