@@ -3,7 +3,7 @@ package eu.crydee.readability.uima.corpuscreator;
 import eu.crydee.readability.uima.corpuscreator.ae.LanguageModelMakerAE;
 import eu.crydee.readability.uima.corpuscreator.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.corpuscreator.cr.CurrentCR;
-import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
+import eu.crydee.readability.corpus.SentenceSplitterModelPath;
 import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
