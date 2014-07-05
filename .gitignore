@@ -10,6 +10,7 @@ dump.xml
 dependency-reduced-pom.xml
 indented.xml
 /client/build
+/client/dist
 /client/node_modules
 /uima-corpus-creator/out/cas/
 /uima-corpus-creator/out/cas-lm/

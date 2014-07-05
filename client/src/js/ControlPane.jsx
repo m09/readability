@@ -1,11 +1,11 @@
 /** @jsx React.DOM */
 var ControlPane = React.createClass({
   render: function() {
-    var optionsWeight = _.map(this.props.scores, function(s) {
-        return <option>{s}</option>;
+    var optionsWeight = _.map(this.props.scores, function(s, i) {
+        return <option selected={this.props.weight === i}>{s}</option>;
     }.bind(this));
-    var optionsSR = _.map(this.props.semirings, function(s) {
-        return <option>{s}</option>;
+    var optionsSR = _.map(this.props.semirings, function(s, i) {
+        return <option selected={this.props.semiring === i}>{s}</option>;
     }.bind(this));
     return (
         <section className="settings">
@@ -15,24 +15,22 @@ var ControlPane = React.createClass({
       </div>
         <div className="col-sm-3">
         Corpus:&nbsp;
-        <select onChange={this.props.callbackCorpus}>
+        <select onChange={this.props.callbackCorpus} autocomplete="off">
         <option value="filtered">Filtered</option>
         <option value="noisy">Noisy</option>
         </select>
         </div>
         <div className="col-sm-3">
-        {(_.isEmpty(optionsWeight) || this.props.tab === 'input') ? "" : [
-          "Weight: ",
-            <select onChange={this.props.callbackWeight}>,
-          {optionsWeight}
-          </select>]}
+        Weight:
+        <select onChange={this.props.callbackWeight} autocomplete="off">
+        {optionsWeight}
+      </select>
         </div>
         <div className="col-sm-3">
-        {(this.props.tab !== 'rewritings' || _.isEmpty(optionsSR)) ? "" : [
-          "Semiring: ",
-            <select onChange={this.props.callbackSemiring}>,
-          {optionsSR}
-          </select>]}
+        Semiring:
+        <select onChange={this.props.callbackSemiring} autocomplete="off">
+        {optionsSR}
+      </select>
         </div>
         </div>
         </section>
