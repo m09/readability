@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.crydee.readability</groupId>
-    <artifactId>uima-server</artifactId>
+    <artifactId>uima-corpus-creator</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>UIMA Readability Server</name>
+    <name>UIMA Corpus Creator</name>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,16 +23,6 @@
     
     <dependencies>
         <!-- Our stuff -->
-        <dependency>
-            <groupId>eu.crydee</groupId>
-            <artifactId>aho-corasick</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.crydee.readability</groupId>
-            <artifactId>utils</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <dependency>
             <groupId>eu.crydee.readability</groupId>
             <artifactId>uima-core</artifactId>
@@ -53,6 +43,11 @@
             <artifactId>model-sentence-splitter</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>eu.crydee.readability</groupId>
+            <artifactId>model-parser</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- UIMA -->
         <dependency>
             <groupId>org.apache.uima</groupId>
@@ -60,6 +55,11 @@
             <version>2.0.0</version>
         </dependency>
         <!-- NLP -->
+        <dependency>
+            <groupId>edu.berkeley.nlp</groupId>
+            <artifactId>berkeleylm</artifactId>
+            <version>1.1.2</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-uima</artifactId>
@@ -70,13 +70,45 @@
             <artifactId>opennlp-tools</artifactId>
             <version>1.6.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>3.3.2.201404171909-r</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.mylyn.wikitext</groupId>
+            <artifactId>wikitext.core</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.mylyn.wikitext</groupId>
+            <artifactId>wikitext.mediawiki.core</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <!-- DATABASE -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.3-1101-jdbc41</version>
+        </dependency>
         <!-- COMMONS -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+            <type>jar</type>
+        </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
             <type>jar</type>
-        </dependency>
+        </dependency>        
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -88,6 +120,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.3</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     
