@@ -25,74 +25,74 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.xml.sax.SAXException;
 
 public class EvaluationPipeline {
-
-    public static void main(String[] args)
-            throws ResourceInitializationException,
-            UIMAException,
-            IOException,
-            SAXException {
-        for (int fold = 0; fold < 1/* DictPartsCreationPipeline.nParts */; ++fold) {
-//            for (String corpus : new String[]{"full/", "filtered/"}) {
-            for (String corpus : new String[]{"filtered/"}) {
-                ExternalResourceDescription dictTest
-                        = createExternalResourceDescription(
-                                "dictTest",
-                                ReadabilityDict_Impl.class,
-                                "file:out/res/parts/"
-                                + "txt/"
-                                + corpus
-                                + DictSplitterAE.testNamer.apply(fold));
-
-                ExternalResourceDescription resultsAggregator
-                        = createExternalResourceDescription(
-                                "resultsAggregator",
-                                ResultsAggregator_Impl.class,
-                                "");
-
-                CollectionReader cr
-                        = CollectionReaderFactory.createReader(
-                                ReadabilityDictCR.class,
-                                ReadabilityDictCR.KEY_RES, dictTest,
-                                ReadabilityDictCR.PARAM_LIMIT, 200);
-
-                AnalysisEngineDescription usageAed = DictUsagePipeline.buildAed(
-                        "file:out/res/parts/"
-                        + "txt/"
-                        + corpus
-                        + DictSplitterAE.trainNamer.apply(fold),
-                        true);
-
-                AnalysisEngineDescription sylAe = createEngineDescription(
-                        SyllableCounterAE.class,
-                        SyllableCounterAE.PARAM_TOKEN_TYPE,
-                        Token.class.getName(),
-                        SyllableCounterAE.PARAM_TOKEN_FEATURE,
-                        "syllablesNumber");
-
-                AnalysisEngineDescription fleschAe = createEngineDescription(
-                        FleschAE.class,
-                        FleschAE.RES_AGGREGATOR,
-                        resultsAggregator);
-
-                AnalysisEngineDescription consumerAe = createEngineDescription(
-                        XmiSerializerUsageAE.class,
-                        XmiSerializerUsageAE.PARAM_OUT_FOLDER,
-                        "out/cas-evaluation");
-
-                AggregateBuilder b = new AggregateBuilder(
-                        null,
-                        TypePrioritiesFactory.createTypePriorities(
-                                Sentence.class,
-                                Token.class),
-                        null);
-                b.add(usageAed);
-                b.add(sylAe);
-                b.add(consumerAe);
-
-                AnalysisEngine aae = b.createAggregate();
-
-                SimplePipeline.runPipeline(cr, aae);
-            }
-        }
-    }
+//
+//    public static void main(String[] args)
+//            throws ResourceInitializationException,
+//            UIMAException,
+//            IOException,
+//            SAXException {
+//        for (int fold = 0; fold < 1/* DictPartsCreationPipeline.nParts */; ++fold) {
+////            for (String corpus : new String[]{"full/", "filtered/"}) {
+//            for (String corpus : new String[]{"filtered/"}) {
+//                ExternalResourceDescription dictTest
+//                        = createExternalResourceDescription(
+//                                "dictTest",
+//                                ReadabilityDict_Impl.class,
+//                                "file:out/res/parts/"
+//                                + "txt/"
+//                                + corpus
+//                                + DictSplitterAE.testNamer.apply(fold));
+//
+//                ExternalResourceDescription resultsAggregator
+//                        = createExternalResourceDescription(
+//                                "resultsAggregator",
+//                                ResultsAggregator_Impl.class,
+//                                "");
+//
+//                CollectionReader cr
+//                        = CollectionReaderFactory.createReader(
+//                                ReadabilityDictCR.class,
+//                                ReadabilityDictCR.KEY_RES, dictTest,
+//                                ReadabilityDictCR.PARAM_LIMIT, 200);
+//
+//                AnalysisEngineDescription usageAed = DictUsagePipeline.buildAed(
+//                        "file:out/res/parts/"
+//                        + "txt/"
+//                        + corpus
+//                        + DictSplitterAE.trainNamer.apply(fold),
+//                        true);
+//
+//                AnalysisEngineDescription sylAe = createEngineDescription(
+//                        SyllableCounterAE.class,
+//                        SyllableCounterAE.PARAM_TOKEN_TYPE,
+//                        Token.class.getName(),
+//                        SyllableCounterAE.PARAM_TOKEN_FEATURE,
+//                        "syllablesNumber");
+//
+//                AnalysisEngineDescription fleschAe = createEngineDescription(
+//                        FleschAE.class,
+//                        FleschAE.RES_AGGREGATOR,
+//                        resultsAggregator);
+//
+//                AnalysisEngineDescription consumerAe = createEngineDescription(
+//                        XmiSerializerUsageAE.class,
+//                        XmiSerializerUsageAE.PARAM_OUT_FOLDER,
+//                        "out/cas-evaluation");
+//
+//                AggregateBuilder b = new AggregateBuilder(
+//                        null,
+//                        TypePrioritiesFactory.createTypePriorities(
+//                                Sentence.class,
+//                                Token.class),
+//                        null);
+//                b.add(usageAed);
+//                b.add(sylAe);
+//                b.add(consumerAe);
+//
+//                AnalysisEngine aae = b.createAggregate();
+//
+//                SimplePipeline.runPipeline(cr, aae);
+//            }
+//        }
+//    }
 }

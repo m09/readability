@@ -3,6 +3,8 @@ package eu.crydee.readability.uima;
 import eu.crydee.readability.uima.ae.LanguageModelMakerAE;
 import eu.crydee.readability.uima.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.cr.CurrentCR;
+import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
+import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
 import opennlp.uima.tokenize.TokenizerModelResourceImpl;
+import opennlp.uima.util.UimaUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.OptionBuilder;
@@ -63,12 +66,12 @@ public class FrequencyCreationPipeline {
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         TokenizerModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-token.bin");
+                        "file:" + TokenizerModelPath.path);
 
         ExternalResourceDescription sentenceModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-sent.bin");
+                        "file:" + SentenceSplitterModelPath.path);
 
         /* Collection reader */
         CollectionReaderDescription crd;
@@ -99,19 +102,19 @@ public class FrequencyCreationPipeline {
         AnalysisEngineDescription sentenceDetector
                 = AnalysisEngineFactory.createEngineDescription(
                         SentenceDetector.class,
-                        "opennlp.uima.ModelName",
+                        UimaUtil.MODEL_PARAMETER,
                         sentenceModel,
-                        "opennlp.uima.SentenceType",
+                        UimaUtil.SENTENCE_TYPE_PARAMETER,
                         Sentence.class.getCanonicalName());
 
         AnalysisEngineDescription tokenizer
                 = AnalysisEngineFactory.createEngineDescription(
                         Tokenizer.class,
-                        "opennlp.uima.ModelName",
+                        UimaUtil.MODEL_PARAMETER,
                         tokenModel,
-                        "opennlp.uima.SentenceType",
+                        UimaUtil.SENTENCE_TYPE_PARAMETER,
                         Sentence.class.getCanonicalName(),
-                        "opennlp.uima.TokenType",
+                        UimaUtil.TOKEN_TYPE_PARAMETER,
                         Token.class.getCanonicalName());
 
         AnalysisEngineDescription lmMakerTxt

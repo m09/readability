@@ -7,6 +7,7 @@
     <artifactId>readability</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>UIMA Readability Server</name>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +22,22 @@
     </repositories>
     
     <dependencies>
+        <!-- Our stuff -->
+        <dependency>
+            <groupId>eu.crydee.readability</groupId>
+            <artifactId>model-tokenizer</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.crydee.readability</groupId>
+            <artifactId>model-tagger</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.crydee.readability</groupId>
+            <artifactId>model-sentence-splitter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- UIMA -->
         <dependency>
             <groupId>org.apache.uima</groupId>

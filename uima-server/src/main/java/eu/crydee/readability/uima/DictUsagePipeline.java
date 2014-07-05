@@ -3,6 +3,9 @@ package eu.crydee.readability.uima;
 import eu.crydee.readability.uima.ae.MapperAE;
 import eu.crydee.readability.uima.ae.RewriterAE;
 import eu.crydee.readability.uima.ae.XmiSerializerUsageAE;
+import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
+import eu.crydee.readability.uima.models.TaggerModelPath;
+import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Sentence;
 import eu.crydee.readability.uima.ts.Token;
@@ -52,17 +55,17 @@ public class DictUsagePipeline {
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         TokenizerModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-token.bin");
+                        "file:" + TokenizerModelPath.path);
 
         ExternalResourceDescription sentenceModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-sent.bin");
+                        "file:" + SentenceSplitterModelPath.path);
 
         ExternalResourceDescription posModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-pos-maxent.bin");
+                        "file:" + TaggerModelPath.path);
 
         ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(

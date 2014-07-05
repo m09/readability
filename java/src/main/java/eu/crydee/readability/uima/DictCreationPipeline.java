@@ -12,6 +12,10 @@ import eu.crydee.readability.uima.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.ae.WordDiffAE;
 import eu.crydee.readability.uima.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.cr.RevisionsCR;
+import eu.crydee.readability.uima.models.ParserModelPath;
+import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
+import eu.crydee.readability.uima.models.TaggerModelPath;
+import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.ts.Chunk;
 import eu.crydee.readability.uima.ts.OriginalSentence;
@@ -72,16 +76,16 @@ public class DictCreationPipeline {
         /* Resources descriptions */
         ExternalResourceDescription tokenM = createExternalResourceDescription(
                 TokenizerModelResourceImpl.class,
-                "file:opennlp/uima/models/en-token.bin"),
+                "file:" + TokenizerModelPath.path),
                 sentenceM = createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-sent.bin"),
+                        "file:" + SentenceSplitterModelPath.path),
                 posM = createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-pos-maxent.bin"),
+                        "file:" + TaggerModelPath.path),
                 parserM = createExternalResourceDescription(
                         ParserModelResourceImpl.class,
-                        "file:opennlp/uima/models/en-parser-chunking.bin"),
+                        "file:" + ParserModelPath.path),
                 fullTxt = createExternalResourceDescription(
                         ReadabilityDict_Impl.class, ""),
                 filteredTxt = createExternalResourceDescription(
