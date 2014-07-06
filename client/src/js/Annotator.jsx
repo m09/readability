@@ -36,9 +36,16 @@ var Annotator = React.createClass({
       if (this.state.fetched[corpus]) return;
     } else this.setState({ fetched: { noisy: false, filtered: false } });
     this.setState({lastText: text});
-    var overlay = jQuery('<div id="overlay">' +
-          '<img id="loading" src="img/ajax-loader.gif">' +
-          '</div>');
+    var overlay = jQuery(
+      '<div id="overlay">' +
+        '<div id="loading">' +
+        'The first request might take around one minute ' +
+        'to complete: the application is shut down after ' +
+        '1h of inactivity and may have to be restarted.' +
+        '<br>' +
+        '<img src="img/ajax-loader.gif">' +
+        '</div>' +
+        '</div>');
     overlay.appendTo(jQuery(this.refs.container.getDOMNode()));
     jQuery.ajax({
       type: 'POST',
