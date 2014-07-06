@@ -13,7 +13,7 @@ import eu.crydee.readability.uima.corpuscreator.ae.WordDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.corpuscreator.cr.RevisionsCR;
 import eu.crydee.readability.uima.models.ParserModelPath;
-import eu.crydee.readability.corpus.SentenceSplitterModelPath;
+import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
 import eu.crydee.readability.uima.models.TaggerModelPath;
 import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.core.res.ReadabilityDict_Impl;
