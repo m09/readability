@@ -17,6 +17,7 @@
 \usepackage{booktabs}
 \usepackage{numprint}
 \usepackage{hyperref}
+\usepackage{siunitx}
 
 \newcommand\wiki{\textsc{Wikipedia}}
 \newcommand\ew{\textsc{English Wikipedia}}
@@ -37,7 +38,7 @@
 \renewcommand\chaptername{Section}
 \renewcommand\thechapter{\Roman{chapter}}
 
-\DeclareGraphicsExtensions{.png, .jpeg, .jpg, .svg, .eps}
+\DeclareGraphicsExtensions{.png, .jpeg, .jpg, .svg, .eps, .pdf}
 \graphicspath{{./img/}}
 
 \hypersetup{
@@ -76,8 +77,7 @@
     \vfill
     % ----------------------------------------------------------------
     \includegraphics[width=0.16\textwidth]{img/nii.png}
-    \hfill
-    \hfill
+    \hspace{0.03\textwidth}\hfill
     \includegraphics[width=0.19\textwidth]{img/lina.png}
     \hfill
     \includegraphics[width=0.19\textwidth]{img/univ.eps}
@@ -124,7 +124,7 @@ The team that welcomed me for this work is \textsc{Aizawa
 by Professor \textsc{Akiko
   Aizawa}\footnote{\url{http://research.nii.ac.jp/~akiko/index_e.html}},
 the director of this internship. At the time of this writing, the
-laboratory has 18 members and strong partnerships with ex-members of
+laboratory has 18 members and strong partnerships with past members of
 the laboratory.
 
 Its expertise lies in several sub-domains of Natural Language
@@ -174,7 +174,7 @@ The approach used in this work is to combine text rewriting with
 scoring techniques to achieve both readability improvement and
 assessment and anchoring in the input text.
 
-\chapter{Prior art}
+\chapter{State of the art}
 \label{sec:sota}
 
 This section details the history and state of the art of computational
@@ -206,8 +206,8 @@ used outside of research to improve the readability of a vast amount
 of publications, yielding excellent results in readership increase.
 
 Roughly at the same time, Dale and Chall introduced a readability
-formula that uses a list a words instead of the average number of
-syllables per word to estimate readability
+formula that makes use of a list a words instead of the average number
+of syllables per word to estimate readability
 \cite{dale1948formula}. This more precise definition of world
 difficulty allows this metric to reach a 0.93 correlation with text
 understanding and because of that has been one of the most used
@@ -223,22 +223,27 @@ using the same variables as either Flesch or Dale and Chall
 Despite their useful applications, readability formulas are not
 perfect. Some works have detailed their problems convincingly
 \cite{duffy1985readability, schriver2000readability}. Among the most
-important ones is using sentence length to model syntactic complexity:
-of the following sentences, (1.) is often considered easier to
-understand than (2.), despite being lengthier:
+important ones is the imprecision of the features used: of the
+following sentences, (1.)  is often considered easier to understand
+than (2.), despite being lengthier:
 \begin{enumerate}
 \item The mouse ate the cheese, and then the rat ate the mouse, and
   after that, the cat ate the rat and died.
 \item The cat that ate the rat that ate the mouse that ate the cheese
   died.
 \end{enumerate}
-Another important problem is modeling word complexity by word length,
-which doesn't consider the fact that affixes are known to
-readers. That makes some long words simple, while some short words
-are, in contrary, relatively unknown: “curr” (to make a murmuring
-sound), is for most people harder to read than reinventing, due to the
-rarity of “curr” and the fact that even early readers know the meaning
-of the “re-” and “-ing” affixes.
+That showcases that sentence length should be considered with care
+when trying to improve on existing readability measures. The average
+word length—one of the other dominant features—has similar
+problems. The reasons for that is two-fold:
+\begin{itemize}
+\item affixes are known even to early readers;
+\item some very short words are difficult intrinsically.
+\end{itemize}
+To illustrate that we can compare “curr” (to make a murmuring sound)
+and “reinventing”. Due to the rarity of “curr”, most early readers
+will have troubles with it while “reinventing” will often not be
+problem because of the known meanings of the “re-” and “-ing” affixes.
 
 Finally, the fact that many formulas only consider short windows of a
 text to estimate its readability make them not reliable without
@@ -341,26 +346,32 @@ been used: the first is to align the articles present both in the
 regular \ew{} and in \sew{} to build a parallel corpus. This approach
 has been used with great success in
 \cite{zhu-bernhard-gurevych:2010:PAPERS} and has resulted in the
-PWKP-108016\footnote{\url{https://www.ukp.tu-darmstadt.de/data/sentence-simplification/simple-complex-sentence-pairs/}}
+\textsc{PWKP-108016}\footnote{\url{https://www.ukp.tu-darmstadt.de/data/sentence-simplification/simple-complex-sentence-pairs/}}
 dataset. The second is to use the revision history of \sew, as
 showcased in \cite{yatskar2010sake}. In this work we use the second
 approach.
 
-The main rationale behind not using the existing PWKP-108016 corpus
-and instead creating one of our own is that we believe the technique
-used to automatically construct the corpus from a revision history is
-a general process and can therefore be extended to many data sources
-beyond \wiki. Those possible extensions include many of the processes
-of the professional publishing world. If proven efficient, big corpora
-could be gathered from journalists, writers, scientists, etc. On the
-contrary, it has been shown to be extremely hard to find good
-comparable corpora outside of \wiki{} and some restricted institution
-publications such as the European Parliament \cite{koehn2005europarl},
-which makes the first approach hard to generalize. Finally, the
-outputs made public by \cite{yatskar2010sake} are of high quality but
-limited in quantity and do not incorporate some important features
-such that the original sentence from which pairs were extracted, nor
-does this release include any code to manipulate the files.
+The main rationale for not using the existing \textsc{PWKP-108016}
+corpus and instead creating one of our own is that we believe the
+technique used to automatically construct the corpus from a revision
+history is a general process and can therefore be extended to many
+data sources beyond \wiki. Hence the community would benefit from an
+efficient tool to exploit such sources. Those possible extensions
+include many of the processes of the professional publishing world and
+especially copy editing. If proven efficient, big corpora could be
+gathered from journalists, writers, scientists, etc. On the contrary,
+it has been shown to be extremely hard to find good comparable corpora
+outside of \wiki{} and some restricted institution publications such
+as the European Parliament proceedings on which \textsc{Europarl} is
+based \cite{koehn2005europarl}, which makes the first approach hard to
+generalize. It is worth noting that it might be even harder to
+construct such corpora for readability study than for machine
+translation, due to the lesser number of publications requiring
+different levels of readability than the number of publications that
+need to be translated. Finally, the outputs made public by
+\cite{yatskar2010sake} are of high quality but not intended to be used
+as a corpus and rather as a supplementary material to study their
+approach.
 
 To build automatically our corpus, we leverage the fact that when
 editing \sew, contributors have the possibility to write a commit
@@ -465,9 +476,14 @@ edits are not readability edits, but either alignment deficiencies or
 edits serving complementary roles. When filtered to only consider
 revisions of 5 words at most, to match the policy used in
 \cite{yatskar2010sake}, the number of entries is reduced to
-\numprint{23507}.  The resulting resource is enriched with
-part-of-speech, and syntactic parsing annotations and is proposed in
-an XML format to optimize re-usability.
+\numprint{35927}. Of those \numprint{35927} couples $(\mathtt{original},
+\mathtt{revision})$, \numprint{25675} occur only once and
+\numprint{18330} $\mathtt{original}$s have only one readable
+equivalent.
+
+The resulting resource is enriched with part-of-speech, and syntactic
+parsing annotations and is proposed in an XML format to optimize
+re-usability.
 
 \section{Lexical enhancements}
 \label{sec:lexical-enhancements}
@@ -577,7 +593,7 @@ $\mathcal{S}_{LMc}$ defined in \equaref{eq:slmc}. $c$ stands for
   \label{eq:slmc}
   \mathcal{S}_{LMc}(w \maps{D} r) & = \log \frac%
   {\proba{w \maps{D} r \given w \maps{D} \_}^\lambda}%
-  {\proba[lm]{w}^{(1 - \lambda)}}
+  {\proba[LM]{w}^{(1 - \lambda)}}
 \end{align}
 
 The scores $\mathcal{S}_{LM}$ and $\mathcal{S}_{LMc}$ already have
@@ -604,11 +620,11 @@ for “weighted”:
   \label{eq:slmw}
   \mathcal{S}_{LMw}(w \maps{D} r) = & \log \frac%
   {\proba{w \maps{D} r}^\lambda}%
-  {\sqrt[\card{w}]{\proba[lm]{w}}^{(1 - \lambda)}} \\
+  {\sqrt[\card{w}]{\proba[LM]{w}}^{(1 - \lambda)}} \\
   \label{eq:slmcw}
   \mathcal{S}_{LMcw}(w \maps{D} r) = & \log \frac%
   {\proba{w \maps{D} r \given w \maps{D} \_}^\lambda}%
-  {\sqrt[\card{w}]{\proba[lm]{w}}^{(1 - \lambda)}} \\
+  {\sqrt[\card{w}]{\proba[LM]{w}}^{(1 - \lambda)}}
 \end{align}
 
 The method used in both \equaref{eq:slmw} and \equaref{eq:slmcw} to
@@ -702,9 +718,10 @@ different semi-ring:
 The motivation for the second use-case is maybe not clear at
 first. The reason it needs to be separated from use-case (1.) is that,
 even for a very long text, the top 100 scores of the rewritings will
-likely correspond to 100 different single token modifications.  while we
-would want to see the complete text rewritten at once at a certain
-level of confidence.
+likely correspond to 100 different single token modifications.  while
+we would want to see the complete text rewritten at once at a certain
+level of confidence. An example will illustrate the key difference
+later on in this section.
 
 We define the semi-rings in \tableref{tab:semi-rings} for the
 $S_{OCC}$ score function. The Negative MaxMin semi-ring allows us to
@@ -729,18 +746,61 @@ probabilities.
   \label{tab:semi-rings}
 \end{table}
 
-Those semi-rings are almost usable with the various flavors of
+To illustrate how those semi-rings work, let us consider an example
+transducer for the sentence “I'm exhausted”
+(\figureref{fig:transducer-ex}). The convention used to represent the
+transducer is that the first line of the transition represents the
+symbol read, the second represents the output symbol and the third is
+the weight of the transition.
+
+As detailed above, per construction a word can output itself (the
+black plain transitions) for free and any other transition (the red
+dotted transitions) will be weighted by a score—here the scores are
+arbitrary but the end goal is of course to use the scores defined
+in \sectionref{sec:lexical-enhancements}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{semirings}
+  \caption{An example transducer for the sentence “I'm exhausted”}
+  \label{fig:transducer-ex}
+\end{figure}
+
+With the semi-rings defined in \tableref{tab:semi-rings}, we would
+obtain the rewritings shown in \tableref{tab:neglog}. We can clearly
+observe the different behaviors of the two semi-rings in the last row
+of the table. While the semi-rings are not different for single
+modifications, the desired threshold effect is obtained with Negative
+MaxMin and the precise transduction score is retrieved with Negative
+Log when considering rewritings with two non-identity transitions.
+
+\begin{table}[H]
+  \centering
+  \caption{Rewritings of “I'm exhausted”}
+  \begin{tabular}[H]{SSl}
+    \toprule
+    {Negative Log Score} & {Negative MaxMin Score} & {Rewriting} \\
+    \midrule
+    0 & 0 & I'm exhausted \\
+    -0.9 & -0.9 & I'm tired \\
+    -3.2 & -3.2 & I am exhausted \\
+    -4.1 & -3.2 & I am tired \\
+  \end{tabular}
+  \label{tab:neglog}
+\end{table}
+
+The two semi-rings are almost usable with the various flavors of
 $\mathcal{S}_{LM}$ score functions. But since they are not the log of
 probabilities, we don't have the guarantee that for all $w \maps{D}
 r$, $\mathcal{S} \left( w \maps{D} r \right) \in \left]-\infty,
-  0\right]$. To fix this problem, we normalize the scores
-$\mathcal{S}_{LM}$ and $\mathcal{S}_{LMc}$ into the scores
-$\mathcal{S}_{LMn}, \mathcal{S}_{LMcn}$ as follows ($n$ standing for
-normalized):
+  0\right]$. To fix this problem and be able to use the semi-rings
+defined above, we normalize the scores $\mathcal{S}_{LM}$ and
+$\mathcal{S}_{LMc}$ into the scores $\mathcal{S}_{LMn},
+\mathcal{S}_{LMcn}$ as follows ($n$ standing for normalized):
 
 \[
 \mathcal{S}_{n} \left( w \maps{D} r \right) = \mathcal{S} \left( w
-  \maps{D} r \right) + \argmin_{w'} \left( \log \proba[lm]{w'} \right)
+  \maps{D} r \right) + \argmin_{w'} \left( \log \proba[LM]{w'}^{(1 - \lambda)} \right)
 \]
 
 And the scores $\mathcal{S}_{LMw}$ and $\mathcal{S}_{LMcw}$ into the
@@ -749,7 +809,7 @@ scores $\mathcal{S}_{LMwn}, \mathcal{S}_{LMcwn}$ as follows:
 \[
 \mathcal{S}_{n} \left( w \maps{D} r \right) = \mathcal{S} \left( w
   \maps{D} r \right) + \argmin_{w'} \left( \log
-  \sqrt[\card{w'}]{\proba[lm]{w'}} \right)
+  \sqrt[\card{w'}]{\proba[LM]{w'}^{(1 - \lambda)}} \right)
 \]
 
 The normalized functions can be used with the semi-rings we defined
@@ -761,8 +821,9 @@ It is now possible to address the two use-cases mentioned in
 use-case and Negative MaxMin for the second.
 
 The next section details \textsc{Readability Lab}, a framework built
-to analyze both lexical enhancements and text rewritings in an
-intuitive and efficient manner.
+to analyze both the lexical enhancements and the text rewritings
+introduced in the two previous section in an intuitive and efficient
+manner.
 
 \section{\textsc{Readability Lab}, a fine-grained readability analysis
   framework}
@@ -804,6 +865,11 @@ speech).
   \caption{\textsc{Readability Lab} interface}
   \label{fig:ui}
 \end{figure}
+
+\section{Fine-grained readability assessment}
+\label{sec:fine-grain-read}
+
+With the above framework defined, 
 
 \chapter{Open source contributions}
 \label{cha:oss-contribs}
