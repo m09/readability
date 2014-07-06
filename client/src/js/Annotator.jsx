@@ -39,9 +39,10 @@ var Annotator = React.createClass({
     var overlay = jQuery(
       '<div id="overlay">' +
         '<div id="loading">' +
-        'The first request might take around one minute ' +
+        'The first request might take ~2 minutes ' +
         'to complete: the application is shut down after ' +
-        '1h of inactivity and may have to be restarted.' +
+        '1h of inactivity and may have to be restarted. ' +
+        'Subsequent ones should be faster.' +
         '<br>' +
         '<img src="img/ajax-loader.gif">' +
         '</div>' +
