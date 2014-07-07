@@ -5,6 +5,7 @@
 \usepackage{polyglossia}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{xfrac}
 \usepackage{mathtools}
 \usepackage{bbold}
 \usepackage[hyperref]{xcolor}
@@ -25,6 +26,7 @@
 \newcommand\tableref[1]{\hyperref[#1]{Table \ref*{#1}}}
 \newcommand\figureref[1]{\hyperref[#1]{Figure \ref*{#1}}}
 \newcommand\sectionref[1]{\hyperref[#1]{Section \ref*{#1}}}
+\newcommand\chapterref[1]{\hyperref[#1]{Chapter \ref*{#1}}}
 \newcommand\equaref[1]{\hyperref[#1]{Equation \ref*{#1}}}
 \newcommand\maps[1]{\xrightarrow{\mathcal{#1}}}
 \newcommand\card[1]{\lvert #1 \rvert}
@@ -90,16 +92,32 @@
 
 \chapter{Acknowledgments}
 
-I would like to thank Aizawa-sensei and Katsu-san for their precious
-help before our arrival to Japan, and their support during our stay.
+I would like to start those acknowledgments by thanking Aizawa-sensei
+and Katsu-san for their precious help before our arrival to Japan, and
+their tireless support during our stay, this was greatly appreciated.
+
+Meeting a solid number of great people has been a pleasure during this
+internship. I thank especially Fujinuma-san and Adelin for their
+support (and corrections to this report for the latter).
 
 I also wouldn't have been able to conduct this internship without the
 scientific advising of Aizawa-sensei and Pascual-san, I thank them for
 all their good insight, even though I am convinced I didn't make the
 best of it.
 
-It was also very nice to have someone exterior to discuss ideas with
+And it was very nice to have someone exterior to discuss ideas with
 when I wanted to, I thank Colin de la Higuera for that.
+
+Because this internship is also the end of my Master's program, I
+would like to acknowledge the awesomeness of the ATAL team (students
+and teachers alike!). Working with passionate people in this context
+has been a pleasure for now close to two years.
+
+Lastly but not leastly—please forgive my English, I would like to
+thank Grégoire for about everything during those five months of
+internship, it was great to share this Japanese experience with a
+friend (and still will be for about three weeks at the
+time of this writing).
 
 \chapter{Laboratory presentation}
 
@@ -112,9 +130,9 @@ the \textsc{University of Tokyo} (\textsc{Todai}) and welcomes
 computer scientists of numerous domains to form a strong innovative
 pole in the Japanese computer science research landscape.
 
-Its International Exchange Agreements program allowed two of the
-students of the 2012−2014 promotion of the ATAL master to join for a
-five month internship.
+Its International Exchange Agreements program allowed myself and
+another student of the first promotion of the ATAL master to join for
+a five month internship.
 
 \section{\textsc{Aizawa Laboratory}}
 \label{sec:aizawa-laboratory}
@@ -153,29 +171,29 @@ comprehensiveness of technical manuals or to better grasp how we
 understand things, readability has been studied for about two
 centuries for its impact in both engineering and scientific endeavors.
 
-Despite this interest of the scientific community, an important part
-of the early research has focused on finding basic metrics to measure
-readability. It is only in recent years that scientists have been able
+Despite the interest of the scientific community for many aspects of
+readability—including cognitive and social ones, early research was
+mostly focused on finding basic metrics to measure how understandable
+a text is. It is only in recent years that scientists have been able
 to come up with more interesting methods, thanks in particular to the
-advances in machine learning, the new speed of modern computers and
-the unparalleled amount of data available on the internet.
+advances in machine learning, gaze processing, the new speed of modern
+computers and the unparalleled amount of data available on the
+internet.
 
-The high-level goal of this internship is to investigate those methods
+The high-level goal of this internship is to investigate these methods
 and improve on them. To be more specific, most methods consider
 documents as a whole when analyzing their readability, which makes it
 hard for users to understand which parts are the most important to
 rework. We aim at providing a fine-grained analysis of readability in
-this work. In the same way than the recursive approach to sentiment
-analysis \cite{socher2013recursive} allows users to detect which parts
-of a sentence convey which sentiment, we aim at detecting which parts
-of a sentence are readable or non readable, and for which reasons.
+this work. This shift has been observed in recent years in other
+natural language processing domains, such as sentiment analysis with
+the recursive approach proposed by \cite{socher2013recursive} that
+allows users to detect which part of a sentence conveys which
+sentiment. In the same way, we want to detect which part of a sentence
+is readable or non readable, and for which reasons.
 
-The approach used in this work is to combine text rewriting with
-scoring techniques to achieve both readability improvement and
-assessment and anchoring in the input text.
-
-\chapter{State of the art}
-\label{sec:sota}
+\chapter{Related work}
+\label{cha:sota}
 
 This section details the history and state of the art of computational
 readability study.
@@ -293,38 +311,8 @@ corpora of readable sentences and their hard-to-read counterparts.
 \chapter{Work}
 \label{cha:work}
 
-To address the lack of corpora and tooling in the readability domain,
-we propose a method to easily build a parallel corpus using \sew's
-revision history. This approach is not novel, since 2008, researchers
-have used \sew's revision history to great effect
-\cite{nelken2008mining}. What is novel is that we plan on releasing
-the corpus with a permissive license and associated tooling to reduce
-the entry cost of readability research and allow comparison between
-methods on a level ground.
-
-To be able to correctly investigate fine-grained readability, we
-propose a software suite to represent results of readability system in
-a way that suits analysis.
-
-Finally we experiment with lexical re-writings using our system.
-
-Details on those three main axes follow.
-
-A timeline of the work done finishes this introduction:
-
-\begin{itemize}
-\item March 1\textsuperscript{st} − April 1\textsuperscript{st}:
-  bibliograhy;
-\item April 1\textsuperscript{st} − April 8\textsuperscript{th}:
-  subject design;
-\item April 8\textsuperscript{th} − May 8\textsuperscript{th}:
-  parallel corpus creation;
-\item May 8\textsuperscript{th} − June 18\textsuperscript{th}:
-  joint work on the demo and the scoring methods, with explorations of
-  other methods;
-\item June 18\textsuperscript{th} − July 10\textsuperscript{th}:
-  report and internship defence preparation.
-\end{itemize}
+The work done during this internship is better presented as five
+different complementary tasks. The following sections detail them.
 
 \section{Automatic readability parallel corpus creation}
 \label{sec:corpus}
@@ -344,8 +332,8 @@ In readability, such a clever technique is to leverage the power of
 \wiki, and in particular \sew. To do so, mainly two techniques have
 been used: the first is to align the articles present both in the
 regular \ew{} and in \sew{} to build a parallel corpus. This approach
-has been used with great success in
-\cite{zhu-bernhard-gurevych:2010:PAPERS} and has resulted in the
+has been used with great success in \cite{zhu2010monolingual} and has
+resulted in the
 \textsc{PWKP-108016}\footnote{\url{https://www.ukp.tu-darmstadt.de/data/sentence-simplification/simple-complex-sentence-pairs/}}
 dataset. The second is to use the revision history of \sew, as
 showcased in \cite{yatskar2010sake}. In this work we use the second
@@ -434,18 +422,21 @@ represented an important part of the commits we might have retrieved
 with a broader rule, so we simply did not consider them.
 
 The next step for the creation of the corpus is to compute the precise
-edit that the contributor made. To do so, we tokenize and sentence
-split both the original version of the article and its revision using
-OpenNLP\footnote{\url{https://opennlp.apache.org/}}. Then, we use
-Myers' alignment algorithm \cite{myers1988optimal} to compute optimal
-alignments at the world and sentence levels. We rely on the
-implementation proposed by
-jgit\footnote{\url{http://www.eclipse.org/jgit/}}.
+edit that the contributor made. To do so, tokenization and sentence
+splitting both were performed on the original version of the article
+and its revision using
+\textsc{OpenNLP}\footnote{\url{https://opennlp.apache.org/}}. Then the
+two texts were aligned at the world and sentence levels with Myers'
+alignment algorithm—the algorithm used in git to compute diffs
+\cite{myers1988optimal}. We rely on the implementation proposed by
+\textsc{jgit}\footnote{\url{http://www.eclipse.org/jgit/}}.
 
-The goal being to obtain a re-usable corpus, we propose the complete
-pipeline on
-github\footnote{\url{https://github.com/m09/readability}}. It is
-freely re-usable.
+Keeping re-usability in mind, the implementation uses
+\textsc{uimaFIT}, a standard NLP framework
+\cite{ogren-bethard:2009:SETQA-NLP}. The complete pipeline is
+available on
+\textsc{Github}\footnote{\url{https://github.com/m09/readability}}. It
+is freely re-usable thanks to its permissive license.
 
 The obtained corpus has important noise problems. A quick glance at
 \tableref{tab:problematic-edits} is sufficient to understand that some
@@ -482,18 +473,18 @@ revisions of 5 words at most, to match the policy used in
 equivalent.
 
 The resulting resource is enriched with part-of-speech, and syntactic
-parsing annotations and is proposed in an XML format to optimize
-re-usability.
+parsing annotations and is proposed in an XML format.
 
 \section{Lexical enhancements}
 \label{sec:lexical-enhancements}
 
 With this corpus at our disposal, we next define a way to use it as a
-lexical dictionary. The goal is to allow authors to pick simpler words
-than the ones they used, in an efficient manner. In what follows, we
-will denote multiset of all rewritings of $x$ in $y$ in $\mathcal{D}$
-by $x \maps{D} y$ and we will use $\_$ as a wildcard to denote any
-word.
+lexical dictionary to simplify vocabulary in a text. The goal is to
+allow authors to pick simpler words than the ones they used, in an
+efficient manner. In what follows, we will denote the multiset of all
+rewritings of $x$ into $y$ in the dictionary $\mathcal{D}$ by $x
+\maps{D} y$ and we will use $\_$ as a wildcard to denote any sequence
+of words.
 
 The first approach and the most basic one, given a dictionary
 $\mathcal{D}$ and for a word $w$, is to propose as lexical rewriting
@@ -638,13 +629,56 @@ the scoring functions over the course of this section, the results of
 those functions are not the log of probabilities anymore, which is not
 a problem to compare rewritings but might very well be to use those
 rewriting scores in a broader framework, for example when performing
-the automatic rewriting of a text. We deal with this task — and those
-issues — in the next section.
+the automatic rewriting of a text. We will later on address this
+issue.
+
+\section{Fine-grained readability assessment}
+\label{sec:fine-grain-read}
+
+Having defined lexical enhancements and a way to score them, we now
+have: (1.) a way to detect which parts of a text need to be rewritten;
+(2.) a score to estimate the importance of those rewritings.
+
+Combining elements (1.) and (2.) we can define a fine-grained
+readability measure of a text as follows:
+
+\begin{itemize}
+\item the readability of a part of a sentence is the combination of
+  the scores of its possible rewritings;
+\item the readability of a sentence is the combination of the
+  readability of its parts;
+\item the readability of a text is the combination of the readability
+  of its sentences.
+\end{itemize}
+
+We chose those three levels (sentence parts, sentence, text) because
+they are the best fit to the alignments made to produce the lexical
+enhancement dictionary.
+
+Formally, we define a Recursive Lexical Readability Measure
+$\mathcal{RLRM}$ of a text $T$ using a lexical enhancement dictionary
+$\mathcal{D}$ as the combination of the three functions $\theta$,
+$\sigma$ and $\pi$—named after the initials of text, sentence and
+part:
+\[
+\mathcal{RLRM}(t) = \theta\Bigg(\Bigg\{ \sigma \left(\left\{ \pi(p
+    \maps{D} r) \suchthat \text{$p$ is a part of $s$}\right\}\right)
+\,\Bigg|\, \text{$s$ is a sentence in $T$} \Bigg\}\Bigg)
+\]
+To define a $\mathcal{RLRM}$, one needs to provide the three functions
+$\theta$, $\sigma$ and $\pi$. While this is quite a general framework,
+at the time of this writing, only the function $\mathcal{RLRM}_{max}$
+with $\theta = \text{average}$ and $\sigma = \pi = \max$ has been
+investigated. Such a function can be used as a readability measure and
+its construction allows for fine-grained annotation of the readability
+of a text.
+
+The next section details another possible usage of a lexical
+enhancement dictionary by considering it as a basis for a translation
+task.
 
 \section{Automatic rewriting of texts}
 \label{sec:rewriting}
-
-% expliquer why transducers et semi-anneau
 
 To rewrite texts automatically, we use weighted finite-state
 transducers that consider the scores defined
@@ -685,18 +719,21 @@ tokens noted $t_1 \dots t_n$ and their $n$ parts of speech noted $p_1
 written English, $\mathcal{P}$ is the set of all parts of speech in
 English and $\mathcal{S} : \mathcal{D} \rightarrow \mathbb{K}$ is the
 score we use, $\mathbb{K}$ being the set of the semi-ring:
-\begin{itemize}
-\item $\Sigma = \mathcal{T} \times \mathcal{P}$;
-\item $\Delta = \mathcal{T} \times \mathcal{P}$;
-\item $Q = \left\{ q_i \suchthat 0 \leq i \leq n \right\}$;
-\item $I = \{ q_0 \}$;
-\item $F = \{ q_n \}$;
-\item $E = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
+\begin{align*}
+\Sigma & = \mathcal{T} \times \mathcal{P} \\
+\Delta & = \mathcal{T} \times \mathcal{P} \\
+Q & = \left\{ q_i \suchthat 0 \leq i \leq n \right\} \\
+I & = \{ q_0 \} \\
+F & = \{ q_n \} \\
+E & = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
     \land w = t_i \land p_w = p_i \land s = \mathcal{S}\left(\ t_i
-      \maps{D} r \right)\right\}$;
-\item $\lambda : x \mapsto \mathbb{1}$;
-\item $\rho : x \mapsto \mathbb{1}$.
-\end{itemize}
+      \maps{D} r \right) \land 1 \leq i \leq n \right\} \\
+  & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
+    \suchthat 1 \leq i \leq n \right\} \\
+\lambda & : x \mapsto \mathbb{1} \\
+\rho & : x \mapsto \mathbb{1}
+\end{align*}
+
 Now, we can define semi-rings to use with the constructed
 transducer. We mainly consider two use-cases, each of them requiring a
 different semi-ring:
@@ -753,10 +790,10 @@ transducer is that the first line of the transition represents the
 symbol read, the second represents the output symbol and the third is
 the weight of the transition.
 
-As detailed above, per construction a word can output itself (the
-black plain transitions) for free and any other transition (the red
-dotted transitions) will be weighted by a score—here the scores are
-arbitrary but the end goal is of course to use the scores defined
+As detailed above, a word can output itself (the black plain
+transitions) for free and any other transition (the red dotted
+transitions) will be weighted by a score—here the scores are arbitrary
+but the end goal is of course to use the scores defined
 in \sectionref{sec:lexical-enhancements}.
 
 \begin{figure}[H]
@@ -822,8 +859,9 @@ use-case and Negative MaxMin for the second.
 
 The next section details \textsc{Readability Lab}, a framework built
 to analyze both the lexical enhancements and the text rewritings
-introduced in the two previous section in an intuitive and efficient
-manner.
+introduced in \sectionref{sec:lexical-enhancements}
+and \sectionref{sec:rewriting}
+in an intuitive and efficient manner.
 
 \section{\textsc{Readability Lab}, a fine-grained readability analysis
   framework}
@@ -836,29 +874,6 @@ of an approach is valuable. It was also the occasion to expose those
 results to other programs by creating a server that could easily be
 used by from other tool-chain.
 
-\href{http://www.playframework.com/}{Play Framework} and
-\href{https://facebook.github.io/react/}{React} were used to create a
-web client that satisfies the constraints exposed
-above. \figureref{fig:ui} shows a screenshot of the interface.
-
-Among the challenges faced during the creation of this demo, the most
-interesting one is certainly the algorithm used to detect matches in a
-text. Indeed, with more than \numprint{20000} patterns to test,
-response times easily grow slow. To address this issue, we used the
-Aho-Corasick algorithm \cite{aho1975efficient} on the alphabet of
-pairs of a token and its part of speech. The principle of this
-algorithm is to build an automaton to match patterns that is
-afterwards usable on any incoming text.
-
-This matches perfectly the structure of a web application where this
-automaton can be built once, slowly, and then used to provide
-extremely fast search on incoming requests for all the lifetime of the
-server. Since no existing implementation that we knew of had
-abstracted away the alphabet used, a new implementation has been
-proposed that addresses this issue and allows to use arbitrary Java
-classes as alphabet (here our pairs of token and their part of
-speech).
-
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{ui}
@@ -866,17 +881,126 @@ speech).
   \label{fig:ui}
 \end{figure}
 
-\section{Fine-grained readability assessment}
-\label{sec:fine-grain-read}
+\textsc{uimaFIT}, \textsc{Play
+  Framework}\footnote{\url{http://www.playframework.com/}},
+\textsc{React}\footnote{\url{https://facebook.github.io/react/}} and
+\textsc{Heroku}\footnote{\url{https://www.heroku.com/}} were used to
+create a web client available at
+\url{http://readability.crydee.eu/}. It satisfies the constraints
+exposed above. \figureref{fig:ui} shows a screenshot of the interface.
 
-With the above framework defined, 
+Among the theoretical obstacles faced during the creation of this
+demo, the most interesting one is certainly the algorithm used to
+detect matches in a text. Indeed, with more than \numprint{30000}
+patterns to test, response times easily grow slow. The Aho-Corasick
+algorithm was used to address this issue \cite{aho1975efficient}. The
+principle of this algorithm is to build an automaton to match a wide
+range of patterns that is afterwards usable on any incoming text. The
+only unusual aspect in our use of this algorithm is the alphabet we
+use: in our case it is the alphabet of pairs of tokens and their part
+of speech instead of the classical English alphabet.
+
+This two-step process—slow automaton building and fast searches
+afterwards—matches perfectly the structure of a web application where
+the starting phase is usually slow, allowing lengthy initialization
+processes after which incoming requests have to be handled
+promptly. Since no existing implementation that we knew of had
+abstracted away the alphabet used, a new implementation has been
+proposed that addresses this issue and allows to use arbitrary Java
+classes as alphabet (here our pairs of token and their part of
+speech). It is freely
+available\footnote{\url{https://github.com/m09/aho-corasick}}.
+
+The source of \textsc{Readability Lab} is—yet again—available on
+\textsc{Github}\footnote{\url{https://github.com/m09/readability}}.
+
+\chapter{Discussion}
+\label{cha:discussion}
+
+To evaluate and discuss the work proposed in \chapterref{cha:work},
+several approaches have been used in the litterature. The main
+possibilities are:
+
+\begin{enumerate}
+\item the use of machine translation measures, such as BLEU
+  \cite{papineni2002bleu}, ROUGE \cite{lin2004rouge} or NIST
+  \cite{doddington2002automatic};
+\item using readability formulas as scores, including Dale−Chall and
+  Flesch Reading Ease;
+\item evaluating by comparing agreement among several lexical
+  enhancement sources. In their 2010 paper, \cite{yatskar2010sake}
+  proposed an evaluation based on a list of interesting rewritings
+  built by a \sew{} contributor. However the list does not seem to be
+  available anymore;
+\item manual evaluation.
+\end{enumerate}
+
+Most of these possibilities are flawed in some way: BLEU, ROUGE and
+NIST have been built to evaluate a translation from one language to
+another. For example, when scoring an English to French translation,
+the starting score is $0$. When scoring a not-readable English to
+readable English translation, the starting score (in the case the
+translation doesn't actually do anything) could already be extremely
+high, consider the gold translation:
+
+“I went to the park and enjoyed the fantastic weather.” $\rightarrow$
+“I went to the park and enjoyed the great weather.”
+
+Compared to it, a NO-OP translation will have a unigram precision of
+$\,\sfrac{9}{10}$, a bigram precision of $\,\sfrac{7}{9}$, etc. The
+resulting scores will be very high.
+
+Readability formulas are also flawed, as detailed
+in \chapterref{cha:sota}. A better alternative is to use the most
+recent machine learning techniques as baselines.
+
+Finally manual evaluation is flawed in the sense that it doesn't cover
+a huge amount of data and has the usual problems of
+annotation—subjectivity and consistency probably being the main
+ones.
+
+At the time of this writing, the automatic evaluation is not yet in a
+presentable form and we settle for manual evaluation and discussion.
+
+\chapter{Future work}
+\label{cha:future-work}
+
+There are many possibilities for future work. Among the most important
+ones are:
+
+\begin{itemize}
+\item quantify the impact of the amount of data on the approaches
+  proposed. Around \numprint{30000} lexical enhancements, while a good
+  start, is certainly a number that could grow with great effects;
+\item to better handle grammaticality in the lexical rewriting
+  context, using syntactic parsing information to constrain rewritings
+  is a promising possibility;
+\item investigate syntactic readability issues in the fine-grained
+  analysis context, in particular by going from a string to string
+  transduction process to a tree to tree transduction process,
+  following related work in text rewriting;
+\item integrate gaze information in the process of estimating the
+  readability of an area of a text. It should combine especially well
+  with lexical estimations, because both can be anchored precisely in
+  a text. Conversely, it might be more challenging to improve a
+  syntactic approach with gaze information;
+\end{itemize}
+
+\chapter{Conclusion}
+
+\bibliographystyle{apalike2}
+\bibliography{report.bib}
+
+\appendix
 
 \chapter{Open source contributions}
 \label{cha:oss-contribs}
 
 During this internship I had the opportunity to contribute to the open
 source natural language processing community. What follows is a list
-of those contributions.
+of those contributions. When no link is provided, the software is part
+of the \textsc{Readability Lab} repository already linked several
+times in this report.
 
 \section{Enhancements of existing software}
 \label{sec:enhancements}
@@ -908,11 +1032,6 @@ of those contributions.
 \item Wikimedia PostgreSQL importer
 \item Generic implementation of Aho-Corasick
 \end{itemize}
-
-\chapter{Conclusions  et perspectives}
-
-\bibliographystyle{apalike2}
-\bibliography{report.bib}
 
 \end{document}
 %%% Local Variables: 
