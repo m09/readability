@@ -106,7 +106,7 @@ var Annotator = React.createClass({
             <li className={this.state.tab === 'analysis' ? 'active' : ''}>
             <a href="#"
             onClick={this.activateOutputTab.bind(this, 'analysis')}>
-            Analysis
+            Lexical enhancements
             </a>
             </li>
             
