@@ -4,8 +4,8 @@ var ControlPane = React.createClass({
     var optionsWeight = _.map(this.props.scores, function(s, i) {
         return <option selected={this.props.weight === i}>{s}</option>;
     }.bind(this));
-    var optionsSR = _.map(this.props.semirings, function(s, i) {
-        return <option selected={this.props.semiring === i}>{s}</option>;
+    var optionsSR = _.map(this.props.monoids, function(s, i) {
+        return <option selected={this.props.monoid === i}>{s}</option>;
     }.bind(this));
     return (
         <section className="settings">
@@ -27,8 +27,8 @@ var ControlPane = React.createClass({
       </select>
         </div>
         <div className="col-sm-3">
-        Semiring:
-        <select onChange={this.props.callbackSemiring} autocomplete="off">
+        Monoid:
+        <select onChange={this.props.callbackMonoid} autocomplete="off">
         {optionsSR}
       </select>
         </div>

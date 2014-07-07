@@ -6,8 +6,8 @@ import eu.crydee.readability.corpus.FullCorpusPath
 import eu.crydee.readability.uima.server.DictUsageAEBuilder
 import eu.crydee.readability.uima.core.model.Score
 import eu.crydee.readability.uima.core.ts.Token
-import eu.crydee.readability.uima.server.model.Semiring
-import eu.crydee.readability.uima.server.model.Weight
+import eu.crydee.readability.uima.server.model.Monoids
+import eu.crydee.readability.uima.server.model.Monoid
 import eu.crydee.readability.uima.server.ts.RewritingsBySemiring
 import eu.crydee.readability.uima.server.ts.RewritingsByScoreThenSemiring
 import eu.crydee.readability.uima.server.ts.Revision
@@ -136,8 +136,8 @@ object Application extends Controller {
     def writes(s: Score): JsValue = JsString(s.toString)
   }
 
-  implicit val weightWrites = new Writes[Weight] {
-    def writes(w: Weight): JsValue = JsString(w.toString)
+  implicit val monoidWrites = new Writes[Monoid] {
+    def writes(m: Monoid): JsValue = JsString(m.toString)
   }
 
   def annotate = Action(parse.json) { request =>
@@ -160,7 +160,7 @@ object Application extends Controller {
       Ok(
         Json.obj(
           "scores"      -> Json.toJson(Score.values),
-          "semirings"   -> Json.toJson(Semiring.values),
+          "monoids"   -> Json.toJson(Monoids.values),
           "text"        -> jcas.getDocumentText,
           "tokens"      -> tokens,
           "revisions"   -> JsObject(

@@ -90,9 +90,9 @@ public class Transducer {
     private final SortedMap<Integer, SortedSetMultimap<Integer, Cell>> byStarts
             = new TreeMap<>();
     private final SetMultimap<Integer, Integer> byEnds = HashMultimap.create();
-    private final Weight weight;
+    private final Monoid weight;
 
-    public Transducer(Weight weight) {
+    public Transducer(Monoid weight) {
         this.weight = weight;
     }
 

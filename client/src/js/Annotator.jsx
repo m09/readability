@@ -5,7 +5,7 @@ var Annotator = React.createClass({
       data: {
         noisy: {
           scores: [],
-          semirings: [],
+          monoids: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -14,7 +14,7 @@ var Annotator = React.createClass({
         },
         filtered: {
           scores: [],
-          semirings: [],
+          monoids: [],
           text: "",
           tokens: [],
           revisions: [],
@@ -23,7 +23,7 @@ var Annotator = React.createClass({
         }
       },
       weight: 0,
-      semiring: 0,
+      monoid: 0,
       corpus: 'filtered',
       tab: 'input',
       lastText: "",
@@ -74,8 +74,8 @@ var Annotator = React.createClass({
       this.fetchData(corpus);
     }
   },
-  controlCallbackSemiring: function(e) {
-    this.setState({semiring: e.target.options.selectedIndex});
+  controlCallbackMonoid: function(e) {
+    this.setState({monoid: e.target.options.selectedIndex});
   },
   activateOutputTab: function(tab) {
     this.fetchData(this.state.corpus);
@@ -90,10 +90,10 @@ var Annotator = React.createClass({
             weight={this.state.weight}
             corpus={this.state.corpus}
             scores={this.state.data[this.state.corpus].scores}
-            semirings={this.state.data[this.state.corpus].semirings}
+            monoids={this.state.data[this.state.corpus].monoids}
             callbackWeight={this.controlCallbackWeight}
             callbackCorpus={this.controlCallbackCorpus}
-            callbackSemiring={this.controlCallbackSemiring}
+            callbackMonoid={this.controlCallbackMonoid}
             tab={this.state.tab}/>
             <ul className="nav nav-tabs nav-justified">
             <li className={this.state.tab === 'input' ? 'active' : ''}>
@@ -132,7 +132,7 @@ var Annotator = React.createClass({
                     : false}/>
             <RewritingsPane id="rewritings"
             weight={this.state.weight}
-            semiring={this.state.semiring}
+            monoid={this.state.monoid}
             data={this.state.corpus === 'noisy'
                   ? this.state.data.noisy
                   : this.state.data.filtered}

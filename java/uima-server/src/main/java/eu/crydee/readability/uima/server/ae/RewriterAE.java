@@ -1,10 +1,10 @@
 package eu.crydee.readability.uima.server.ae;
 
 import eu.crydee.readability.uima.core.model.Score;
-import eu.crydee.readability.uima.server.model.Semiring;
+import eu.crydee.readability.uima.server.model.Monoids;
 import eu.crydee.readability.uima.server.model.Transducer;
 import eu.crydee.readability.uima.server.model.Transducer.Span;
-import eu.crydee.readability.uima.server.model.Weight;
+import eu.crydee.readability.uima.server.model.Monoid;
 import eu.crydee.readability.uima.server.ts.RewritingsByScoreThenSemiring;
 import eu.crydee.readability.uima.server.ts.Revision;
 import eu.crydee.readability.uima.server.ts.Rewriting;
@@ -33,7 +33,7 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         int scoreSize = Score.values().length,
-                semiringSize = Semiring.values().length;
+                semiringSize = Monoids.values().length;
         RewritingsByScoreThenSemiring rbsts = new RewritingsByScoreThenSemiring(
                 jcas,
                 0,
@@ -57,7 +57,7 @@ public class RewriterAE extends JCasAnnotator_ImplBase {
             int scoreIndex,
             int semiringIndex)
             throws AnalysisEngineProcessException {
-        Weight weight = Semiring.values()[semiringIndex];
+        Monoid weight = Monoids.values()[semiringIndex];
         Transducer transitions = new Transducer(weight);
         int previousEnd = 0, txtLength = jcas.getDocumentText().length();
         for (Token token : JCasUtil.select(jcas, Token.class)) {
