@@ -24,3 +24,14 @@ See which terms have the most translations
 ------------------------------------------
 
     xsltproc scripts/top.xsl dict.xml | less
+
+Compute top translations for each score
+---------------------------------------
+    for s in OCC LMn LMwn LMcn LMcwn; do
+        xsltproc --stringparam "score" "$s" \
+            scripts/flattener.xsl \
+            filteredTxt.xml | \
+            sort -gr | \
+            head -n 20 \
+            > "$s"
+    done

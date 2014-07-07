@@ -5,6 +5,8 @@
 
   <xsl:strip-space elements="*"/>
 
+  <xsl:param name="score"/>
+
   <xsl:template match="/">
     <xsl:apply-templates select="dict/original"/>
   </xsl:template>
@@ -14,7 +16,7 @@
       <xsl:value-of select="text/text()"/>
     </xsl:variable>
     <xsl:for-each select="revised-list/revised">
-      <xsl:value-of select="@scoreLMWN"/>
+      <xsl:value-of select="@*[local-name()=concat('score', $score)]"/>
       <xsl:text>	</xsl:text>
       <xsl:value-of select="$originalText"/>
       <xsl:text>	</xsl:text>

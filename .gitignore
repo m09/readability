@@ -17,6 +17,7 @@ indented.xml
 /java/uima-corpus-creator/out/res/fullTxt.xml
 /java/uima-corpus-creator/out/res/filteredTxt.xml
 /java/uima-corpus-creator/out/res/processed/
+/java/uima-corpus-creator/out/res/tops/
 /server/conf/application.conf
 /server/data/
 /server/logs
