@@ -689,16 +689,20 @@ language of readable texts.
 
 Two of the main tasks performed while manipulating weighted
 transducers are combining weights in a given branch and combining the
-weights of two different branches. Those two operations require
-respectively a product and a sum and therefore semi-rings are commonly
-used to model the way weights are handled in a weighted transducer
-\cite{mohri2004weighted}.
+weights of two different branches. Those two operations require two
+closed binary operations and therefore semi-rings are commonly used to
+model the way weights are handled in a weighted transducer
+\cite{mohri2004weighted}. However the end-goal of using transducers
+being to use the Viterbi algorithm \cite{forney1973viterbi}, we only
+need one binary operation (the need to combine branches never occurs
+during Viterbi). Therefore we part from the common definition, for
+simplicity, and use monoids instead of semi-rings.
 
-We define a weighted finite-state transducer over a semi-ring
-$(\mathbb{K}, \oplus, \otimes, \mathbb{0}, \mathbb{1})$ (that we will
-use to combine the outputs of a score function) as an 8-tuple that
-follows the common definition used by \cite{mohri2004weighted}: $T =
-(\Sigma, \Delta, Q, I, F, E, \lambda, \rho)$ where:
+We define a weighted finite-state transducer over a monoid
+$(\mathbb{K}, \otimes, \mathbb{1})$ (that we will use to combine the
+outputs of a score function) as an 8-tuple that follows the common
+definition used by \cite{mohri2004weighted}: $T = (\Sigma, \Delta, Q,
+I, F, E, \lambda, \rho)$ where:
 \begin{itemize}
 \item $\Sigma$ is the finite input alphabet of the transducer;
 \item $\Delta$ is the finite output alphabet;
@@ -712,13 +716,13 @@ follows the common definition used by \cite{mohri2004weighted}: $T =
 \item $\rho : F \rightarrow \mathbb{K}$ the final weight function mapping
   $F$ to $\mathbb{K}$.
 \end{itemize}
-Such a transducer over a semi-ring $(\mathbb{K}, \oplus, \otimes,
-\mathbb{0}, \mathbb{1})$ is constructed for a given input text of $n$
-tokens noted $t_1 \dots t_n$ and their $n$ parts of speech noted $p_1
-\dots p_n$ as follows, where $\mathcal{T}$ is the set of all tokens in
-written English, $\mathcal{P}$ is the set of all parts of speech in
-English and $\mathcal{S} : \mathcal{D} \rightarrow \mathbb{K}$ is the
-score we use, $\mathbb{K}$ being the set of the semi-ring:
+Such a transducer over a monoid $(\mathbb{K}, \otimes, \mathbb{1})$ is
+constructed for a given input text of $n$ tokens noted $t_1 \dots t_n$
+and their $n$ parts of speech noted $p_1 \dots p_n$ as follows, where
+$\mathcal{T}$ is the set of all tokens in written English,
+$\mathcal{P}$ is the set of all parts of speech in English and
+$\mathcal{S} : \mathcal{D} \rightarrow \mathbb{K}$ is the score we
+use, $\mathbb{K}$ being the set of the monoid:
 \begin{align*}
 \Sigma & = \mathcal{T} \times \mathcal{P} \\
 \Delta & = \mathcal{T} \times \mathcal{P} \\
@@ -734,20 +738,18 @@ E & = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
 \rho & : x \mapsto \mathbb{1}
 \end{align*}
 
-Now, we can define semi-rings to use with the constructed
-transducer. We mainly consider two use-cases, each of them requiring a
-different semi-ring:
+Now, we can define monoids to use with the constructed transducer. We
+mainly consider two use-cases, each of them requiring a different
+monoid:
 
 \begin{figure}[H]
   \centering
   \begin{enumerate}
   \item from the transducer and an input text, calculate the top $n$
-    transductions. This is the classical of statistical machine
-    translation;
+    transductions. This is the classical task of machine translation;
   \item from the transducer and an input text, get an idea of how the
     system rewrites the text at a certain level of confidence.
   \end{enumerate}
-  
   \caption{Use-cases of text rewriting}
 \label{fig:use-cases}
 \end{figure}
@@ -755,35 +757,32 @@ different semi-ring:
 The motivation for the second use-case is maybe not clear at
 first. The reason it needs to be separated from use-case (1.) is that,
 even for a very long text, the top 100 scores of the rewritings will
-likely correspond to 100 different single token modifications.  while
-we would want to see the complete text rewritten at once at a certain
+likely correspond to 100 different single token modifications while we
+would want to see the complete text rewritten at once at a certain
 level of confidence. An example will illustrate the key difference
 later on in this section.
 
-We define the semi-rings in \tableref{tab:semi-rings} for the
-$S_{OCC}$ score function. The Negative MaxMin semi-ring allows us to
-obtain the threshold effect of use-case (2.) from
-\figureref{fig:use-cases} while the Negative Log semi-ring allows us
-to compute the precise tops of use-case (1.). Negative Log is the log
-equivalent of the $(\left[0, 1\right], +, *, 0, 1)$ semi-ring for
-probabilities.
+We define the monoids in \tableref{tab:monoids} for the $S_{OCC}$
+score function. The Negative MaxMin monoid allows us to obtain the
+threshold effect of use-case (2.) from \figureref{fig:use-cases} while
+the Negative Log monoid allows us to compute the precise tops of
+use-case (1.). Negative Log is the log equivalent of the $(\left[0,
+  1\right], *, 1)$ monoid for probabilities.
 
 \begin{table}[H]
   \centering
-  \caption{Interesting semi-rings for our score functions, where
-    $a +_{\log} b = \log\left(e^a + e^b\right)$}
-  \begin{tabular}{rccccc}
+  \caption{Interesting monoids for our score functions}
+  \begin{tabular}{rccc}
     \toprule
-    Semiring & $\mathbb{K}$ & $\oplus$ & $\otimes$ & $\mathbb{0}$ & $\mathbb{1}$
-    \\
+    Semiring & $\mathbb{K}$ & $\otimes$ & $\mathbb{1}$ \\
     \midrule
-    Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+_{\log}$ & $+$ & $-\infty$ & $0$ \\
-    Negative MaxMin & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\max$ & $\min$ & $-\infty$ & $0$ \\
+    Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+$ & $0$ \\
+    Negative MaxMin & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\min$ & $0$ \\
   \end{tabular}
-  \label{tab:semi-rings}
+  \label{tab:monoids}
 \end{table}
 
-To illustrate how those semi-rings work, let us consider an example
+To illustrate how those monoids work, let us consider an example
 transducer for the sentence “I'm exhausted”
 (\figureref{fig:transducer-ex}). The convention used to represent the
 transducer is that the first line of the transition represents the
@@ -803,10 +802,10 @@ in \sectionref{sec:lexical-enhancements}.
   \label{fig:transducer-ex}
 \end{figure}
 
-With the semi-rings defined in \tableref{tab:semi-rings}, we would
-obtain the rewritings shown in \tableref{tab:neglog}. We can clearly
-observe the different behaviors of the two semi-rings in the last row
-of the table. While the semi-rings are not different for single
+With the monoids defined in \tableref{tab:monoids}, we would obtain
+the rewritings shown in \tableref{tab:neglog}. We can clearly observe
+the different behaviors of the two monoids in the last row of the
+table. While the monoids have similar effects for single
 modifications, the desired threshold effect is obtained with Negative
 MaxMin and the precise transduction score is retrieved with Negative
 Log when considering rewritings with two non-identity transitions.
@@ -826,11 +825,11 @@ Log when considering rewritings with two non-identity transitions.
   \label{tab:neglog}
 \end{table}
 
-The two semi-rings are almost usable with the various flavors of
+The two monoids are almost usable with the various flavors of
 $\mathcal{S}_{LM}$ score functions. But since they are not the log of
 probabilities, we don't have the guarantee that for all $w \maps{D}
-r$, $\mathcal{S} \left( w \maps{D} r \right) \in \left]-\infty,
-  0\right]$. To fix this problem and be able to use the semi-rings
+r$, $\mathcal{S} \left( w \maps{D} r \right) \in \mathbb{R}^{-} \cup
+\{-\infty\}$. To fix this problem and be able to use the semi-rings
 defined above, we normalize the scores $\mathcal{S}_{LM}$ and
 $\mathcal{S}_{LMc}$ into the scores $\mathcal{S}_{LMn},
 \mathcal{S}_{LMcn}$ as follows ($n$ standing for normalized):
@@ -849,19 +848,22 @@ scores $\mathcal{S}_{LMwn}, \mathcal{S}_{LMcwn}$ as follows:
   \sqrt[\card{w'}]{\proba[LM]{w'}^{(1 - \lambda)}} \right)
 \]
 
-The normalized functions can be used with the semi-rings we defined
-for $\mathcal{S}_{OCC}$.
+The normalized functions can be used with the monoids we defined for
+$\mathcal{S}_{OCC}$. Note that if we had used semi-rings, this
+normalization would be incorrect because we do not obtain a
+probability distribution after this normalization process. However,
+while it is a problem to combine the weights of different branches, it
+is not a problem to combine weights in a branch.
 
 It is now possible to address the two use-cases mentioned in
 \figureref{fig:use-cases} by using the Viterbi algorithm
-\cite{forney1973viterbi} with Negative Log as semi-ring for the first
+\cite{forney1973viterbi} with Negative Log as monoid for the first
 use-case and Negative MaxMin for the second.
 
 The next section details \textsc{Readability Lab}, a framework built
 to analyze both the lexical enhancements and the text rewritings
 introduced in \sectionref{sec:lexical-enhancements}
-and \sectionref{sec:rewriting}
-in an intuitive and efficient manner.
+and \sectionref{sec:rewriting} in an intuitive and efficient manner.
 
 \section{\textsc{Readability Lab}, a fine-grained readability analysis
   framework}
