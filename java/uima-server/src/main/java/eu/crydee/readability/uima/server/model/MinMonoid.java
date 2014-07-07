@@ -1,6 +1,6 @@
 package eu.crydee.readability.uima.server.model;
 
-public class MaxMinMonoid implements Monoid {
+public class MinMonoid implements Monoid {
 
     @Override
     public double getUnit() {
@@ -19,6 +19,6 @@ public class MaxMinMonoid implements Monoid {
 
     @Override
     public String toString() {
-        return "MaxMin";
+        return "Min";
     }
 }
