@@ -15,6 +15,7 @@ import eu.crydee.readability.uima.server.ts.TxtSuggestion;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -86,7 +87,9 @@ public class MapperAE extends JCasAnnotator_ImplBase {
                 .map(t -> Pair.of(t.getBegin(), t.getEnd()))
                 .collect(Collectors.toList());
         Pair<String, String>[] text = tokens.stream()
-                .map(t -> Pair.of(t.getCoveredText(), t.getPOS()))
+                .map(t -> Pair.of(
+                                t.getCoveredText().toLowerCase(Locale.ENGLISH),
+                                t.getPOS()))
                 .toArray(length -> new Pair[length]);
         SetMultimap<Integer, Integer> suggestions = ac.search(text, true);
         for (Integer mappedIndex : suggestions.keySet()) {
