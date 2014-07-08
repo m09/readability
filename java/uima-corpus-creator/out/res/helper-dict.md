@@ -27,7 +27,8 @@ See which terms have the most translations
 
 Compute top translations for each score
 ---------------------------------------
-    for s in OCC LMn LMwn LMcn LMcwn; do
+
+    for s in LM LMc DLM DLMc DLMw DLMcw; do
         xsltproc --stringparam "score" "$s" \
             scripts/flattener.xsl \
             filteredTxt.xml | \

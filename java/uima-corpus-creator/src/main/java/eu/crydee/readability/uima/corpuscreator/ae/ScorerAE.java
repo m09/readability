@@ -48,10 +48,6 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
     @Override
     public void collectionProcessComplete()
             throws AnalysisEngineProcessException {
-        double lowestScoreLM = Double.POSITIVE_INFINITY,
-                highestScoreLM = Double.NEGATIVE_INFINITY;
-        double lowestScoreLMW = Double.POSITIVE_INFINITY,
-                highestScoreLMW = Double.NEGATIVE_INFINITY;
         double minLMProba = Double.POSITIVE_INFINITY;
         double minLMWProba = Double.POSITIVE_INFINITY;
         double logTotalCount = Math.log(dict.getTotalCount());
@@ -59,57 +55,63 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
             Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             int originalCount
                     = revs.values().stream().mapToInt(Metadata::getCount).sum();
-            List<String> tokens = new ArrayList<>();
-            tokens.add("<s>");
-            tokens.addAll(original.getTokens());
-            tokens.add("</s>");
-            float lmProba = nlm.scoreSentence(tokens),
-                    lmWProba = lmProba / original.getTokens().size();
-            minLMProba = Math.min(minLMProba, lmProba);
-            minLMWProba = Math.min(minLMWProba, lmWProba);
+            List<String> originalTokens = new ArrayList<>();
+            originalTokens.add("<s>");
+            originalTokens.addAll(original.getTokens());
+            originalTokens.add("</s>");
+            float originalLmProba = nlm.scoreSentence(originalTokens),
+                    originalLmWProba = originalLmProba
+                    / original.getTokens().size();
+            minLMProba = Math.min(minLMProba, originalLmProba);
+            minLMWProba = Math.min(minLMWProba, originalLmWProba);
             for (Mapped rev : revs.keySet()) {
+                List<String> revisedTokens = new ArrayList<>();
+                revisedTokens.add("<s>");
+                revisedTokens.addAll(rev.getTokens());
+                revisedTokens.add("</s>");
+                float revisedLmProba = nlm.scoreSentence(revisedTokens),
+                        revisedLmWProba = revisedLmProba
+                        / rev.getTokens().size();
                 Metadata metric = revs.get(rev);
-                double scoreOcc = Math.log(metric.getCount())
-                        - logTotalCount,
-                        scoreLM = Math.log(metric.getCount())
+                double scoreLM = Math.log(metric.getCount())
                         - logTotalCount
-                        - lmProba,
-                        scoreLMW = Math.log(metric.getCount())
-                        - logTotalCount
-                        - lmWProba,
+                        - originalLmWProba,
                         scoreLMC = Math.log(metric.getCount())
                         - Math.log(originalCount)
-                        - lmProba,
-                        scoreLMCW = Math.log(metric.getCount())
+                        - originalLmWProba,
+                        scoreDLM = Math.log(metric.getCount())
+                        - logTotalCount
+                        + revisedLmProba
+                        - originalLmWProba,
+                        scoreDLMC = Math.log(metric.getCount())
                         - Math.log(originalCount)
-                        - lmWProba;
-                lowestScoreLM = Math.min(scoreLMC, lowestScoreLM);
-                highestScoreLM = Math.max(scoreLMC, highestScoreLM);
-                lowestScoreLMW = Math.min(scoreLMCW, lowestScoreLMW);
-                highestScoreLMW = Math.max(scoreLMCW, highestScoreLMW);
-                metric.setScore(Score.OCC, scoreOcc);
-                metric.setScore(Score.LMn, scoreLM);
-                metric.setScore(Score.LMwn, scoreLMW);
-                metric.setScore(Score.LMcn, scoreLMC);
-                metric.setScore(Score.LMcwn, scoreLMCW);
+                        + revisedLmProba
+                        - originalLmWProba,
+                        scoreDLMW = Math.log(metric.getCount())
+                        - logTotalCount
+                        + revisedLmWProba
+                        - originalLmWProba,
+                        scoreDLMCW = Math.log(metric.getCount())
+                        - Math.log(originalCount)
+                        + revisedLmWProba
+                        - originalLmWProba;
+                metric.setScore(Score.S, scoreLM);
+                metric.setScore(Score.Sc, scoreLMC);
+                metric.setScore(Score.Sd, scoreDLM);
+                metric.setScore(Score.Sdc, scoreDLMC);
+                metric.setScore(Score.Swd, scoreDLMW);
+                metric.setScore(Score.Swdc, scoreDLMCW);
             }
         }
         for (Mapped original : dict.keySet()) {
             Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             for (Mapped rev : revs.keySet()) {
                 Metadata metric = revs.get(rev);
-                metric.setScore(
-                        Score.LMn,
-                        metric.getScore(Score.LMn) + minLMProba);
-                metric.setScore(
-                        Score.LMwn,
-                        metric.getScore(Score.LMwn) + minLMWProba);
-                metric.setScore(
-                        Score.LMcn,
-                        metric.getScore(Score.LMcn) + minLMProba);
-                metric.setScore(
-                        Score.LMcwn,
-                        metric.getScore(Score.LMcwn) + minLMWProba);
+                for (Score score : Score.values()) {
+                    metric.setScore(
+                            score,
+                            metric.getScore(score) + minLMWProba);
+                }
             }
         }
     }
