@@ -412,6 +412,18 @@
                 <li>Conclusion</li>
             </ul>
           </section>
+          <section>
+            <h2>Machine translation
+              <br>to the rescue</h2>
+            <ul>
+              <li>use phrase based machine translation to model
+                lexical improvements</li>
+              <li>use translation scores as indicators of readability</li>
+            </ul>
+            <br>
+            <br>
+            <p>→ achieve fine-grained readability</p>
+          </section>
         </section>
         <section>
           <section>
@@ -431,6 +443,30 @@
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
                 <li>Conclusion</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Corpus creation</h2>
+            <h3>a subtask</h3>
+            <p>Free readability corpora are based on comparable
+              corpora. We propose a free corpus based on revision
+              history.</p>
+            <br>
+            <p>Reasons:</p>
+            <ul>
+              <li>general process</li>
+              <li>easily extensible outside of wikipedia (copy-editing)</li>
+              <li>allows us to also make tooling available</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Corpus creation</h2>
+            <h3>Methodology</h3>
+            <p>We use previously known methods:</p>
+            <ul>
+              <li>SEW edit history</li>
+              <li>align the sentences with a `diff` program</li>
+              <li>release it to the public</li>
             </ul>
           </section>
         </section>
@@ -495,6 +531,88 @@
                 <li><strong class="text-success">Text rewriting</strong></li>
                 <li>Conclusion</li>
             </ul>
+          </section>
+          <section>
+            <h2>Text rewriting</h2>
+            We can use our lexicon to rewrite text: with <strong>weighted transducers</strong>.
+          </section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>definition</h3>
+            <ul>
+              <li>$\Sigma$ input alphabet</li>
+              <li>$\Delta$ output alphabet</li>
+              <li>$Q$ set of states</li>
+              <li>$I \subseteq Q$ set of initial states</li>
+              <li>$F \subseteq Q$ set of final states</li>
+              <li>$E \subseteq Q \times (\Sigma \cup \{\varepsilon\})
+                \times (\Delta \cup \{\varepsilon\}) \times \mathbb{K}
+                \times Q$ set of transitions</li>
+              <li>$\lambda : I \rightarrow \mathbb{K}$ the initial weight function</li>
+              <li>$\rho : F \rightarrow \mathbb{K}$ the final weight function mapping
+                $F$ to $\mathbb{K}$</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>construction</h3>
+            <ul>
+              <li>$\Sigma = \mathcal{T}$</li>
+              <li>$\Delta = \mathcal{T}$</li>
+              <li>$Q = \left\{ q_i | 0 \leq i \leq n \right\}$</li>
+              <li>$I = \{ q_0 \}$</li>
+              <li>$F = \{ q_n \}$</li>
+              <li>$\displaystyle
+                \begin{aligned}[t]
+                E & = \left\{ (q_{i - 1}, x, y, s, q_i) | (x, y, s) \in \mathcal{L}
+                \land 1 \leq i \leq n \right\} \\
+                & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
+                | 1 \leq i \leq n \right\}
+                \end{aligned}$</li>
+              <li>$\lambda : x \mapsto \mathbb{1}$</li>
+              <li>$\rho : x \mapsto \mathbb{1}$</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>example</h3>
+            <img src="img/monoids.svg" width="830">
+          </section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>Combining weights</h3>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>score with +</th>
+                  <th>score with min</th>
+                  <th>output</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>I'm exhausted</td>
+                </tr>
+                <tr>
+                  <td>-0.9</td>
+                  <td>-0.9</td>
+                  <td>I'm tired</td>
+                </tr>
+                <tr>
+                  <td>-3.2</td>
+                  <td>-3.2</td>
+                  <td>I am exhausted</td>
+                </tr>
+                <tr>
+                  <td>-4.1</td>
+                  <td>-3.2</td>
+                  <td>I am tired</td>
+                </tr>
+              </tbody>
+            </table>
+            <img src="img/monoids.svg">
           </section>
         </section>
         <section>
