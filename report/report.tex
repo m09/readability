@@ -715,14 +715,13 @@ they are the best fit to the alignments made to produce the lexical
 enhancement dictionary.
 
 Formally, we define a Recursive Lexical Readability Measure
-$\mathcal{RLRM}$ of a text $T$ using a lexical enhancement dictionary
-$\mathcal{D}$ as the combination of the three functions $\theta$,
-$\sigma$ and $\pi$—named after the initials of text, sentence and
-part:
+$\mathcal{RLRM}$ of a text $t$ using a lexicon $\mathcal{L}$ as the
+combination of the three functions $\theta$, $\sigma$ and $\pi$—named
+after the initials of text, sentence and part:
 \[
-\mathcal{RLRM}(t) = \theta\Bigg(\Bigg\{ \sigma \left(\left\{ \pi(p
-    \maps{D} r) \suchthat \text{$p$ is a part of $s$}\right\}\right)
-\,\Bigg|\, \text{$s$ is a sentence in $T$} \Bigg\}\Bigg)
+\mathcal{RLRM}(t) = \theta\Bigg(\Bigg\{ \sigma \left(\left\{ \pi(s)
+    \suchthat (x, y, s) \in \mathcal{L} \land \text{$x$ is a part of $sent$}\right\}\right) \,\Bigg|\,
+\text{$sent$ is a sentence in $T$} \Bigg\}\Bigg)
 \]
 To define a $\mathcal{RLRM}$, one needs to provide the three functions
 $\theta$, $\sigma$ and $\pi$. While this is quite a general framework,
