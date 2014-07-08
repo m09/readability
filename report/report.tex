@@ -196,7 +196,7 @@ is readable or non readable, and for which reasons.
 \label{cha:sota}
 
 This section details the history and state of the art of computational
-readability study.
+readability study that served as a basis for this work.
 
 \section{Early works and readability formulas}
 \label{sec:early-works-and-formulas}
@@ -311,8 +311,22 @@ corpora of readable sentences and their hard-to-read counterparts.
 \chapter{Work}
 \label{cha:work}
 
+To achieve fine-grained readability analysis, we propose an approach
+relying on statistical phrase based translation
+\cite{koehn2003statistical}. The underlying idea is to build a lexicon
+of not-so-readable phrases and their readable counterparts enriched
+with a score reflecting the quality of the translation to be able to
+score areas of a text depending on the translations available for
+them. \sew{} is used to provide the initial translations.
+
+In the literature, most of the best models are based on a language
+model of the target language. Our approach differs from this principle
+mainly because \sew{} doesn't contain a sufficient number of examples
+so that we can reliably build readable English and non-readable
+English language models.
+
 The work done during this internship is better presented as five
-different complementary tasks. The following sections detail them.
+different complementary tasks.
 
 \section{Automatic readability parallel corpus creation}
 \label{sec:corpus}
@@ -475,10 +489,10 @@ equivalent.
 The resulting resource is enriched with part-of-speech, and syntactic
 parsing annotations and is proposed in an XML format.
 
-\section{Lexical enhancements}
+\section{Phrasal lexicon creation}
 \label{sec:lexical-enhancements}
 
-With this corpus at our disposal, we next define a way to use it as a
+With this corpus at our disposal, it is we next define a way to use it as a
 lexical dictionary to simplify vocabulary in a text. The goal is to
 allow authors to pick simpler words than the ones they used, in an
 efficient manner. In what follows, we will denote the multiset of all
@@ -763,7 +777,7 @@ level of confidence. An example will illustrate the key difference
 later on in this section.
 
 We define the monoids in \tableref{tab:monoids} for the $S_{OCC}$
-score function. The Negative MaxMin monoid allows us to obtain the
+score function. The Negative Min monoid allows us to obtain the
 threshold effect of use-case (2.) from \figureref{fig:use-cases} while
 the Negative Log monoid allows us to compute the precise tops of
 use-case (1.). Negative Log is the log equivalent of the $(\left[0,
@@ -777,7 +791,7 @@ use-case (1.). Negative Log is the log equivalent of the $(\left[0,
     Semiring & $\mathbb{K}$ & $\otimes$ & $\mathbb{1}$ \\
     \midrule
     Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+$ & $0$ \\
-    Negative MaxMin & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\min$ & $0$ \\
+    Negative Min & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\min$ & $0$ \\
   \end{tabular}
   \label{tab:monoids}
 \end{table}
@@ -807,7 +821,7 @@ the rewritings shown in \tableref{tab:neglog}. We can clearly observe
 the different behaviors of the two monoids in the last row of the
 table. While the monoids have similar effects for single
 modifications, the desired threshold effect is obtained with Negative
-MaxMin and the precise transduction score is retrieved with Negative
+Min and the precise transduction score is retrieved with Negative
 Log when considering rewritings with two non-identity transitions.
 
 \begin{table}[H]
@@ -815,7 +829,7 @@ Log when considering rewritings with two non-identity transitions.
   \caption{Rewritings of “I'm exhausted”}
   \begin{tabular}[H]{SSl}
     \toprule
-    {Negative Log Score} & {Negative MaxMin Score} & {Rewriting} \\
+    {Negative Log Score} & {Negative Min Score} & {Rewriting} \\
     \midrule
     0 & 0 & I'm exhausted \\
     -0.9 & -0.9 & I'm tired \\
@@ -850,7 +864,7 @@ scores $\mathcal{S}_{LMwn}, \mathcal{S}_{LMcwn}$ as follows:
 
 The normalized functions can be used with the monoids we defined for
 $\mathcal{S}_{OCC}$. Note that if we had used semi-rings, this
-normalization would be incorrect because we do not obtain a
+normalization would be incorrect because we do not obtain the log of a
 probability distribution after this normalization process. However,
 while it is a problem to combine the weights of different branches, it
 is not a problem to combine weights in a branch.
@@ -876,7 +890,7 @@ of an approach is valuable. It was also the occasion to expose those
 results to other programs by creating a server that could easily be
 used by from other tool-chain.
 
-\begin{figure}[H]
+\begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{ui}
   \caption{\textsc{Readability Lab} interface}
@@ -916,7 +930,7 @@ available\footnote{\url{https://github.com/m09/aho-corasick}}.
 The source of \textsc{Readability Lab} is—yet again—available on
 \textsc{Github}\footnote{\url{https://github.com/m09/readability}}.
 
-\chapter{Discussion}
+\chapter{Evaluation \& Discussion}
 \label{cha:discussion}
 
 To evaluate and discuss the work proposed in \chapterref{cha:work},
@@ -941,7 +955,7 @@ Most of these possibilities are flawed in some way: BLEU, ROUGE and
 NIST have been built to evaluate a translation from one language to
 another. For example, when scoring an English to French translation,
 the starting score is $0$. When scoring a not-readable English to
-readable English translation, the starting score (in the case the
+readable English translation, the starting score (when the case the
 translation doesn't actually do anything) could already be extremely
 high, consider the gold translation:
 
@@ -950,11 +964,12 @@ high, consider the gold translation:
 
 Compared to it, a NO-OP translation will have a unigram precision of
 $\,\sfrac{9}{10}$, a bigram precision of $\,\sfrac{7}{9}$, etc. The
-resulting scores will be very high.
+resulting BLEU, ROUGE and NIST scores will be very high.
 
 Readability formulas are also flawed, as detailed
 in \chapterref{cha:sota}. A better alternative is to use the most
-recent machine learning techniques as baselines.
+recent machine learning techniques as baselines, at the price of
+implementation troubles.
 
 Finally manual evaluation is flawed in the sense that it doesn't cover
 a huge amount of data and has the usual problems of
@@ -964,19 +979,153 @@ ones.
 At the time of this writing, the automatic evaluation is not yet in a
 presentable form and we settle for manual evaluation and discussion.
 
+The main point to evaluate in this work is the efficiency of the five
+different scoring functions. They are analyzed below. To determine the
+problems and advantages of the scoring functions, an empirical study
+was led with a range of news articles. This informal insight still has
+to be backed up by further experiments at the time of this
+writing. All experiments were done with the $\lambda$ parameter fixed
+at $0.5$.
+
+\paragraph*{$\mathcal{S}_{OCC}$ function}
+\label{par:occ}
+
+Counting occurrences has an important bias towards non-content
+words—they are by far the most frequent in most languages, including
+English. They occupy the vast majority of the top suggestions
+spots. This is an important problem for a lexical approach. Indeed,
+non-content words mostly serve syntactical purposes. Trying to improve
+on the syntactic structure without further consideration for
+grammatical context is bound to fail. Despite these important
+problems, when lexical matches are found in the top rewritings they
+tend to be of good quality, as shown in \tableref{tab:tops-socc}.
+
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{OCC}$ top 5 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Rewriting \\
+    \midrule
+    -4.99 & , & . \\
+    -5.10 & external links & other websites \\
+    -5.26 & discovered & found \\
+    -5.32 & , and & . \\
+    -5.62 & ; & . \\
+  \end{tabularx}
+  \label{tab:tops-socc}
+\end{table}
+
+\paragraph*{$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ functions}
+\label{par:lmn}
+
+Balancing the $S_{OCC}$ score with a language model is not enough, as
+quickly appears from glancing at the top rewritings shown in
+\tableref{tab:tops-slmn}. All the best rewritings are of the maximum
+length ($5$ tokens) and are mostly noise. Indeed, the noisier some
+sequence is, the lower its language model score is and the higher its
+$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ scores are.
+
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ top 5 rewritings}
+  \begin{tabularx}{\textwidth}{SS>{\hsize=1.2\hsize}X>{\hsize=0.8\hsize}X}
+    \toprule
+    {$\mathcal{S}_{LMn}$} & {$\mathcal{S}_{LMcn}$} & Original & Rewriting \\
+    \midrule
+    -10.48 & 0.00  & slit-like vertical external urethral orifice & urethra \\
+    -11.87 & -1.38 & cover throughout entire catchments, & unchanged. \\
+    -12.52 & -2.03 & :cognitive biases category:group processes & :psicology \\
+    -13.21 & -2.72 & heading a mclaren one-two with & and his \\
+    -13.72 & -3.23 & recieve a hard sting from & were stung by \\
+  \end{tabularx}
+  \label{tab:tops-slmn}
+\end{table}
+
+\newpage
+
+\paragraph*{$\mathcal{S}_{LMwn}$ function}
+\label{par:lmn}
+
+Once averaged by the sequence length, the language model balancing
+yields better results as shown in \tableref{tab:tops-slmwn}. While the
+results seem very good in this top 5, it appears empirically that the
+scoring is inconsistent: many poor rewritings have good relative
+scores compared to interesting ones. Further study would be needed to
+see if these inconsistencies can be addressed by setting the $\lambda$
+parameter to a more efficient value.
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{LMwn}$ top 5 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original   & Rewriting \\
+    \midrule
+    -9.75   & obtain     & get       \\
+    -9.79   & discovered & found     \\
+    -10.10  & n't        & not       \\
+    -10.17  & indicate   & show      \\
+    -10.34  & allow      & let       \\
+  \end{tabularx}
+  \label{tab:tops-slmwn}
+\end{table}
+
+\paragraph*{$\mathcal{S}_{LMcwn}$ function}
+\label{par:lmn}
+
+Finally, by using the conditional probability of a rewriting occurring
+when trying to rewrite a given word instead of the straight
+probability of a rewriting occurring, the results obtained typically
+seem of lower quality than the results of the $\mathcal{S}_{LMwn}$
+function, as shown in \tableref{tab:tops-slmcwn}. It is however
+interesting to discuss which use-case we are evaluating:
+
+\begin{itemize}
+\item if we are evaluating the best rewritings without any context,
+  then this function is worse than $\mathcal{S}_{LMwn}$;
+\item if we are trying to simplify a text, then the noisy entries such
+  as “"he” and “exaggerated” do not matter so much, since they are
+  unlikely to appear in the words to rewrite.
+\end{itemize}
+
+We can conclude that this function is very dependent on the corpus
+quality. For the corpus we gathered, in practice, it is the function
+that yields the best results in our experience.
+
+As for the rest of this evaluation, further study is necessary to
+confirm or infirm this empirical conclusion—it is not backed by enough
+data.
+
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{LMcwn}$ top 5 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Rewriting \\
+    \midrule
+    0.00 & "he & that while giotto \\
+    -0.51 & exaggerated & said that \\
+    -0.57 & stray & wander \\
+    -0.60 & virtuous & good \\
+    -0.64 & discoloration & colour \\
+  \end{tabularx}
+  \label{tab:tops-slmcwn}
+\end{table}
+
 \chapter{Future work}
 \label{cha:future-work}
 
 There are many possibilities for future work. Among the most important
 ones are:
 
-\begin{itemize}
+\begin{enumerate}
 \item quantify the impact of the amount of data on the approaches
   proposed. Around \numprint{30000} lexical enhancements, while a good
-  start, is certainly a number that could grow with great effects;
-\item to better handle grammaticality in the lexical rewriting
-  context, using syntactic parsing information to constrain rewritings
-  is a promising possibility;
+  start, is certainly a number that could grow with great effects for
+  our statistical approaches;
+\item better handle grammaticality in the lexical rewriting context by
+  using syntactic parsing information to constrain rewritings is a
+  promising possibility;
 \item investigate syntactic readability issues in the fine-grained
   analysis context, in particular by going from a string to string
   transduction process to a tree to tree transduction process,
@@ -985,10 +1134,24 @@ ones are:
   readability of an area of a text. It should combine especially well
   with lexical estimations, because both can be anchored precisely in
   a text. Conversely, it might be more challenging to improve a
-  syntactic approach with gaze information;
-\end{itemize}
+  syntactic approach with gaze information.
+\item conduct a thorough evaluation, including automatic evaluation
+  with readability measures, lexical improvement lists comparison and
+  manual evaluation. An idea to evaluate manually the quality of the
+  rewritings proposed is to submit two rewritings, one of our own and
+  one of a similar approach to a human judge together with the
+  original text being rewritten and ask the judge to compare the two
+  rewritings.
+\end{enumerate}
+
+During the month left of this internship, we plan on focusing on tree
+transducing (3.) and a better evaluation (5.).
 
 \chapter{Conclusion}
+
+In this work we studied how to use classical machine translation and
+readability techniques to obtain fine-grained measurements of the
+readability of a text.
 
 \bibliographystyle{apalike2}
 \bibliography{report.bib}
