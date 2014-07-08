@@ -185,12 +185,13 @@ and improve on them. To be more specific, most methods consider
 documents as a whole when analyzing their readability, which makes it
 hard for users to understand which parts are the most important to
 rework. We aim at providing a fine-grained analysis of readability in
-this work. This shift has been observed in recent years in other
-natural language processing domains, such as sentiment analysis with
-the recursive approach proposed by \cite{socher2013recursive} that
-allows users to detect which part of a sentence conveys which
-sentiment. In the same way, we want to detect which part of a sentence
-is readable or non readable, and for which reasons.
+this work. This shift towards fine-grained analysis of linguistic
+phenomena has been observed in recent years in other natural language
+processing domains, such as sentiment analysis with the recursive
+approach proposed by \cite{socher2013recursive} that allows users to
+detect which part of a sentence conveys which sentiment. In the same
+way, we want to detect which part of a sentence is readable or non
+readable, and for which reasons.
 
 \chapter{Related work}
 \label{cha:sota}
@@ -232,10 +233,12 @@ understanding and because of that has been one of the most used
 formulas in research.
 
 Later works brought formulas that are easier to compute or give
-slightly better results. Some also give their result as the grade that
-would be required to be able to read the input text. Overall are all
-using the same variables as either Flesch or Dale and Chall
-\cite{mclaughlin1969smog, kincaid1975derivation,
+slightly better results. These improvements were not small
+improvements due to the time required to compute readability formulas
+on a large number of texts at the time. Some also give their result as
+the grade that would be required to be able to read the input
+text. Overall, all are using the same variables as either Flesch or
+Dale and Chall \cite{mclaughlin1969smog, kincaid1975derivation,
   chall1995readability}.
 
 Despite their useful applications, readability formulas are not
@@ -304,9 +307,34 @@ learning research in readability.
 \section{Readability research using \wiki}
 \label{sec:wiki-approaches}
 
-From 2006 onwards, \sew has been rightly seen as an important resource
-for readability studies. Scientists have used it to compute parallel
-corpora of readable sentences and their hard-to-read counterparts.
+From 2006 onwards—since its inception—\sew{} has been rightly seen as
+an important resource for readability studies. Scientists have used it
+to compute parallel corpora of readable sentences and their
+hard-to-read counterparts.
+
+Among the most notable works, \cite{zhu2010monolingual} used the
+comparable nature of \wiki{} and \sew{} to compute a parallel corpora
+about readability and proposed a general rewriting model based on tree
+transduction to exploit their corpus.
+
+Following the approach proposed by \cite{nelken2008mining} in the
+compression domain, in \cite{yatskar2010sake, woodsend2011learning},
+\sew{} is used as a basis to compute a parallel corpus on its own,
+thanks to its revision history. The corpora obtained are then used to
+train lexical simplification systems in the case of
+\cite{yatskar2010sake} and general systems
+\cite{woodsend2011learning}.
+
+\cite{biran2011putting} take a different look at the problem. They
+learn simplifications thanks to \wiki{} and \sew{} but without
+computing a parallel corpus. Instead, they rely on a set of methods to
+simplify words while preserving grammaticality. They also take word
+contexts into account thanks to a classical context vector method.
+
+Another interesting work using \sew{} is \cite{wubben2012sentence}. It
+considers text simplification as a monolingual machine translation
+task. This approach has important similarities with the use of machine
+translation in the paraphrasing task.
 
 \chapter{Work}
 \label{cha:work}
@@ -404,9 +432,13 @@ process. An example of readability edit can be seen in
   \label{fig:dan-kelly}
 \end{figure}
 
-The heuristic we use to gather edits is extremely simple: once
-stripped of the category information, we only consider edits with
-commit messages $m$ so that:
+The heuristic we use to gather edits is extremely simple: as a first
+step, the category information of a commit is removed. For example, in
+the commit message “/* Casablanca */ make the movie description more
+readable” the part “/* Casablanca */ ” is automatic data added by the
+\textsc{Mediawiki} software to specify in which section the edit was
+made. Once this part of the commit is deleted, we only consider commit
+messages $m$ so that:
 
 \[
 m \in \left\{\text{“simplify”}, \text{“simplifying”},
@@ -422,7 +454,7 @@ purposes, one of which will bring noise (the wikification). Commit \#2
 contains one of the matching terms, but we should not consider
 it. It's not clear if commit \#3 tries to address readability or not.
 
-\begin{table}[H]
+\begin{table}[h]
   \centering
   \caption{Problematic commit messages}
   \begin{tabular}{rp{12cm}}
@@ -448,7 +480,7 @@ edit that the contributor made. To do so, tokenization and sentence
 splitting both were performed on the original version of the article
 and its revision using
 \textsc{OpenNLP}\footnote{\url{https://opennlp.apache.org/}}. Then the
-two texts were aligned at the world and sentence levels with Myers'
+two texts were aligned at the word and sentence levels with Myers'
 alignment algorithm—the algorithm used in git to compute diffs
 \cite{myers1988optimal}. We rely on the implementation proposed by
 \textsc{jgit}\footnote{\url{http://www.eclipse.org/jgit/}}.
@@ -460,13 +492,16 @@ available on
 \textsc{Github}\footnote{\url{https://github.com/m09/readability}}. It
 is freely re-usable thanks to its permissive license.
 
-The obtained corpus has important noise problems. A quick glance at
-\tableref{tab:problematic-edits} is sufficient to understand that some
-edits are not readability edits, but either alignment deficiencies or
-edits serving complementary roles. When filtered to only consider
-revisions of 5 words at most, to match the policy used in
-\cite{yatskar2010sake}, the number of entries is reduced to
-\numprint{23507}.
+The obtained corpus—which has \numprint{43753} entries—has important
+noise problems. A quick glance at \tableref{tab:problematic-edits} is
+sufficient to understand that some edits are not readability edits,
+but either alignment deficiencies or edits serving complementary
+roles. When filtered to only consider revisions of 5 words at most, to
+match the policy used in \cite{yatskar2010sake}, the number of entries
+is reduced to \numprint{35927}. Of those \numprint{35927} couples
+$(\mathtt{original}, \mathtt{revision})$, \numprint{25675} occur only
+once and \numprint{18330} $\mathtt{original}$s have only one readable
+equivalent.
 
 \begin{table}[H]
   \centering
@@ -481,18 +516,6 @@ revisions of 5 words at most, to match the policy used in
   \end{tabular}
   \label{tab:problematic-edits}
 \end{table}
-
-The unfiltered corpus has \numprint{43753} entries. However, it has
-important noise problems. A quick glance at
-\tableref{tab:problematic-edits} is sufficient to understand that some
-edits are not readability edits, but either alignment deficiencies or
-edits serving complementary roles. When filtered to only consider
-revisions of 5 words at most, to match the policy used in
-\cite{yatskar2010sake}, the number of entries is reduced to
-\numprint{35927}. Of those \numprint{35927} couples $(\mathtt{original},
-\mathtt{revision})$, \numprint{25675} occur only once and
-\numprint{18330} $\mathtt{original}$s have only one readable
-equivalent.
 
 The resulting resource is enriched with part-of-speech, and syntactic
 parsing annotations and is proposed in an XML format.
@@ -541,10 +564,10 @@ the size of the two multisets concerned:
   \label{eq:prob}
   \proba[\mathcal{C}]{(x, y)} & = \frac{\card{\left\{(x, y) \suchthat
         (x, y) \in \mathcal{C}\right\}}}{\card{\mathcal{C}}} \\
-  \label{eq:s1}
+  \label{eq:s'1}
   \mathcal{S'}((x, y)) & = \log \frac{\proba[\mathcal{C}]{(x, y)}^{\lambda_1}}%
   {\proba[LM]{x}^{\lambda_2}} \\
-  \label{eq:s2}
+  \label{eq:s'2}
   & = \lambda_1 \log \proba[\mathcal{C}]{(x, y)} - \lambda_2 \log \proba[LM]{x}
 \end{align}
 
@@ -555,9 +578,9 @@ small values.
 The view of the problem we express with the design of $\mathcal{S'}$
 is that a strong rewriting is a frequent rewriting of a rarely
 occurring word. The two equations above explain this in two different
-ways. \equaref{eq:s1} best shows that $\mathcal{S'}$ is an
+ways. \equaref{eq:s'1} best shows that $\mathcal{S'}$ is an
 approximation of the ratio of the number of times a word is rewritten
-on the number of times it appears in English. \equaref{eq:s2} best
+on the number of times it appears in English. \equaref{eq:s'2} best
 shows that $\mathcal{S'}$ is a balancing act: both $\log
 \proba[\mathcal{C}]{(x, y)}$ and $\log \proba[lm]{x}$ are negative
 quantities: by subtracting one to the other we balance two properties
@@ -570,7 +593,7 @@ interesting to define it as the conditional frequency given that $x$
 is being rewritten. This definition is well captured by the
 conditional probability defined in \equaref{eq:probcond} and its
 application to the score $\mathcal{S'}_{c}$ defined in
-\equaref{eq:sc}. $c$ stands for “conditional”:
+\equaref{eq:s'c}. $c$ stands for “conditional”:
 
 \begin{align}
   \label{eq:probcond}
@@ -578,7 +601,7 @@ application to the score $\mathcal{S'}_{c}$ defined in
   {\card{\left\{(x, y) \suchthat (x, y) \in \mathcal{C}\right\}}}%
   {\card{\left\{(x, y') \suchthat y' \in \mathcal{P} \land (x, y') \in
         \mathcal{C}\right\}}} \\
-  \label{eq:sc}
+  \label{eq:s'c}
   \mathcal{S'}_{c}((x, y)) & = \log \frac%
   {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}}%
   {\proba[LM]{x}^{\lambda_2}}
@@ -604,17 +627,17 @@ language model scores by considering the length of the words
 considered. $w$ stands for “weighted”:
 
 \begin{align}
-  \label{eq:slmw}
+  \label{eq:s}
   \mathcal{S}((x, y)) & = \log \frac%
-  {\proba[\mathcal{C}]{w \maps{D} r}^{\lambda_1}}%
+  {\proba[\mathcal{C}]{(x, y)}^{\lambda_1}}%
   {\sqrt[\card{w}]{\proba[LM]{x}}^{\lambda_2}} \\
-  \label{eq:slmcw}
+  \label{eq:sc}
   \mathcal{S}_{c}((x, y)) & = \log \frac%
   {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}}%
   {\sqrt[\card{x}]{\proba[LM]{x}}^{\lambda_2}}
 \end{align}
 
-The method used in both \equaref{eq:slmw} and \equaref{eq:slmcw} to
+The method used in both \equaref{eq:s} and \equaref{eq:sc} to
 weight a language model score by its length $l$ is to take its
 $l^{th}$-root. This is justified by the fact that language model
 scores follow a power law when subjected to the length of their input
@@ -651,11 +674,11 @@ average the language model score of the replacement term over its
 length, so that paraphrases are not penalized.
 
 \begin{align}
-  \label{eq:sd}
+  \label{eq:swd}
   \mathcal{S}_{wd}((x, y)) & = \log \frac%
   {\proba[\mathcal{C}]{(x, y)}^{\lambda_1}\sqrt[\card{y}]{\proba[LM]{y}}^{\lambda_3}}%
   {\sqrt[\card{w}]{\proba[LM]{x}}^{\lambda_2}} \\
-  \label{eq:sdc}
+  \label{eq:swdc}
   \mathcal{S}_{wdc}((x, y)) & = \log \frac%
   {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}\sqrt[\card{y}]{\proba[LM]{y}}^{\lambda_3}}%
   {\sqrt[\card{x}]{\proba[LM]{x}}^{\lambda_2}}
@@ -759,20 +782,24 @@ $\mathcal{T}$ is the set of all tokens in written English,
 $\mathcal{P}$ is the set of all parts of speech in English and
 $\mathcal{S} : \mathcal{D} \rightarrow \mathbb{K}$ is the score we
 use, $\mathbb{K}$ being the set of the monoid:
-\begin{align*}
-\Sigma & = \mathcal{T} \times \mathcal{P} \\
-\Delta & = \mathcal{T} \times \mathcal{P} \\
-Q & = \left\{ q_i \suchthat 0 \leq i \leq n \right\} \\
-I & = \{ q_0 \} \\
-F & = \{ q_n \} \\
-E & = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
-    \land w = t_i \land p_w = p_i \land s = \mathcal{S}\left(\ t_i
-      \maps{D} r \right) \land 1 \leq i \leq n \right\} \\
-  & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
-    \suchthat 1 \leq i \leq n \right\} \\
-\lambda & : x \mapsto \mathbb{1} \\
-\rho & : x \mapsto \mathbb{1}
-\end{align*}
+
+\begin{itemize}
+\item $\Sigma = \mathcal{T} \times \mathcal{P}$
+\item $\Delta = \mathcal{T} \times \mathcal{P}$
+\item $Q = \left\{ q_i \suchthat 0 \leq i \leq n \right\}$
+\item $I = \{ q_0 \}$
+\item $F = \{ q_n \}$
+\item $\displaystyle
+  \begin{aligned}[t]
+    E & = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
+      \land w = t_i \land p_w = p_i \land s = \mathcal{S}\left(\ t_i
+        \maps{D} r \right) \land 1 \leq i \leq n \right\} \\
+    & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
+      \suchthat 1 \leq i \leq n \right\}
+  \end{aligned}$
+\item $\lambda : x \mapsto \mathbb{1}$
+\item $\rho : x \mapsto \mathbb{1}$
+\end{itemize}
 
 Now, we can define monoids to use with the constructed transducer. We
 mainly consider two use-cases, each of them requiring a different
@@ -954,18 +981,22 @@ possibilities are:
 
 Most of these possibilities are flawed in some way: BLEU, ROUGE and
 NIST have been built to evaluate a translation from one language to
-another. For example, when scoring an English to French translation,
-the starting score is $0$. When scoring a not-readable English to
-readable English translation, the starting score (when the case the
-translation doesn't actually do anything) could already be extremely
-high, consider the gold translation:
+another. When applied to the same source and target language, their
+behavior is sub-optimal at best. To observe this phenomenon, consider
+a translation system that does not do anything. In the context of
+multilingual translation, it is likely to obtain $0$—the worst
+score—with all the metrics mentioned. On the contrary, in the context
+of monolingual translation, it might very well obtain very high
+scores. Consider the gold translation:
 
 “I went to the park and enjoyed the fantastic weather.” $\rightarrow$
 “I went to the park and enjoyed the great weather.”
 
 Compared to it, a NO-OP translation will have a unigram precision of
 $\,\sfrac{9}{10}$, a bigram precision of $\,\sfrac{7}{9}$, etc. The
-resulting BLEU, ROUGE and NIST scores will be very high.
+resulting BLEU, ROUGE and NIST scores will be very high. Indeed,
+instead of measuring the quality of the translation, they mainly
+measure the amount of the sentence that was rewritten.
 
 Readability formulas are also flawed, as detailed
 in \chapterref{cha:sota}. A better alternative is to use the most
@@ -1041,15 +1072,15 @@ language model score to see if this improves these two functions.
 \paragraph*{$\mathcal{S}_{wd}$ \& $\mathcal{S}_{wdc}$ functions}
 \label{par:swd}
 
-\tableref{tab:top-swd} \& \tableref{tab:top-swdc} show that
-allowing for paraphrases is very interesting: while quite noisy, these
-tables have very interesting rewritings, such as “enact $\rightarrow$
-make it into law” and “unanimously $\rightarrow$ by all of the
-members”. It would be extremely hard to come up with one word that has
-the same meaning as “enact”, since “enact” is a specialized term. If
-further study reveals that it is possible to successfully control the
-noise with parameters or extensions to this score function it might
-become a worthy candidate for text simplification.
+\tableref{tab:top-swd} \& \tableref{tab:top-swdc} show that allowing
+for paraphrases is quite promising: while noisy, these tables have
+very interesting rewritings, such as “enact $\rightarrow$ make it into
+law” and “unanimously $\rightarrow$ by all of the members”. It would
+be extremely hard to come up with one word that has the same meaning
+as “enact”, since “enact” is a specialized term. If further study
+reveals that it is possible to successfully control the noise with
+parameters or extensions to this score function it might become a
+worthy candidate for text simplification.
 
 \chapter{Future work}
 \label{cha:future-work}
@@ -1088,9 +1119,42 @@ transducing (3.) and a better evaluation (5.).
 
 \chapter{Conclusion}
 
-In this work we studied how to use classical machine translation and
-readability techniques to obtain fine-grained measurements of the
-readability of a text.
+In this work we studied how to extend classical machine translation
+and readability techniques to obtain fine-grained measurements of the
+readability of a text. We also explored the related tasks of text
+rewriting.
+
+Despite the lack of a proper evaluation, the tool created to estimate
+the interest of our approaches—\textsc{Readability Lab}—already allows
+users to get feedback on any written text using our methods.
+
+On a personal level, I learned a lot during this internship. It
+allowed me to explore many aspects of gaze processing, readability,
+machine translation and the theories those domains are based on, such
+as string and tree transducing. By implementing a fairly large
+software solution around these problems I also gained more knowledge
+of the NLP software eco-system, which is always very interesting for a
+NLP student. I would like to mention that topics such as math
+information retrieval and scientific paper analysis during the weekly
+meetings of \textsc{Aizawa Laboratory} was very interesting as well.
+
+This internship was also my first contact with a long-term research
+activity. It was very challenging to correctly balance theoretical
+work and implementation and I am happy to have been able to experience
+that as it will help me for my future activities.
+
+I also noticed that it is hard to properly conceptualize “all day
+every day” during a research activity. Writing this report has brought
+many concepts and improvements that I had not thought of before trying
+to get the whole system on paper. It also appeared to me that I had
+reinvented the wheel many times over the course of this internship and
+it is a good experience to have, so that it can be avoided in the
+future and replaced by adequate search of existing literature.
+
+As a final note to this internship report, I would like to thank
+\textsc{Aizawa-sensei} again for her support during this internship,
+it was great to be a part of \textsc{Aizawa Laboratory} during those
+five months.
 
 \bibliographystyle{apalike2}
 \bibliography{report.bib}
