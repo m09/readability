@@ -990,130 +990,66 @@ writing. All experiments were done with the $\lambda$ parameters fixed
 at $1$, which is an obvious problem that will need to be addressed
 later on.
 
-\paragraph*{$\mathcal{S}_{OCC}$ function}
+\paragraph*{$\mathcal{S}$ \& $\mathcal{S}_c$ functions}
 \label{par:occ}
 
-Counting occurrences has an important bias towards non-content
-words—they are by far the most frequent in most languages, including
-English. They occupy the vast majority of the top suggestions
-spots. This is an important problem for a lexical approach. Indeed,
-non-content words mostly serve syntactical purposes. Trying to improve
-on the syntactic structure without further consideration for
-grammatical context is bound to fail. Despite these important
-problems, when lexical matches are found in the top rewritings they
-tend to be of good quality, as shown in \tableref{tab:tops-socc}.
+Using a language model to estimate whether or not the word being
+rewritten is common already yields interesting results, as shown in
+\tableref{tab:tops-socc}. We can note that the $\mathcal{S}_c$
+function is subject to a lot of noise. This was to be expected as
+there is no measure to ensure that the replacement terms are common in
+the English language. More surprising is the score of the “"he
+$\rightarrow$ that while giotto” entry given by the $\mathcal{S}$
+function. After further investigation, it appears that the term “"he”
+has been mistokenized and left as is. Its language model score was
+certainly maximal (unknown token) while its length was one, explaining
+its very high score.
 
 \begin{table}[H]
   \centering
-  \caption{$\mathcal{S}_{OCC}$ top 5 rewritings}
-  \begin{tabularx}{\textwidth}{SXX}
+  \caption{$\mathcal{S}$ \& $\mathcal{S}_c$ top 10 rewritings}
+  \noindent\makebox[\textwidth]{%
+  \begin{tabularx}{1.1\textwidth}{Sp{1.6cm}p{2.6cm}Sp{2cm}X}
     \toprule
-    {Score} & Original & Rewriting \\
+    \multicolumn{3}{c}{{$\mathcal{S}$ function}} & \multicolumn{3}{c}{{$\mathcal{S}_c function$}} \\
+    \cmidrule(r{4pt}){1-3} \cmidrule{4-6} \\
+    {Score} & Original & Rewriting & {Score} & Original & Rewriting \\
     \midrule
-    -4.99 & , & . \\
-    -5.10 & external links & other websites \\
-    -5.26 & discovered & found \\
-    -5.32 & , and & . \\
-    -5.62 & ; & . \\
-  \end{tabularx}
+    -9.75  & obtain     & get                &  0.00 & "he           & that while giotto              \\
+    -9.79  & discovered & found              & -0.51 & exaggerated   & said that                      \\
+    -10.10  & n't        & not               & -0.57 & stray         & wander                         \\
+    -10.17  & indicate   & show              & -0.60 & virtuous      & good                           \\
+    -10.34  & allow      & let               & -0.64 & discoloration & colour                         \\
+    -10.39  & indicate   & show              & -0.66 & :terrorism    & :national liberation movements \\
+    -10.43  & fifty-one  & 51                & -0.81 & solely        & only                           \\
+    -10.48  & "he        & that while giotto & -0.83 & barrage       & attack                         \\
+    -10.53  & resolve    & break             & -0.95 & allow         & make up for                    \\
+    -10.54  & entire     & whole             & -0.95 & allow         & let                            \\
+  \end{tabularx}}
   \label{tab:tops-socc}
 \end{table}
 
-\paragraph*{$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ functions}
-\label{par:lmn}
+\paragraph*{$\mathcal{S}_d$ \& $\mathcal{S}_{dc}$ functions}
+\label{par:sd-sdc}
 
-Balancing the $S_{OCC}$ score with a language model is not enough, as
-quickly appears from glancing at the top rewritings shown in
-\tableref{tab:tops-slmn}. All the best rewritings are of the maximum
-length ($5$ tokens) and are mostly noise. Indeed, the noisier some
-sequence is, the lower its language model score is and the higher its
-$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ scores are.
+For those functions, we refer to the appendix \tableref{tab:top-sd}
+and \tableref{tab:top-sdc}. Many extremely bad rules reach the top. It
+would certainly be interesting—given more time—to adjust the
+$\lambda_3$ parameter to reduce the effect of the replacement term
+language model score to see if this improves these two functions.
 
-\begin{table}[H]
-  \centering
-  \caption{$\mathcal{S}_{LMn}$ and $\mathcal{S}_{LMcn}$ top 5 rewritings}
-  \begin{tabularx}{\textwidth}{SS>{\hsize=1.2\hsize}X>{\hsize=0.8\hsize}X}
-    \toprule
-    {$\mathcal{S}_{LMn}$} & {$\mathcal{S}_{LMcn}$} & Original & Rewriting \\
-    \midrule
-    -10.48 & 0.00  & slit-like vertical external urethral orifice & urethra \\
-    -11.87 & -1.38 & cover throughout entire catchments, & unchanged. \\
-    -12.52 & -2.03 & :cognitive biases category:group processes & :psicology \\
-    -13.21 & -2.72 & heading a mclaren one-two with & and his \\
-    -13.72 & -3.23 & recieve a hard sting from & were stung by \\
-  \end{tabularx}
-  \label{tab:tops-slmn}
-\end{table}
+\paragraph*{$\mathcal{S}_{wd}$ \& $\mathcal{S}_{wdc}$ functions}
+\label{par:swd}
 
-\newpage
-
-\paragraph*{$\mathcal{S}_{LMwn}$ function}
-\label{par:lmn}
-
-Once averaged by the sequence length, the language model balancing
-yields better results as shown in \tableref{tab:tops-slmwn}. While the
-results seem very good in this top 5, it appears empirically that the
-scoring is inconsistent: many poor rewritings have good relative
-scores compared to interesting ones. Further study would be needed to
-see if these inconsistencies can be addressed by setting the $\lambda$
-parameter to a more efficient value.
-\begin{table}[H]
-  \centering
-  \caption{$\mathcal{S}_{LMwn}$ top 5 rewritings}
-  \begin{tabularx}{\textwidth}{SXX}
-    \toprule
-    {Score} & Original   & Rewriting \\
-    \midrule
-    -9.75   & obtain     & get       \\
-    -9.79   & discovered & found     \\
-    -10.10  & n't        & not       \\
-    -10.17  & indicate   & show      \\
-    -10.34  & allow      & let       \\
-  \end{tabularx}
-  \label{tab:tops-slmwn}
-\end{table}
-
-\paragraph*{$\mathcal{S}_{LMcwn}$ function}
-\label{par:lmn}
-
-Finally, by using the conditional probability of a rewriting occurring
-when trying to rewrite a given word instead of the straight
-probability of a rewriting occurring, the results obtained typically
-seem of lower quality than the results of the $\mathcal{S}_{LMwn}$
-function, as shown in \tableref{tab:tops-slmcwn}. It is however
-interesting to discuss which use-case we are evaluating:
-
-\begin{itemize}
-\item if we are evaluating the best rewritings without any context,
-  then this function is worse than $\mathcal{S}_{LMwn}$;
-\item if we are trying to simplify a text, then the noisy entries such
-  as “"he” and “exaggerated” do not matter so much, since they are
-  unlikely to appear in the words to rewrite.
-\end{itemize}
-
-We can conclude that this function is very dependent on the corpus
-quality. For the corpus we gathered, in practice, it is the function
-that yields the best results in our experience.
-
-As for the rest of this evaluation, further study is necessary to
-confirm or infirm this empirical conclusion—it is not backed by enough
-data.
-
-\begin{table}[H]
-  \centering
-  \caption{$\mathcal{S}_{LMcwn}$ top 5 rewritings}
-  \begin{tabularx}{\textwidth}{SXX}
-    \toprule
-    {Score} & Original & Rewriting \\
-    \midrule
-    0.00 & "he & that while giotto \\
-    -0.51 & exaggerated & said that \\
-    -0.57 & stray & wander \\
-    -0.60 & virtuous & good \\
-    -0.64 & discoloration & colour \\
-  \end{tabularx}
-  \label{tab:tops-slmcwn}
-\end{table}
+\tableref{tab:top-swd} \& \tableref{tab:top-swdc} show that
+allowing for paraphrases is very interesting: while quite noisy, these
+tables have very interesting rewritings, such as “enact $\rightarrow$
+make it into law” and “unanimously $\rightarrow$ by all of the
+members”. It would be extremely hard to come up with one word that has
+the same meaning as “enact”, since “enact” is a specialized term. If
+further study reveals that it is possible to successfully control the
+noise with parameters or extensions to this score function it might
+become a worthy candidate for text simplification.
 
 \chapter{Future work}
 \label{cha:future-work}
@@ -1283,7 +1219,6 @@ times in this report.
     -1.29 & indicate & show \\
     -1.29 & commissions & pays for \\
     -1.29 & combatants & fighters \\
-
   \end{tabularx}
 \end{table}
 
@@ -1326,6 +1261,7 @@ times in this report.
     -18.44 & ,<ref & .<ref \\
     -18.48 & redone & new \\
   \end{tabularx}
+  \label{tab:top-sd}
 \end{table}
 
 \section{Top 30 for the score function $\mathcal{S}_{dc}$}
@@ -1367,6 +1303,7 @@ times in this report.
     -8.55 & democide & people \\
     -8.56 & incident & , \\
   \end{tabularx}
+  \label{tab:top-sdc}
 \end{table}
 
 \section{Top 30 for the score function $\mathcal{S}_{wd}$}
@@ -1408,6 +1345,7 @@ times in this report.
     -15.81 & befriended & became friends with \\
     -15.83 & vice-versa & the other way round \\
   \end{tabularx}
+  \label{tab:top-swd}
 \end{table}
 
 \section{Top 30 for the score function $\mathcal{S}_{wdc}$}
@@ -1449,6 +1387,7 @@ times in this report.
     -5.44 & remediation & damage that should be fixed \\
     -5.44 & precedes & in front of \\
   \end{tabularx}
+  \label{tab:top-swdc}
 \end{table}
 
 \end{document}
