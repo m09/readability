@@ -314,19 +314,27 @@ corpora of readable sentences and their hard-to-read counterparts.
 To achieve fine-grained readability analysis, we propose an approach
 relying on statistical phrase based translation
 \cite{koehn2003statistical}. The underlying idea is to build a lexicon
-of not-so-readable phrases and their readable counterparts enriched
-with a score reflecting the quality of the translation to be able to
-score areas of a text depending on the translations available for
-them. \sew{} is used to provide the initial translations.
+of not-so-readable phrases and their readable counterparts along with
+scores reflecting the quality of the pairings. This lexicon can then
+be used to score areas of a text depending on the translations
+available for them, yielding a fine-grained readability assessment of
+a text. \sew{} is used as a corpus to build such a lexicon. The
+process used is detailed in the first section of this chapter.
 
-In the literature, most of the best models are based on a language
-model of the target language. Our approach differs from this principle
-mainly because \sew{} doesn't contain a sufficient number of examples
-so that we can reliably build readable English and non-readable
-English language models.
+In the literature, most of the best translation models are based on a
+language model of the target language. In this approach, we extend
+this model to also consider the source language to better fit the
+readability simplification problem. This extension is the object of
+the second section of this chapter.
 
-The work done during this internship is better presented as five
-different complementary tasks.
+As mentioned above, with such a model defined, it is possible to
+create a fine-grained measure to assess the readability of a text. The
+details of this operation are exposed in the third section.
+
+The following section will then look at how to rewrite texts from the
+models computed beforehand and finally, the last section of this
+chapter introduces a tool—\textsc{Readability Lab}—created to explore
+the results of our approach.
 
 \section{Automatic readability parallel corpus creation}
 \label{sec:corpus}
@@ -492,116 +500,91 @@ parsing annotations and is proposed in an XML format.
 \section{Phrasal lexicon creation}
 \label{sec:lexical-enhancements}
 
-With this corpus at our disposal, it is we next define a way to use it as a
-lexical dictionary to simplify vocabulary in a text. The goal is to
-allow authors to pick simpler words than the ones they used, in an
-efficient manner. In what follows, we will denote the multiset of all
-rewritings of $x$ into $y$ in the dictionary $\mathcal{D}$ by $x
-\maps{D} y$ and we will use $\_$ as a wildcard to denote any sequence
-of words.
+The corpus $\mathcal{C}$ created in \sectionref{sec:corpus} can be
+used as a basis for phrase based translation, in order to simplify
+vocabulary in a text. The goal is to allow authors to pick simpler
+words than the ones they used, in an efficient manner. With
+$\mathcal{P}$ denoting the multiset of all english phrases, we
+consider $\mathcal{C} \subset \mathcal{P} \times \mathcal{P}$ as a
+multiset of lexical pairs $(x, y)$ where we found in \sew{} that $x$
+was rewritten into $y$.
 
-The first approach and the most basic one, given a dictionary
-$\mathcal{D}$ and for a word $w$, is to propose as lexical rewriting
-candidates the set $R_w$ such that:
+To reduce lexical ambiguity, phrases are matched with their part of
+speeches. This way, “it was a good \emph{buy}.” and “I \emph{buy} it.”
+will not have their translations mixed.
 
-\[
-R_w = \left\{r \suchthat w \maps{D} r\right\}
-\]
+A score function $\mathcal{S} : \mathcal{P} \times \mathcal{P}
+\rightarrow \mathbb{R}$ is needed to turn the corpus $\mathcal{C}$
+into a phrasal lexicon $\mathcal{L} \subset \mathcal{P} \times
+\mathcal{P} \times \mathbb{R}$. To design such a function, there are
+two properties to satisfy that are of utmost importance:
 
-But obviously, while this approach will have a important recall, it
-will be extremely noisy and will not be of any real help to an author,
-the time lost cruising through the noise outweighing the benefits of
-the correct lexical enhancements.
+\begin{itemize}
+\item giving more importance to $(x, y)$ if $x$ is not a common word:
+  the less common a word is, the more important it is to rewrite it;
+\item giving more importance to $(x, y)$ if $y$ is a common word to
+  end up with the simplest translations ranked at the top.
+\end{itemize}
 
-A first improvement is to use the part of speeches available in the
-corpus to make sure they match. That will already somewhat reduce
-lexical ambiguity. That allows us to refine the definition of $R_w$ as
-follows, $p_w$ being the part of speech of $w$:
+We use a language model on one hand and probabilities to assess the
+commonness of a rewriting in $\mathcal{C}$ on the other hand to
+properly model those properties. The language model is built on the
+final version of every harvested page of \sew, at a bigram level.
 
-\begin{equation*}
-  R_w = \left\{
-    r \suchthat u \maps{D} r \land u = w \land p_u = p_w
-  \right\}
-\end{equation*}
-
-This is not enough. It would be practical to be able to compare
-rewritings and rank them from the worst to the best. Rewriting scoring
-functions are introduced to achieve that.
-
-Maybe the most obvious scoring function is one that gives a score to a
-rewriting that reflects how often it occurs in the corpus
-$\mathcal{D}$. The probability $\proba{w \maps{D} r}$ of a rewriting
-from $w$ to $r$ occurring in $\mathcal{D}$ is computed as follows:
-
-\begin{equation*}
-  \proba{w \maps{D} r} = \frac{\card{w \maps{D} r}}{\card{\_ \maps{D} \_}}
-\end{equation*}
-
-\equaref{eq:socc} expresses the score function $\mathcal{S}_{OCC}$
-that uses this probability and measures how often a rewriting occurs.
-
-\begin{equation}
-  \label{eq:socc}
-  \mathcal{S}_{OCC}(w \maps{D} r) = \log \proba{w \maps{D} r}
-\end{equation}
-
-We take the log to ensure the numerical precision of the computations
-despite the imprecision of floating point arithmetic for small values.
-
-Even though this score is a great starting point, it is not a good
-score to evaluate lexical rewritings. Its main shortcoming is that it
-outlines mainly punctuation and non-content words rewritings. Those
-are mainly linked to syntax and cannot be handled by a purely lexical
-rewriting system at any acceptable level of performance. The following
-scores try to fix this punctuation and non-content words focus to turn
-it into a lexical focus.
-
-To accomplish this shift, we define the quality of a rewriting of $w$
-into $r$ as the probability of a human rewriting $w$ into $r$. By
-combining a language model to the information present in the corpus
-$\mathcal{D}$, it is possible to derive a measure close to this
-probability.
-
-The score $\mathcal{S}_{LM}$ is one way to capture the above
-definition, with $\proba[LM]{w}$ the language model probability of
-$w$:
+$\mathcal{S'}$ is now introduced as the first combination proposed of
+these two elements. It will serve as a basis for some variations
+presented later on in this section. The probability of a rewriting
+occurring in $\mathcal{C}$ is defined in \equaref{eq:prob} in terms of
+the size of the two multisets concerned:
 
 \begin{align}
-  \label{eq:slm1}
-  \mathcal{S}_{LM}(w \maps{D} r) & = \log \frac{\proba{w \maps{D} r}^\lambda}%
-  {\proba[LM]{w}^{(1 - \lambda)}} \\
-  \label{eq:slm2}
-  & = \lambda \mathcal{S}_{OCC} - (1 - \lambda) \log \proba[LM]{w}
+  \label{eq:prob}
+  \proba[\mathcal{C}]{(x, y)} & = \frac{\card{\left\{(x, y) \suchthat
+        (x, y) \in \mathcal{C}\right\}}}{\card{\mathcal{C}}} \\
+  \label{eq:s1}
+  \mathcal{S'}((x, y)) & = \log \frac{\proba[\mathcal{C}]{(x, y)}^{\lambda_1}}%
+  {\proba[LM]{x}^{\lambda_2}} \\
+  \label{eq:s2}
+  & = \lambda_1 \log \proba[\mathcal{C}]{(x, y)} - \lambda_2 \log \proba[LM]{x}
 \end{align}
 
-The two equations above explain $\mathcal{S}_{LM}$ in two different
-ways. \equaref{eq:slm1} best shows that $\mathcal{S}_{LM}$ is an
-approximation of the ratio of the number of times a word is rewritten
-on the number of times it appears. \equaref{eq:slm2} best shows that
-$\mathcal{S}_{LM}$ is a balancing act: both $\mathcal{S}_{OCC}$ and
-$\log \proba[lm]{w}$ are negative quantities: by subtracting one to
-the other we balance two properties of a good rewriting. $\lambda \in
-\left[0,1\right]$ is a parameter to control this balancing.
+This function works on logs to ensure the numerical precision of the
+computations despite the imprecision of floating point arithmetic for
+small values.
 
-Another take on this problem is to consider that good lexical
-rewritings are good rewritings of rarely occurring words. This
-definition is well captured by the conditional probability defined in
-\equaref{eq:probcond} and its application to the score
-$\mathcal{S}_{LMc}$ defined in \equaref{eq:slmc}. $c$ stands for
-“conditional”:
+The view of the problem we express with the design of $\mathcal{S'}$
+is that a strong rewriting is a frequent rewriting of a rarely
+occurring word. The two equations above explain this in two different
+ways. \equaref{eq:s1} best shows that $\mathcal{S'}$ is an
+approximation of the ratio of the number of times a word is rewritten
+on the number of times it appears in English. \equaref{eq:s2} best
+shows that $\mathcal{S'}$ is a balancing act: both $\log
+\proba[\mathcal{C}]{(x, y)}$ and $\log \proba[lm]{x}$ are negative
+quantities: by subtracting one to the other we balance two properties
+of a good rewriting. $\lambda_1$ and $\lambda_2$ are parameters to
+control this balancing.
+
+Instead of defining the frequency of a rewriting from $x$ into $y$ as
+the global frequency of $(x, y)$ in the corpus $\mathcal{C}$, it is
+interesting to define it as the conditional frequency given that $x$
+is being rewritten. This definition is well captured by the
+conditional probability defined in \equaref{eq:probcond} and its
+application to the score $\mathcal{S'}_{c}$ defined in
+\equaref{eq:sc}. $c$ stands for “conditional”:
 
 \begin{align}
   \label{eq:probcond}
-  \proba{w \maps{D} r \given w \maps{D} \_} & = \frac%
-  {\card{w \maps{D} r}}%
-  {\card{w \maps{D} \_}} \\
-  \label{eq:slmc}
-  \mathcal{S}_{LMc}(w \maps{D} r) & = \log \frac%
-  {\proba{w \maps{D} r \given w \maps{D} \_}^\lambda}%
-  {\proba[LM]{w}^{(1 - \lambda)}}
+  \proba[\mathcal{C}]{(x, y) \given x} & = \frac%
+  {\card{\left\{(x, y) \suchthat (x, y) \in \mathcal{C}\right\}}}%
+  {\card{\left\{(x, y') \suchthat y' \in \mathcal{P} \land (x, y') \in
+        \mathcal{C}\right\}}} \\
+  \label{eq:sc}
+  \mathcal{S'}_{c}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}}%
+  {\proba[LM]{x}^{\lambda_2}}
 \end{align}
 
-The scores $\mathcal{S}_{LM}$ and $\mathcal{S}_{LMc}$ already have
+The scores $\mathcal{S'}$ and $\mathcal{S'}_c$ already have
 nice qualities to model different definitions of good rewritings. But
 as they stand, the lengthier the word being rewritten, the better the
 score of its rewriting, almost regardless of whether or not the
@@ -614,22 +597,21 @@ Concretely it means that the rewriting of a bigram such as “\emph{,
   and} $\rightarrow$ \emph{.}”  will come above most lexical
 rewritings, such as the rewriting “\emph{exhausted} $\rightarrow$
 \emph{tired}”. Taking into account the length of the sequence being
-rewritten allows to fix that. The scoring functions
-$\mathcal{S}_{LMw}$ and $\mathcal{S}_{LMcw}$ are extensions of
-respectively the scoring functions $\mathcal{S}_{LM}$ and
-$\mathcal{S}_{LMc}$ and are introduced to average the language model
-scores by considering the length of the words considered. $w$ stands
-for “weighted”:
+rewritten allows to fix that. The scoring functions $\mathcal{S}$ and
+$\mathcal{S}_c$ are extensions of respectively the scoring functions
+$\mathcal{S'}$ and $\mathcal{S'}_c$ and are introduced to average the
+language model scores by considering the length of the words
+considered. $w$ stands for “weighted”:
 
 \begin{align}
   \label{eq:slmw}
-  \mathcal{S}_{LMw}(w \maps{D} r) = & \log \frac%
-  {\proba{w \maps{D} r}^\lambda}%
-  {\sqrt[\card{w}]{\proba[LM]{w}}^{(1 - \lambda)}} \\
+  \mathcal{S}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{w \maps{D} r}^{\lambda_1}}%
+  {\sqrt[\card{w}]{\proba[LM]{x}}^{\lambda_2}} \\
   \label{eq:slmcw}
-  \mathcal{S}_{LMcw}(w \maps{D} r) = & \log \frac%
-  {\proba{w \maps{D} r \given w \maps{D} \_}^\lambda}%
-  {\sqrt[\card{w}]{\proba[LM]{w}}^{(1 - \lambda)}}
+  \mathcal{S}_{c}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}}%
+  {\sqrt[\card{x}]{\proba[LM]{x}}^{\lambda_2}}
 \end{align}
 
 The method used in both \equaref{eq:slmw} and \equaref{eq:slmcw} to
@@ -638,9 +620,49 @@ $l^{th}$-root. This is justified by the fact that language model
 scores follow a power law when subjected to the length of their input
 sequences.
 
-Note that while we progressively improved the lexical properties of
-the scoring functions over the course of this section, the results of
-those functions are not the log of probabilities anymore, which is not
+Of the two good properties of phrase translations mentioned in the
+beginning of this section, only one was considered: that a rewriting
+should be important if the word rewritten is not common. We now
+consider the second important property: that a rewriting should have a
+good score if its replacement term is simple. To do that we introduce
+two new scores—$\mathcal{S}_d$ and $\mathcal{S}_{dc}$—counterparts of
+$\mathcal{S}$ and $\mathcal{S}_c$. $d$ stands for \emph{d}ouble
+language model.
+
+\begin{align}
+  \label{eq:sd}
+  \mathcal{S}_d((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y)}^{\lambda_1}\proba[LM]{y}^{\lambda_3}}%
+  {\sqrt[\card{w}]{\proba[LM]{x}}^{\lambda_2}} \\
+  \label{eq:sdc}
+  \mathcal{S}_{dc}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}\proba[LM]{y}^{\lambda_3}}%
+  {\sqrt[\card{x}]{\proba[LM]{x}}^{\lambda_2}}
+\end{align}
+
+\equaref{eq:sd} and \equaref{eq:sdc} have almost the same form as
+previous scores. The only difference is the introduction of the
+language model probability of the replacement term and a new parameter
+to balance it.
+
+Finally, to allow for paraphrase replacements of terms, we introduce
+extensions of the scores $\mathcal{S}_d$ and $\mathcal{S}_{dc}$ to
+average the language model score of the replacement term over its
+length, so that paraphrases are not penalized.
+
+\begin{align}
+  \label{eq:sd}
+  \mathcal{S}_{wd}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y)}^{\lambda_1}\sqrt[\card{y}]{\proba[LM]{y}}^{\lambda_3}}%
+  {\sqrt[\card{w}]{\proba[LM]{x}}^{\lambda_2}} \\
+  \label{eq:sdc}
+  \mathcal{S}_{wdc}((x, y)) & = \log \frac%
+  {\proba[\mathcal{C}]{(x, y) \given x}^{\lambda_1}\sqrt[\card{y}]{\proba[LM]{y}}^{\lambda_3}}%
+  {\sqrt[\card{x}]{\proba[LM]{x}}^{\lambda_2}}
+\end{align}
+
+It is important to note that the score functions that have been
+defined in this section are not the log of probabilities. This is not
 a problem to compare rewritings but might very well be to use those
 rewriting scores in a broader framework, for example when performing
 the automatic rewriting of a text. We will later on address this
@@ -649,12 +671,12 @@ issue.
 \section{Fine-grained readability assessment}
 \label{sec:fine-grain-read}
 
-Having defined lexical enhancements and a way to score them, we now
-have: (1.) a way to detect which parts of a text need to be rewritten;
-(2.) a score to estimate the importance of those rewritings.
+Having defined a phrasal lexicon, we now have: (1.) a way to detect
+which parts of a text need to be rewritten; (2.) a score to estimate
+the importance of those rewritings.
 
-Combining elements (1.) and (2.) we can define a fine-grained
-readability measure of a text as follows:
+By combining elements (1.) and (2.) it is possible to define a
+fine-grained readability measure of a text as follows:
 
 \begin{itemize}
 \item the readability of a part of a sentence is the combination of
@@ -776,10 +798,10 @@ would want to see the complete text rewritten at once at a certain
 level of confidence. An example will illustrate the key difference
 later on in this section.
 
-We define the monoids in \tableref{tab:monoids} for the $S_{OCC}$
-score function. The Negative Min monoid allows us to obtain the
-threshold effect of use-case (2.) from \figureref{fig:use-cases} while
-the Negative Log monoid allows us to compute the precise tops of
+The two monoids of \tableref{tab:monoids} are the candidates used to
+satisfy those use-cases. The Negative Min monoid allows us to obtain
+the threshold effect of use-case (2.) from \figureref{fig:use-cases}
+while the Negative Log monoid allows us to compute the precise tops of
 use-case (1.). Negative Log is the log equivalent of the $(\left[0,
   1\right], *, 1)$ monoid for probabilities.
 
@@ -839,35 +861,16 @@ Log when considering rewritings with two non-identity transitions.
   \label{tab:neglog}
 \end{table}
 
-The two monoids are almost usable with the various flavors of
-$\mathcal{S}_{LM}$ score functions. But since they are not the log of
-probabilities, we don't have the guarantee that for all $w \maps{D}
-r$, $\mathcal{S} \left( w \maps{D} r \right) \in \mathbb{R}^{-} \cup
-\{-\infty\}$. To fix this problem and be able to use the semi-rings
-defined above, we normalize the scores $\mathcal{S}_{LM}$ and
-$\mathcal{S}_{LMc}$ into the scores $\mathcal{S}_{LMn},
-\mathcal{S}_{LMcn}$ as follows ($n$ standing for normalized):
-
-\[
-\mathcal{S}_{n} \left( w \maps{D} r \right) = \mathcal{S} \left( w
-  \maps{D} r \right) + \argmin_{w'} \left( \log \proba[LM]{w'}^{(1 - \lambda)} \right)
-\]
-
-And the scores $\mathcal{S}_{LMw}$ and $\mathcal{S}_{LMcw}$ into the
-scores $\mathcal{S}_{LMwn}, \mathcal{S}_{LMcwn}$ as follows:
-
-\[
-\mathcal{S}_{n} \left( w \maps{D} r \right) = \mathcal{S} \left( w
-  \maps{D} r \right) + \argmin_{w'} \left( \log
-  \sqrt[\card{w'}]{\proba[LM]{w'}^{(1 - \lambda)}} \right)
-\]
-
-The normalized functions can be used with the monoids we defined for
-$\mathcal{S}_{OCC}$. Note that if we had used semi-rings, this
-normalization would be incorrect because we do not obtain the log of a
-probability distribution after this normalization process. However,
-while it is a problem to combine the weights of different branches, it
-is not a problem to combine weights in a branch.
+The two monoids are almost usable with the various flavors of score
+functions defined in \sectionref{sec:lexical-enhancements}. But since
+they are not the log of probabilities, we don't have the guarantee
+that $\forall (x, y) \in \mathcal{C}, \mathcal{S}(( x, y)) \in
+\mathbb{R}^{-} \cup \{-\infty\}$. To fix this problem and be able to
+use the monoids defined above, we normalize the scores by adding
+$\argmin_{(x, y) \in \mathcal{C}} \left( \log
+  \proba[LM]{x}^{\lambda_2} \right)$ to all the scores computed with
+the functions defined in
+\sectionref{sec:lexical-enhancements}.
 
 It is now possible to address the two use-cases mentioned in
 \figureref{fig:use-cases} by using the Viterbi algorithm
@@ -883,12 +886,10 @@ and \sectionref{sec:rewriting} in an intuitive and efficient manner.
   framework}
 \label{sec:framework}
 
-Considering that automatic evaluation of readability rewriting and
-lexical enhancement is a very hard task, producing a high quality
-testing environment to be able to quickly assess manually the quality
-of an approach is valuable. It was also the occasion to expose those
-results to other programs by creating a server that could easily be
-used by from other tool-chain.
+To easily assess the quality of the approaches proposed in this work,
+a web application has been made available. Creating it was also the
+occasion to expose our results to other programs by creating a server
+that could easily be used from other tool-chains.
 
 \begin{figure}[h]
   \centering
@@ -901,9 +902,9 @@ used by from other tool-chain.
   Framework}\footnote{\url{http://www.playframework.com/}},
 \textsc{React}\footnote{\url{https://facebook.github.io/react/}} and
 \textsc{Heroku}\footnote{\url{https://www.heroku.com/}} were used to
-create a web client available at
-\url{http://readability.crydee.eu/}. It satisfies the constraints
-exposed above. \figureref{fig:ui} shows a screenshot of the interface.
+create the application available at
+\url{http://readability.crydee.eu/}. \figureref{fig:ui} shows a
+screenshot of the interface.
 
 Among the theoretical obstacles faced during the creation of this
 demo, the most interesting one is certainly the algorithm used to
@@ -971,21 +972,23 @@ in \chapterref{cha:sota}. A better alternative is to use the most
 recent machine learning techniques as baselines, at the price of
 implementation troubles.
 
-Finally manual evaluation is flawed in the sense that it doesn't cover
-a huge amount of data and has the usual problems of
-annotation—subjectivity and consistency probably being the main
-ones.
+Finally manual evaluation is flawed in the sense that it either does
+not cover a huge amount of data or is not usable in an iterative
+testing environment due to the high cost of the process. It also has
+the usual problems of annotation—subjectivity and consistency probably
+being the main ones.
 
 At the time of this writing, the automatic evaluation is not yet in a
 presentable form and we settle for manual evaluation and discussion.
 
-The main point to evaluate in this work is the efficiency of the five
+The main point to evaluate in this work is the efficiency of the six
 different scoring functions. They are analyzed below. To determine the
 problems and advantages of the scoring functions, an empirical study
 was led with a range of news articles. This informal insight still has
 to be backed up by further experiments at the time of this
-writing. All experiments were done with the $\lambda$ parameter fixed
-at $0.5$.
+writing. All experiments were done with the $\lambda$ parameters fixed
+at $1$, which is an obvious problem that will need to be addressed
+later on.
 
 \paragraph*{$\mathcal{S}_{OCC}$ function}
 \label{par:occ}
@@ -1197,6 +1200,256 @@ times in this report.
 \item Wikimedia PostgreSQL importer
 \item Generic implementation of Aho-Corasick
 \end{itemize}
+
+\chapter{Top rewritings}
+
+\section{Top 30 for the score function $\mathcal{S}$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+    -9.75 & obtain & get \\
+    -9.79 & discovered & found \\
+    -10.10 & n't & not \\
+    -10.17 & indicate & show \\
+    -10.34 & allow & let \\
+    -10.39 & indicate & show \\
+    -10.43 & fifty-one & 51 \\
+    -10.48 & "he & that while giotto \\
+    -10.53 & resolve & break \\
+    -10.54 & entire & whole \\
+    -10.62 & incredibly & very \\
+    -10.68 & invitees & players they invited \\
+    -10.68 & commenced & started \\
+    -10.71 & created & made \\
+    -10.78 & digit & number \\
+    -10.83 & preserve & keep \\
+    -10.93 & inducted & added \\
+    -10.95 & assumed & thought \\
+    -10.97 & relocated & moved \\
+    -10.97 & castaway & player \\
+    -11.00 & exaggerated & said that \\
+    -11.01 & prevent & stop \\
+    -11.06 & stray & wander \\
+    -11.09 & virtuous & good \\
+    -11.13 & discoloration & colour \\
+    -11.14 & amended & changed \\
+    -11.15 & :terrorism & :national liberation movements \\
+    -11.21 & remain & stay \\
+    -11.22 & entente & allies \\
+    -11.24 & suitable & good \\
+
+  \end{tabularx}
+\end{table}
+
+\section{Top 30 for the score function $\mathcal{S}_c$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_c$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+     0.00 & "he & that while giotto \\
+    -0.51 & exaggerated & said that \\
+    -0.57 & stray & wander \\
+    -0.60 & virtuous & good \\
+    -0.64 & discoloration & colour \\
+    -0.66 & :terrorism & :national liberation movements \\
+    -0.81 & solely & only \\
+    -0.83 & barrage & attack \\
+    -0.95 & allow & make up for \\
+    -0.95 & allow & let \\
+    -0.98 & marketed & sold \\
+    -1.02 & notebook & laptop \\
+    -1.02 & cooperate & work well \\
+    -1.04 & boasts & has \\
+    -1.05 & obtain & get \\
+    -1.06 & reflected & shown \\
+    -1.06 & reflected & showed \\
+    -1.09 & township & town \\
+    -1.16 & assumed & thought \\
+    -1.18 & inh & in \\
+    -1.18 & authoritative & sacred \\
+    -1.20 & sub-discipline & kind \\
+    -1.21 & recedes & drains \\
+    -1.26 & lowered & became cheaper \\
+    -1.29 & cups & being prepared \\
+    -1.29 & sterilise & sterilize \\
+    -1.29 & indicate & show \\
+    -1.29 & indicate & show \\
+    -1.29 & commissions & pays for \\
+    -1.29 & combatants & fighters \\
+
+  \end{tabularx}
+\end{table}
+
+\section{Top 30 for the score function $\mathcal{S}_d$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_d$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+    -15.27 & ; & . \\
+    -15.41 & , & . \\
+    -15.57 & and & . \\
+    -16.06 & ,but & . \\
+    -16.98 & ,and & . \\
+    -17.29 & : & . \\
+    -17.35 & inh & in \\
+    -17.51 & where & . \\
+    -17.52 & n't & not \\
+    -17.71 & ''the & the \\
+    -17.77 & speedminton & it \\
+    -17.78 & so-called & . \\
+    -17.80 & with & . \\
+    -17.81 & incredibly & very \\
+    -17.95 & involved & . \\
+    -18.02 & satisfy & the \\
+    -18.02 & obtain & get \\
+    -18.03 & , and & . \\
+    -18.07 & gws & it \\
+    -18.18 & solely & only \\
+    -18.28 & which & . \\
+    -18.28 & allow & let \\
+    -18.29 & ,<ref & .<ref \\
+    -18.29 & while & . \\
+    -18.30 & - & . \\
+    -18.36 & incident & , \\
+    -18.38 & included & . \\
+    -18.43 & "at & in \\
+    -18.44 & ,<ref & .<ref \\
+    -18.48 & redone & new \\
+  \end{tabularx}
+\end{table}
+
+\section{Top 30 for the score function $\mathcal{S}_{dc}$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{dc}$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+    -5.57 & ,but & . \\
+    -6.86 & inh & in \\
+    -7.19 & ,and & . \\
+    -7.22 & ''the & the \\
+    -7.28 & speedminton & it \\
+    -7.53 & satisfy & the \\
+    -7.69 & solely & only \\
+    -7.94 & "at & in \\
+    -8.02 & ...the & the \\
+    -8.09 & tribe & " \\
+    -8.09 & m13 & it \\
+    -8.10 & virtuous & good \\
+    -8.12 & greengard & he \\
+    -8.12 & waned with & . \\
+    -8.14 & outlive & after \\
+    -8.14 & enterprising & some \\
+    -8.15 & involved & . \\
+    -8.20 & mcewen & it \\
+    -8.25 & townsfolk & people \\
+    -8.25 & orators & people \\
+    -8.31 & wary & because \\
+    -8.39 & rations & they \\
+    -8.39 & tinsulanonda & he \\
+    -8.47 & naiad & it \\
+    -8.47 & itis & it is \\
+    -8.47 & motions & even \\
+    -8.48 & foregoing & at \\
+    -8.54 & referenes & references \\
+    -8.55 & democide & people \\
+    -8.56 & incident & , \\
+  \end{tabularx}
+\end{table}
+
+\section{Top 30 for the score function $\mathcal{S}_{wd}$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{wd}$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+    -14.20 & investigate & see if it was true \\
+    -15.07 & "he & that while giotto \\
+    -15.08 & enact & make it into law. \\
+    -15.21 & :terrorism & :national liberation movements \\
+    -15.26 & a/k/a & , also known as \\
+    -15.27 & invitees & players they invited \\
+    -15.27 & ; & . \\
+    -15.33 & allow & make up for \\
+    -15.34 & indulgence & doing what you want, \\
+    -15.34 & unanimously & by all of the members \\
+    -15.41 & , & . \\
+    -15.45 & exaggerated & said that \\
+    -15.45 & cosmography & the world and the universe \\
+    -15.50 & straddles & built on the banks of \\
+    -15.55 & favorably & in a good way \\
+    -15.57 & consisted & was made up \\
+    -15.57 & and & . \\
+    -15.60 & society- & society, such as \\
+    -15.61 & centralised & put into one place, \\
+    -15.61 & potable & the country's \\
+    -15.64 & oxygen-carrying & proteins in the baby's \\
+    -15.68 & nationalteams & national team in norway \\
+    -15.69 & spans & 's a bit longer than \\
+    -15.70 & phenotype & strength of natural selection \\
+    -15.79 & hfcs & high fructose corn syrup \\
+    -15.79 & hfcs & high fructose corn syrup \\
+    -15.80 & exclusively & all the time \\
+    -15.81 & negligible & "not needed" \\
+    -15.81 & befriended & became friends with \\
+    -15.83 & vice-versa & the other way round \\
+  \end{tabularx}
+\end{table}
+
+\section{Top 30 for the score function $\mathcal{S}_{wdc}$}
+\begin{table}[H]
+  \centering
+  \caption{$\mathcal{S}_{wdc}$ top 30 rewritings}
+  \begin{tabularx}{\textwidth}{SXX}
+    \toprule
+    {Score} & Original & Revised \\
+    \midrule
+    -4.58 & "he & that while giotto \\
+    -4.59 & enact & make it into law. \\
+    -4.72 & :terrorism & :national liberation movements \\
+    -4.77 & a/k/a & , also known as \\
+    -4.84 & allow & make up for \\
+    -4.85 & indulgence & doing what you want, \\
+    -4.85 & unanimously & by all of the members \\
+    -4.96 & exaggerated & said that \\
+    -4.96 & cosmography & the world and the universe \\
+    -5.01 & straddles & built on the banks of \\ 
+    -5.06 & favorably & in a good way \\
+    -5.10 & investigate & see if it was true \\
+    -5.11 & society- & society, such as \\
+    -5.12 & centralised & put into one place, \\
+    -5.16 & oxygen-carrying & proteins in the baby's \\
+    -5.19 & nationalteams & national team in norway \\
+    -5.21 & phenotype & strength of natural selection \\
+    -5.30 & hfcs & high fructose corn syrup \\
+    -5.30 & hfcs & high fructose corn syrup \\
+    -5.32 & negligible & "not needed" \\
+    -5.32 & befriended & became friends with \\
+    -5.34 & vice-versa & the other way round \\
+    -5.34 & eschewed & did not focus on \\
+    -5.37 & purportedly & said to have been \\
+    -5.39 & exemplified & was part of \\
+    -5.39 & itis & it is \\
+    -5.41 & cohuna & pleistocene burials have been found \\
+    -5.43 & resented & did not like \\
+    -5.44 & remediation & damage that should be fixed \\
+    -5.44 & precedes & in front of \\
+  \end{tabularx}
+\end{table}
 
 \end{document}
 %%% Local Variables: 
