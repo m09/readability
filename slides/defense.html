@@ -490,6 +490,111 @@
                 <li>Conclusion</li>
             </ul>
           </section>
+          <section>
+            <h2>Lexicon creation</h2>
+            <p>The objective is to score the tranlations in the corpus
+              we created: go from a corpus $\mathcal{C} \in
+              \mathcal{P} \times \mathcal{P}$ to a lexicon
+              $\mathcal{L} \in \mathcal{P} \times \mathcal{P} \times
+              \mathbb{R}$ ($\mathcal{P}$ is the set of English phrases)</p>
+            <br>
+            <p>→ need to define score functions $\mathcal{P} \times \mathcal{P} \rightarrow \mathbb{R}$</p>
+          </section>
+          <section>
+            <h2>Properties of good scores</h2>
+            <p>Since we are looking for good lexical simplifications:</p>
+            <ul>
+              <li>the less common $x$ is, the better $\mathcal{S}(x, y)$ should be</li>
+              <li>the more common $y$ is, the better $\mathcal{S}(x, y)$ should be</li>
+              <li>the more common $(x, y)$ is in $\mathcal{C}$, the
+              better $\mathcal{S}(x, y)$ should be</li>
+            </ul>
+          </section>
+          <section>
+            <h2>How common is
+              <br>$(x, y)$ in $\mathcal{C}$ ?</h2>
+            <p>We can answer with two probabilities:</p>
+            <ul>
+              <li>$P_\mathcal{C}\big((x, y)\big) =
+                \frac{\lvert\left\{(x, y) \,\middle|\, (x, y) \in
+                \mathcal{C}\right\}\rvert}{\lvert\mathcal{C}\rvert}$</li>
+              <li>$P_\mathcal{C}\big((x, y)\big|x\big) =
+                \frac{\lvert\left\{(x, y) \,\middle|\, (x, y) \in
+                \mathcal{C}\right\}\rvert}{\lvert\left\{(x, y')
+                \,\middle|\, y' \in \mathcal{P} \land (x, y') \in
+                \mathcal{C}\right\}\rvert}$</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}$</h2>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>uses our first definition of the commonness of a translation</li>
+            </ul>
+            $\begin{align*}
+            \mathcal{S}(x, y) & = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}} \\
+            & = \lambda_1 \log P_\mathcal{C}\big((x, y)\big) - \lambda_2 \log
+            \sqrt[\lvert x \rvert]{P_{LM}\big(x\big)} \end{align*}$
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_c$</h2>
+            <h3>$c$ for <strong>c</strong>onditional</h3>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>uses our second definition of the commonness of a translation</li>
+            </ul>
+            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_d$</h2>
+            <h3>$d$ for <strong>d</strong>ouble language model</h3>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>models how common the replacement term is</li>
+              <li>uses our first definition of the commonness of a translation</li>
+            </ul>
+            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
+            P_{LM}\big(y\big)^{\lambda_3}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{dc}$</h2>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>models how common the replacement term is</li>
+              <li>uses our second definition of the commonness of a translation</li>
+            </ul>
+            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
+            P_{LM}\big(y\big)^{\lambda_3}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{wd}$</h2>
+            <h3>$w$ for <strong>w</strong>eighted replacement</h3>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>models how common the replacement term is</li>
+              <li>uses our first definition of the commonness of a translation</li>
+              <li>allows for paraphrases</li>
+            </ul>
+            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
+            \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{wdc}$</h2>
+            <ul>
+              <li>models how rare the term rewritten is</li>
+              <li>models how common the replacement term is</li>
+              <li>uses our second definition of the commonness of a translation</li>
+              <li>allows for paraphrases</li>
+            </ul>
+            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
+            \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
+            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+          </section>
         </section>
         <section>
           <section>
