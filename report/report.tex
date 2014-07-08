@@ -780,8 +780,8 @@ constructed for a given input text of $n$ tokens noted $t_1 \dots t_n$
 and their $n$ parts of speech noted $p_1 \dots p_n$ as follows, where
 $\mathcal{T}$ is the set of all tokens in written English,
 $\mathcal{P}$ is the set of all parts of speech in English and
-$\mathcal{S} : \mathcal{D} \rightarrow \mathbb{K}$ is the score we
-use, $\mathbb{K}$ being the set of the monoid:
+$\mathcal{L}$ is the lexicon obtained
+in \sectionref{sec:lexical-enhancements}:
 
 \begin{itemize}
 \item $\Sigma = \mathcal{T} \times \mathcal{P}$
@@ -791,9 +791,8 @@ use, $\mathbb{K}$ being the set of the monoid:
 \item $F = \{ q_n \}$
 \item $\displaystyle
   \begin{aligned}[t]
-    E & = \left\{ (q_{i - 1}, w, r, s, q_i) \suchthat w \maps{D} r
-      \land w = t_i \land p_w = p_i \land s = \mathcal{S}\left(\ t_i
-        \maps{D} r \right) \land 1 \leq i \leq n \right\} \\
+    E & = \left\{ (q_{i - 1}, x, y, s, q_i) \suchthat (x, y, s) \in
+      \mathcal{L} \land x = t_i \land p_x = p_i \land 1 \leq i \leq n \right\} \\
     & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
       \suchthat 1 \leq i \leq n \right\}
   \end{aligned}$
@@ -837,7 +836,7 @@ use-case (1.). Negative Log is the log equivalent of the $(\left[0,
   \caption{Interesting monoids for our score functions}
   \begin{tabular}{rccc}
     \toprule
-    Semiring & $\mathbb{K}$ & $\otimes$ & $\mathbb{1}$ \\
+    Monoid & $\mathbb{K}$ & $\otimes$ & $\mathbb{1}$ \\
     \midrule
     Negative Log & $\mathbb{R}^{-} \cup \{-\infty\}$ & $+$ & $0$ \\
     Negative Min & $\mathbb{R}^{-} \cup \{-\infty\}$ & $\min$ & $0$ \\
@@ -902,7 +901,7 @@ the functions defined in
 It is now possible to address the two use-cases mentioned in
 \figureref{fig:use-cases} by using the Viterbi algorithm
 \cite{forney1973viterbi} with Negative Log as monoid for the first
-use-case and Negative MaxMin for the second.
+use-case and Negative Min for the second.
 
 The next section details \textsc{Readability Lab}, a framework built
 to analyze both the lexical enhancements and the text rewritings
