@@ -262,6 +262,78 @@
                 <li>Conclusion</li>
             </ul>
           </section>
+          <section>
+            <h2>The tasks</h2>
+            <style>
+              .table th, .table td {
+              text-align: center !important;
+              }
+            </style>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Classical task</th>
+                  <th>Machine learning task</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Score a text</td>
+                  <td>Regression</td>
+                </tr>
+                <tr>
+                  <td>Sort texts on readability</td>
+                  <td>Regression, classification on pairs of
+                    documents</td>
+                </tr>
+                <tr>
+                  <td>Assign a required grade to a text</td>
+                  <td>Classification with grades as labels</td>
+                </tr>
+                <tr>
+                  <td>Regroup texts of similar readability</td>
+                  <td>Clustering</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section>
+            <h2>Language model approach</h2>
+            <p>Schwarm and Ostendorf, 2005:</p>
+            <br>
+            <ul>
+              <li>bigrams and trigrams LM alone</li>
+              <li>combination in a SVM of:
+                <ul>
+                  <li>LM perplexities</li>
+                  <li>readability formulas</li>
+                  <li>syntactic features</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h2>Complex features</h2>
+            <p>
+              Pitler and Nenkova, 2008:
+            </p>
+            <br>
+            <ul>
+              <li>unigram model</li>
+              <li>lexical cohesion (cosine similiarity averaged over
+                all sentences)</li>
+              <li>syntactic features (as Schwarm and Ostendorf)</li>
+              <li>entity coherence (analyse the subjects / objects of
+                consecutive sentences)</li>
+              <li>language model over discourse relations</li>
+            </ul>
+            <br>
+            <br>
+            <p>→ proves the superiority of discourse relations over
+            average lengths of sentences and
+            words. <strong>But</strong> discourse relations are not
+            yet easily computable.</p>
+          </section>
         </section>
         <section>
           <section>
@@ -283,6 +355,42 @@
                 <li>Conclusion</li>
             </ul>
           </section>
+          <section>
+            <h2>Simple English Wikipedia (SEW)</h2>
+            <ul>
+              <li>translation of the English Wikipedia in simple English</li>
+              <li>goal is:
+                <ul>
+                  <li>to use only the 1000 most common words in English</li>
+                  <li>to keep sentences short</li>
+                </ul>
+              </li>
+              <li>100 000 articles</li>
+            </ul>
+            <br>
+            <br>
+            <strong>→ Amazing readability resource</strong>
+          </section>
+          <section>
+            <h2>Comparable corpus
+              <br><strong>EW</strong> → <strong>SEW</strong></h2>
+            <p>(Zhu et al., 2010)</p>
+            <ul>
+              <li>align EW and SEW versions of a same article</li>
+              <li>gather the differences to compute a non-readable → readable corpus</li>
+              <li>100 000 pairs of sentences</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Parallel corpus
+              <br><strong>EW → EW & SEW</strong> → <strong>SEW</strong></h2>
+            <p>(Yatskar et al., 2010)</p>
+            <ul>
+              <li>use EW and SEW revision histories</li>
+              <li>gather the differences between two versions modified for readability</li>
+            </ul>
+          </section>
+        </section>
         </section>
         <section>
           <section>
