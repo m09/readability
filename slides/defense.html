@@ -511,6 +511,50 @@
                 <li>Conclusion</li>
             </ul>
           </section>
+          <section>
+            <h2>A general framework</h2>
+            Recursive combination of readability scores with 3 functions:
+            <ul>
+              <li>$\pi$ to handle the different scores of a sentence <strong>p</strong>art</li>
+              <li>$\sigma$ to handle the parts of a <strong>s</strong>entence</li>
+              <li>$\theta$ to handle the sentences of a <strong>t</strong>ext</li>
+            </ul>
+            $\begin{align*}
+            f(t) = \theta\Bigg(& \Bigg\{ \sigma \left(\left\{ \pi(s)| x \subset sent \land (x, y, s) \in \mathcal{L}\right\}\right)
+             \\
+            & \Bigg|\, \text{$sent$ is a sentence in $t$} \Bigg\}\Bigg)
+            \end{align*}$
+          </section>
+          <section>
+            <h2>An application</h2>
+            <p>We construct $f_{max}$ with:</p>
+            <ul>
+              <li>$\pi = \max$</li>
+              <li>$\sigma = \max$</li>
+              <li>$\theta = \mathrm{average}$</li>
+            </ul>
+            <br>
+            <br>
+            <p>in English: $f_{max}$ averages the maximum of the
+              sentences lexical improvement scores to assess the
+              readability of a text.</p>
+          </section>
+          <section>
+            <h2>Example</h2>
+            <p>Given a text with the best transformation computed for
+              each part of each sentence:</p>
+            <img src="img/rrf-1.png" class="stretch">
+          </section>
+          <section>
+            <h2>Example</h2>
+            <p>Compute the sentence scores with $\max$:</p>
+            <img src="img/rrf-2.png" class="stretch">
+          </section>
+          <section>
+            <h2>Example</h2>
+            <p>Compute the text score with $\mathrm{average}$:</p>
+            <img src="img/rrf-3.png" class="stretch">
+          </section>
         </section>
         <section>
           <section>
