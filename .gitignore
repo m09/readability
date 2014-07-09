@@ -24,6 +24,7 @@ indented.xml
 /server/project/project
 /server/project/target
 /server/target
+/slides/bower_components
 /transducers
 /uima-server/out
 /docear
