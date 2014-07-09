@@ -50,8 +50,9 @@
           <h3><a href="http://readability.crydee.eu/" target="_blank">http://readability.crydee.eu/</a></h3>
           <div>
             <strong class="text-primary">Internship defense</strong>
-            — <strong class="text-primary">Hugo Mougard</strong> — <strong class="text-primary">July
-              the 10ᵗʰ</strong>
+            — <strong class="text-primary">Hugo Mougard</strong>
+            <br>
+            <strong class="text-muted">July the 10ᵗʰ</strong>
           </div>
         </section>
         <section>
@@ -71,6 +72,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -92,6 +94,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -163,6 +166,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -194,6 +198,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -259,6 +264,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -352,6 +358,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -409,6 +416,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -442,6 +450,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -487,6 +496,7 @@
                 <li><strong class="text-danger">Phrase lexicon learning</strong></li>
                 <li>Fine-grained readability measure</li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -511,6 +521,23 @@
             </ul>
           </section>
           <section>
+            <h2>How rare is $x$ ?</h2>
+            <p>Direct language model score is not enough ($P_{LM}\big(x\big)$):</p>
+            <ul>
+              <li>“exhausted” would likely have a higher LM score than “I am”</li>
+              <li>we want to rewrite “exhausted”, not “I am”</li>
+            </ul>
+            <p>→ average by $x$ length: $\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}$</p>
+          </section>
+          <section>
+            <h2>How common is $y$ ?</h2>
+            <p>Two worthy definitions:</p>
+            <ul>
+              <li>$P_{LM}\big(y\big)$ to allow only for short simplifications</li>
+              <li>$\sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}$ to allow for paraphrases</li>
+            </ul>
+          </section>
+          <section>
             <h2>How common is
               <br>$(x, y)$ in $\mathcal{C}$ ?</h2>
             <p>We can answer with two probabilities:</p>
@@ -526,74 +553,110 @@
             </ul>
           </section>
           <section>
+            <h2>Combinations</h2>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>score</th>
+                  <th>x is conditional?</th>
+                  <th>uses LM of y?</th>
+                  <th>normalizes LM of y?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>$\mathcal{S}$</td>
+                  <td>✗</td>
+                  <td>✗</td>
+                  <td>✗</td>
+                </tr>
+                <tr>
+                  <td>$\mathcal{S}_c$</td>
+                  <td>✓</td>
+                  <td>✗</td>
+                  <td>✗</td>
+                </tr>
+                <tr>
+                  <td>$\mathcal{S}_d$</td>
+                  <td>✗</td>
+                  <td>✓</td>
+                  <td>✗</td>
+                </tr>
+                <tr>
+                  <td>$\mathcal{S}_{dc}$</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>✗</td>
+                </tr>
+                <tr>
+                  <td>$\mathcal{S}_{wd}$</td>
+                  <td>✗</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                </tr>
+                <tr>
+                  <td>$\mathcal{S}_{wdc}$</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section>
             <h2>Score $\mathcal{S}$</h2>
-            <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>uses our first definition of the commonness of a translation</li>
-            </ul>
-            $\begin{align*}
+            <p>$\begin{align}
             \mathcal{S}(x, y) & = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}}
             {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}} \\
             & = \lambda_1 \log P_\mathcal{C}\big((x, y)\big) - \lambda_2 \log
-            \sqrt[\lvert x \rvert]{P_{LM}\big(x\big)} \end{align*}$
+              \sqrt[\lvert x \rvert]{P_{LM}\big(x\big)} \end{align}$</p>
+            <br>
+            <ul>
+              <li class="text-success"><strong>discovered → found</strong> has a good score</li>
+              <li class="text-danger"><strong>and → .</strong> has a good score</li>
+            </ul>
           </section>
           <section>
             <h2>Score $\mathcal{S}_c$</h2>
             <h3>$c$ for <strong>c</strong>onditional</h3>
+            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}}
+              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
+            <br>
             <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>uses our second definition of the commonness of a translation</li>
+              <li class="text-success"><strong>and → .</strong> has a bad score</li>
+              <li class="text-danger"><strong>targeted → wanted to vote off</strong> has a good score</li>
             </ul>
-            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
           </section>
           <section>
             <h2>Score $\mathcal{S}_d$</h2>
             <h3>$d$ for <strong>d</strong>ouble language model</h3>
-            <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>models how common the replacement term is</li>
-              <li>uses our first definition of the commonness of a translation</li>
-            </ul>
-            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
+            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
             P_{LM}\big(y\big)^{\lambda_3}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
+            <p class="text-danger">non-content rewritings have high scores. Might be fixable with $\lambda$ tweaking.</p>
           </section>
           <section>
             <h2>Score $\mathcal{S}_{dc}$</h2>
-            <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>models how common the replacement term is</li>
-              <li>uses our second definition of the commonness of a translation</li>
-            </ul>
-            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
+            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
             P_{LM}\big(y\big)^{\lambda_3}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
           </section>
           <section>
             <h2>Score $\mathcal{S}_{wd}$</h2>
             <h3>$w$ for <strong>w</strong>eighted replacement</h3>
-            <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>models how common the replacement term is</li>
-              <li>uses our first definition of the commonness of a translation</li>
-              <li>allows for paraphrases</li>
-            </ul>
-            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
+            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
             \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
+            <ul>
+              <li class="text-success"><strong>good score: </strong>considerable → a lot of</li>
+              <li class="text-danger"><strong>bad score: </strong>discovered → found</li>
+            </ul>
           </section>
           <section>
             <h2>Score $\mathcal{S}_{wdc}$</h2>
-            <ul>
-              <li>models how rare the term rewritten is</li>
-              <li>models how common the replacement term is</li>
-              <li>uses our second definition of the commonness of a translation</li>
-              <li>allows for paraphrases</li>
-            </ul>
-            $\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
+            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
             \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$
+              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
           </section>
         </section>
         <section>
@@ -613,6 +676,7 @@
                 <li>Phrase lexicon learning</li>
                 <li><strong style="color: black;">Fine-grained readability measure</strong></li>
                 <li>Text rewriting</li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -678,6 +742,7 @@
                 <li>Phrase lexicon learning</li>
                 <li>Fine-grained readability measure</li>
                 <li><strong class="text-success">Text rewriting</strong></li>
+                <li>Future works</li>
                 <li>Conclusion</li>
             </ul>
           </section>
@@ -764,6 +829,41 @@
             <img src="img/monoids.svg">
           </section>
         </section>
+        <section>
+          <section>
+            <h1>Overview</h1>
+            <ul>
+              <li>Definition: what is readability?</li>
+              <li>Research statement</li>
+              <li>Related works:
+                <ul>
+                  <li>Readability formulas</li>
+                  <li>Machine learning</li>
+                  <li>Simple Wikipedia</li>
+                </ul>
+                <li>Idea</li>
+                <li>Corpus creation</li>
+                <li>Phrase lexicon learning</li>
+                <li>Fine-grained readability measure</li>
+                <li>Text rewriting</li>
+                <li><strong class="text-warning">Future works</strong></li>
+                <li>Conclusion</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Evaluation</h2>
+            <ul>
+              <li>manual evaluation, comparison between top rewritings
+                of this approach and other lexical approaches</li>
+              <li>automatic evaluation, with readability formulas or
+                machine learning approaches</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Syntactic rewriting</h2>
+            <p>Go from string → string transducing to tree → tree
+              transducing to handle syntactic rewritings.</p>
+          </section>
         <section>
           <h1>Conclusion</h1>
           What we have talked about today:
