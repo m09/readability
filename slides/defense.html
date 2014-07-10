@@ -75,49 +75,73 @@
               the text, not the layout nor the appearance.</p>
           </section>
           <section>
-            <h2>Readability, a broad topic…</h2>
+            <h2>Medium</h2>
+            <h3>High legibility</h3>
+            <img src="img/legibility-good.png" class="stretch">
+          </section>
+          <section>
+            <h2>Cdiscount</h2>
+            <h3>Low legibility</h3>
+            <img src="img/cdiscount.png" class="stretch">
+          </section>
+          <section>
+            <h2>Simple English Wikipedia, <i>Commodore Nutt</i></h2>
+            <h3>High readability</h3>
+            Nutt toured the world between 1869 and 1872 with the
+            Thumbs and Lavinia's sister, Minnie Warren. They returned
+            to America rich after performing before royalty. Nutt left
+            Barnum's employ after a disagreement with the showman. He
+            toured with a comic opera company, put together a variety
+            show on the United States West Coast, and operated saloons
+            in Oregon and California. He returned to New York City,
+            and died there of Bright's disease in May 1881.
+          </section>
+          <section>
+            <h2>James Joyce, <i>Ulysses</i></h2>
+            <h3>Low readability</h3>
+            It soared, a bird, it held its flight, a swift pure cry,
+            soar silver orb it leaped serene, speeding, sustained, to
+            come, don't spin it out too long long breath he breath
+            long life, soaring high, high resplendent, aflame,
+            crowned, high in the effulgence symbolistic, high, of the
+            ethereal bosom, high, of the high vast irradiation
+            everywhere all soaring all around about the all, the
+            endlessnessnessness...
+          </section>
+          <section>
+            <h2>Definition of readability</h2>
             <blockquote>
               <p>
-                Readability is the <strong>sum of all the elements</strong>
-                within a text that affect the success a group of
-                readers have with it. The success is the extent to
-                which they <strong>understand</strong> it, read it at
-                <strong>optimal speed</strong>, and find it
-                <strong>interesting</strong>
+                Readability is the <strong>ease</strong> with which
+                text can be <strong>read</strong> and <strong>understood</strong>.
               </p>
-              <footer>Edited from Dale and Chall, 1949</footer>
+              <footer>Wikipedia</footer>
             </blockquote>
             <aside class="notes">
               most complete
             </aside>
           </section>
           <section>
-            <h2>All the elements</h2>
-            <h3>Depending on the reader</h3>
+            <h2>Readability factors</h2>
+            <h3>Reader related</h3>
             <ul>
-              <li>background knowledge</li>
-              <li>reading fluency</li>
-              <li>language</li>
+              <li><strong>understanding</strong>: background knowledge, language</li>
+              <li><strong>reading</strong>: reading fluency, language</li>
             </ul>
           </section>
           <section>
-            <h2>All the elements</h2>
-            <h3>Depending on the text</h3>
+            <h2>Readability factors</h2>
+            <h3>Text related</h3>
             <ul>
-              <li>syntax</li>
-              <li>vocabulary</li>
-              <li>idea density</li>
-              <li>cognitive load</li>
+              <li><strong>reading</strong>: syntax, vocabulary</li>
+              <li><strong>understanding</strong>: syntax, vocabulary,
+              idea density, cognitive load</li>
             </ul>
           </section>
           <section>
             <h2>In this work</h2>
-            <ul>
-              <li class="text-warning">syntax</li>
-              <li class="text-danger">vocabulary</li>
-              <li>idea density</li>
-              <li>cognitive load</li>
-            </ul>
+            Focus on <strong>vocabulary</strong> aspect of
+            readability.
           </section>
         </section>
         <section>
@@ -140,7 +164,7 @@
           </section>
           <section>
             <h2>End goal</h2>
-              <p>Be able to find which words or sentences to rewrite, and how.</p>
+            <p>Be able to find which words or sentences to rewrite, and how.</p>
           </section>
         </section>
         <section>
@@ -354,16 +378,8 @@
             </ol>
           </section>
           <section>
-            <h2>Machine translation
-              <br>to the rescue</h2>
-            <ul>
-              <li>use phrase based machine translation to model
-                lexical improvements</li>
-              <li>use translation scores as indicators of readability</li>
-            </ul>
-            <br>
-            <br>
-            <p>→ achieve fine-grained readability</p>
+            <h2>Subtasks</h2>
+            <img src="img/overview.svg" class="stretch">
           </section>
           <section>
             <h1>Approach</h1>
@@ -377,7 +393,7 @@
           </section>
           <section>
             <h2>Corpus creation</h2>
-            <h3>a subtask</h3>
+            <h3>Motivation</h3>
             <p>Free readability corpora are based on comparable
               corpora. We propose a free corpus based on revision
               history.</p>
@@ -386,7 +402,6 @@
             <ul>
               <li>general process</li>
               <li>easily extensible outside of wikipedia (copy-editing)</li>
-              <li>allows us to also make tooling available</li>
             </ul>
           </section>
           <section>
@@ -396,8 +411,11 @@
             <ul>
               <li>SEW edit history</li>
               <li>align the sentences with a `diff` program</li>
-              <li>release it to the public</li>
             </ul>
+            <br>
+            <br>
+            <p>The corpus itself and the related tooling are freely
+              available</p>
           </section>
           <section>
             <h1>Approach</h1>
@@ -424,149 +442,58 @@
             <h2>Properties of good scores</h2>
             <p>Since we are looking for good lexical simplifications:</p>
             <ul>
-              <li>the less common $x$ is, the better $\mathcal{S}(x, y)$ should be</li>
-              <li>the more common $y$ is, the better $\mathcal{S}(x, y)$ should be</li>
-              <li>the more common $(x, y)$ is in $\mathcal{C}$, the
-              better $\mathcal{S}(x, y)$ should be</li>
+              <li>the less common $s$ is, the higher $\mathcal{S}(s,
+                t)$ should be</li>
+              <li>the more common $t$ is, the higher $\mathcal{S}(s,
+                t)$ should be</li>
+              <li>the more common $(s, t)$ is in $\mathcal{D}$, the
+                higher $\mathcal{S}(s, t)$ should be</li>
             </ul>
           </section>
           <section>
-            <h2>How rare is $x$ ?</h2>
-            <p>Direct language model score is not enough ($P_{LM}\big(x\big)$):</p>
+            <h2>How rare is $s$ ?</h2>
+            <p>Direct language model score is not enough ($P_{LM}\big(s\big)$):</p>
             <ul>
               <li>“exhausted” would likely have a higher LM score than “I am”</li>
               <li>we want to rewrite “exhausted”, not “I am”</li>
             </ul>
-            <p>→ average by $x$ length: $\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}$</p>
+            <p>→ average by $s$ length: $\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}$</p>
           </section>
           <section>
-            <h2>How common is $y$ ?</h2>
+            <h2>How common is $t$ ?</h2>
+            <br>
             <p>Two worthy definitions:</p>
-            <ul>
-              <li>$P_{LM}\big(y\big)$ to allow only for short simplifications</li>
-              <li>$\sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}$ to allow for paraphrases</li>
-            </ul>
+            <br>
+            <ol>
+              <li>$P_{LM}\big(t\big)$ to allow only for short simplifications</li>
+              <li>$\sqrt[\lvert t \rvert]{P_{LM}\big(t\big)}$ to allow for paraphrases</li>
+            </ol>
+            <br>
+            <br>
+            <p>Scores using any of (1.) or (2.) have a $d$ index, for
+            $d$ouble language model.</p>
+            <p>Scores using (2.) have a $w$ index, for weighted</p>
           </section>
           <section>
             <h2>How common is
-              <br>$(x, y)$ in $\mathcal{C}$ ?</h2>
+              <br>$(s, t)$ in $\mathcal{D}$ ?
+            </h2>
+            <br>
             <p>We can answer with two probabilities:</p>
-            <ul>
-              <li>$P_\mathcal{C}\big((x, y)\big) =
-                \frac{\lvert\left\{(x, y) \,\middle|\, (x, y) \in
-                \mathcal{C}\right\}\rvert}{\lvert\mathcal{C}\rvert}$</li>
-              <li>$P_\mathcal{C}\big((x, y)\big|x\big) =
-                \frac{\lvert\left\{(x, y) \,\middle|\, (x, y) \in
-                \mathcal{C}\right\}\rvert}{\lvert\left\{(x, y')
-                \,\middle|\, y' \in \mathcal{P} \land (x, y') \in
-                \mathcal{C}\right\}\rvert}$</li>
-            </ul>
-          </section>
-          <section>
-            <h2>Combinations</h2>
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>score</th>
-                  <th>x is conditional?</th>
-                  <th>uses LM of y?</th>
-                  <th>normalizes LM of y?</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>$\mathcal{S}$</td>
-                  <td>✗</td>
-                  <td>✗</td>
-                  <td>✗</td>
-                </tr>
-                <tr>
-                  <td>$\mathcal{S}_c$</td>
-                  <td>✓</td>
-                  <td>✗</td>
-                  <td>✗</td>
-                </tr>
-                <tr>
-                  <td>$\mathcal{S}_d$</td>
-                  <td>✗</td>
-                  <td>✓</td>
-                  <td>✗</td>
-                </tr>
-                <tr>
-                  <td>$\mathcal{S}_{dc}$</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✗</td>
-                </tr>
-                <tr>
-                  <td>$\mathcal{S}_{wd}$</td>
-                  <td>✗</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                </tr>
-                <tr>
-                  <td>$\mathcal{S}_{wdc}$</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}$</h2>
-            <p>$\begin{align}
-            \mathcal{S}(x, y) & = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}}
-            {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}} \\
-            & = \lambda_1 \log P_\mathcal{C}\big((x, y)\big) - \lambda_2 \log
-              \sqrt[\lvert x \rvert]{P_{LM}\big(x\big)} \end{align}$</p>
             <br>
-            <ul>
-              <li class="text-success"><strong>discovered → found</strong> has a good score</li>
-              <li class="text-danger"><strong>and → .</strong> has a good score</li>
-            </ul>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}_c$</h2>
-            <h3>$c$ for <strong>c</strong>onditional</h3>
-            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}}
-              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
+            <ol>
+              <li>$P_\mathcal{C}\big((s, t)\big) =
+                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
+                \mathcal{D}\right\}\rvert}{\lvert\mathcal{C}\rvert}$</li>
+              <li>$P_\mathcal{C}\big((s, t)\big|s\big) =
+                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
+                \mathcal{D}\right\}\rvert}{\lvert\left\{(s, t')
+                \,\middle|\, t' \in \mathcal{P} \land (s, t') \in
+                \mathcal{D}\right\}\rvert}$</li>
+            </ol>
             <br>
-            <ul>
-              <li class="text-success"><strong>and → .</strong> has a bad score</li>
-              <li class="text-danger"><strong>targeted → wanted to vote off</strong> has a good score</li>
-            </ul>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}_d$</h2>
-            <h3>$d$ for <strong>d</strong>ouble language model</h3>
-            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
-            P_{LM}\big(y\big)^{\lambda_3}}
-              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
-            <p class="text-danger">non-content rewritings have high scores. Might be fixable with $\lambda$ tweaking.</p>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}_{dc}$</h2>
-            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
-            P_{LM}\big(y\big)^{\lambda_3}}
-              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}_{wd}$</h2>
-            <h3>$w$ for <strong>w</strong>eighted replacement</h3>
-            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y)\big)^{\lambda_1}
-            \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
-              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
-            <ul>
-              <li class="text-success"><strong>good score: </strong>considerable → a lot of</li>
-              <li class="text-danger"><strong>bad score: </strong>discovered → found</li>
-            </ul>
-          </section>
-          <section>
-            <h2>Score $\mathcal{S}_{wdc}$</h2>
-            <p>$\mathcal{S}(x, y) = \log \frac{P_\mathcal{C}\big((x, y) \,\big|\, x\big)^{\lambda_1}
-            \sqrt[\lvert y \rvert]{P_{LM}\big(y\big)}^{\lambda_3}}
-              {\sqrt[\lvert x \rvert]{P_{LM}\big(x\big)}^{\lambda_2}}$</p>
+            <br>
+            Scores using (2.) have $c$ index, for $c$onditional.
           </section>
           <section>
             <h1>Approach</h1>
@@ -607,20 +534,30 @@
               readability of a text.</p>
           </section>
           <section>
-            <h2>Example</h2>
-            <p>Given a text with the best transformation computed for
-              each part of each sentence:</p>
-            <img src="img/rrf-1.png" class="stretch">
+            <h2>$\pi$ scoring</h2>
+            <img src="img/rrf.png" width="800">
+            <br>↓<br>
+            <img src="img/rrf-1.png" width="800">
           </section>
           <section>
-            <h2>Example</h2>
-            <p>Compute the sentence scores with $\max$:</p>
-            <img src="img/rrf-2.png" class="stretch">
+            <h2>$\sigma$ scoring</h2>
+            <img src="img/rrf-1.png" width="800">
+            <br>↓<br>
+            <img src="img/rrf-2.png" width="800">
           </section>
           <section>
-            <h2>Example</h2>
-            <p>Compute the text score with $\mathrm{average}$:</p>
-            <img src="img/rrf-3.png" class="stretch">
+            <h2>$\theta$ scoring</h2>
+            <img src="img/rrf-2.png" width="800">
+            <br>↓<br>
+            <img src="img/rrf-3.png" width="800">
+          </section>
+          <section>
+            <h2>Interest</h2>
+            <ul>
+              <li>fine-grained analysis when needed</li>
+              <li>still usable as a readability score for the complete
+                text</li>
+            </ul>
           </section>
           <section>
             <h1>Approach</h1>
@@ -635,43 +572,6 @@
           <section>
             <h2>Text rewriting</h2>
             We can use our lexicon to rewrite text: with <strong>weighted transducers</strong>.
-          </section>
-          <section>
-            <h2>Weighted Transducers</h2>
-            <h3>definition</h3>
-            <ul>
-              <li>$\Sigma$ input alphabet</li>
-              <li>$\Delta$ output alphabet</li>
-              <li>$Q$ set of states</li>
-              <li>$I \subseteq Q$ set of initial states</li>
-              <li>$F \subseteq Q$ set of final states</li>
-              <li>$E \subseteq Q \times (\Sigma \cup \{\varepsilon\})
-                \times (\Delta \cup \{\varepsilon\}) \times \mathbb{K}
-                \times Q$ set of transitions</li>
-              <li>$\lambda : I \rightarrow \mathbb{K}$ the initial weight function</li>
-              <li>$\rho : F \rightarrow \mathbb{K}$ the final weight function mapping
-                $F$ to $\mathbb{K}$</li>
-            </ul>
-          </section>
-          <section>
-            <h2>Weighted Transducers</h2>
-            <h3>construction</h3>
-            <ul>
-              <li>$\Sigma = \mathcal{T}$</li>
-              <li>$\Delta = \mathcal{T}$</li>
-              <li>$Q = \left\{ q_i | 0 \leq i \leq n \right\}$</li>
-              <li>$I = \{ q_0 \}$</li>
-              <li>$F = \{ q_n \}$</li>
-              <li>$\displaystyle
-                \begin{aligned}[t]
-                E & = \left\{ (q_{i - 1}, x, y, s, q_i) | (x, y, s) \in \mathcal{L}
-                \land 1 \leq i \leq n \right\} \\
-                & \quad \, \cup \left\{ (q_{i - 1}, t_i, t_i, \mathbb{1}, q_i)
-                | 1 \leq i \leq n \right\}
-                \end{aligned}$</li>
-              <li>$\lambda : x \mapsto \mathbb{1}$</li>
-              <li>$\rho : x \mapsto \mathbb{1}$</li>
-            </ul>
           </section>
           <section>
             <h2>Weighted Transducers</h2>
@@ -770,8 +670,7 @@
         </section>
         <section>
           <h2>Slightly off-topic ♥</h2>
-          <img src="img/fuji.jpg">
-          
+          <img src="img/fuji.jpg" class="stretch">
         </section>
         <section>
           <h1><span style="color: white;">Thank</span>
@@ -786,6 +685,89 @@
         <section>
           <h1><span style="color: black;">Do you have any
             question?</span></h1>
+          <h3><a href="http://readability.crydee.eu/" target="_blank">http://readability.crydee.eu/</a></h3>
+        </section>
+        <section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>definition</h3>
+            <ul>
+              <li>$\Sigma$ input alphabet</li>
+              <li>$\Delta$ output alphabet</li>
+              <li>$Q$ set of states</li>
+              <li>$I \subseteq Q$ set of initial states</li>
+              <li>$F \subseteq Q$ set of final states</li>
+              <li>$E \subseteq Q \times (\Sigma \cup \{\varepsilon\})
+                \times (\Delta \cup \{\varepsilon\}) \times \mathbb{K}
+                \times Q$ set of transitions</li>
+              <li>$\lambda : I \rightarrow \mathbb{K}$ the initial weight function</li>
+              <li>$\rho : F \rightarrow \mathbb{K}$ the final weight function mapping
+                $F$ to $\mathbb{K}$</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Weighted Transducers</h2>
+            <h3>construction</h3>
+            For a text of length $n$ and its tokens $x_1, \dots, x_n$:
+            <ul>
+              <li>$\Sigma = \mathcal{T}$</li>
+              <li>$\Delta = \mathcal{T}$</li>
+              <li>$Q = \left\{ q_i | 0 \leq i \leq n \right\}$</li>
+              <li>$I = \{ q_0 \}$</li>
+              <li>$F = \{ q_n \}$</li>
+              <li>$\displaystyle
+                \begin{aligned}[t]
+                E & = \left\{ (q_{i - 1}, x_i, y, s, q_i) | (x_i, y, s) \in \mathcal{D}
+                \land 1 \leq i \leq n \right\} \\
+                & \quad \, \cup \left\{ (q_{i - 1}, x_i, x_i, \mathbb{1}, q_i)
+                | 1 \leq i \leq n \right\}
+                \end{aligned}$</li>
+              <li>$\lambda : x \mapsto \mathbb{1}$</li>
+              <li>$\rho : x \mapsto \mathbb{1}$</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Score $\mathcal{S}$</h2>
+            <p>$\begin{align}
+              \mathcal{S}(s, t) & = \log \frac{P_\mathcal{D}\big((s, t)\big)^{\lambda_1}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}} \\
+              & = \lambda_1 \log P_\mathcal{D}\big((s, t)\big) - \lambda_2 \log
+              \sqrt[\lvert s \rvert]{P_{LM}\big(s\big)} \end{align}$</p>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_c$</h2>
+            <h3>$c$ for <strong>c</strong>onditional</h3>
+            <p>$\mathcal{S}(s, t) = \log \frac{P_\mathcal{D}\big((s, t) \,\big|\, s\big)^{\lambda_1}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}}$</p>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_d$</h2>
+            <h3>$d$ for <strong>d</strong>ouble language model</h3>
+            <p>$\mathcal{S}(s, t) = \log \frac{P_\mathcal{D}\big((s, t)\big)^{\lambda_1}
+            P_{LM}\big(t\big)^{\lambda_3}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}}$</p>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{dc}$</h2>
+            <p>$\mathcal{S}(s, t) = \log \frac{P_\mathcal{D}\big((s, t) \,\big|\, s\big)^{\lambda_1}
+            P_{LM}\big(t\big)^{\lambda_3}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}}$</p>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{wd}$</h2>
+            <h3>$w$ for <strong>w</strong>eighted replacement</h3>
+            <p>$\mathcal{S}(s, t) = \log \frac{P_\mathcal{D}\big((s, t)\big)^{\lambda_1}
+            \sqrt[\lvert t \rvert]{P_{LM}\big(t\big)}^{\lambda_3}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}}$</p>
+          </section>
+          <section>
+            <h2>Score $\mathcal{S}_{wdc}$</h2>
+            <p>$\mathcal{S}(s, t) = \log \frac{P_\mathcal{D}\big((s, t) \,\big|\, s\big)^{\lambda_1}
+            \sqrt[\lvert t \rvert]{P_{LM}\big(t\big)}^{\lambda_3}}
+              {\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}^{\lambda_2}}$</p>
+          </section>
         </section>
       </div>
     </div>
