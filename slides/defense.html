@@ -202,33 +202,16 @@
             </ul>
           </section>
           <section>
-            <h2>Flesch Reading Ease</h2>
+            <h2>An example</h2>
             <p>
-               (Flesch, 1948), ~100 = easy, <30 = somewhat hard for a
-               good reader:
-               <br>
-               <br>
-               $206.835
-               - 1.015 \left(\frac{\text{total words}}{\text{total
-               sentences}}\right)
-               - 84.6 \left(\frac{\text{total syllables}}{\text{total words}}\right)$
-            </p>
-          </section>
-          <section>
-            <h2>Dale–Chall readability formula</h2>
-            <p>
-               (Dale and Chall, 1949):
-               <br>
-               <br>
-               $0.1579 \left(\frac{\text{difficult
-               words}}{\text{words}}
-               \times100 \right)
-               + 0.0496
-               \left(\frac{\text{words}}{\text{sentences}}\right)$
-               <br>
-               <br>
-               Where difficult words are words not present in a list
-               of 763 words (updated to 3k words in 1995).
+              Dale–Chall readability formula (Dale and Chall, 1949):
+              <br>
+              <br>
+              $0.1579 \left(\frac{\text{difficult
+              words}}{\text{words}}
+              \times100 \right)
+              + 0.0496
+              \left(\frac{\text{words}}{\text{sentences}}\right)$
             </p>
           </section>
           <section>
@@ -322,7 +305,7 @@
           <section>
             <h2>Simple English Wikipedia (SEW)</h2>
             <ul>
-              <li>translation of the English Wikipedia in simple English</li>
+              <li>Wikipedia written in simple english</li>
               <li>goal is:
                 <ul>
                   <li>to use only the 1000 most common words in English</li>
@@ -331,28 +314,39 @@
               </li>
               <li>100 000 articles</li>
             </ul>
-            <br>
-            <br>
-            <strong>→ Amazing readability resource</strong>
           </section>
           <section>
-            <h2>Comparable corpus
-              <br><strong>EW</strong> → <strong>SEW</strong></h2>
+            <h2>Transformation example</h2>
+            <p>From the “Baseball uniform” pages:</p>
+            <ul>
+              <li><strong>SEW:</strong> On April 4, 1849, the New York
+                Knickerbockers became the first team to use uniforms.</li>
+              <li><strong>EW:</strong> The New York Knickerbockers
+                were the first baseball team to wear uniforms, taking
+                the field on April 4, 1849 in pants made of blue wool,
+                white flannel shirts and straw hats.</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Comparable corpora
+              <br><strong>EW</strong> ~$\parallel$ <strong>SEW</strong></h2>
             <p>(Zhu et al., 2010)</p>
             <ul>
               <li>align EW and SEW versions of a same article</li>
-              <li>gather the differences to compute a non-readable → readable corpus</li>
+              <li>gather the differences to compute a non-readable →
+              readable corpus</li>
               <li>100 000 pairs of sentences</li>
             </ul>
           </section>
           <section>
-            <h2>Parallel corpus
-              <br><strong>EW → EW & SEW</strong> → <strong>SEW</strong></h2>
+            <h2>Revision history</h2>
             <p>(Yatskar et al., 2010)</p>
             <ul>
               <li>use EW and SEW revision histories</li>
-              <li>gather the differences between two versions modified for readability</li>
+              <li>gather differences between two consecutive revisions
+                if the modification is about readability</li>
             </ul>
+            <img src="img/dan-kelly.png" class="stretch">
           </section>
         </section>
         <section>
@@ -371,6 +365,7 @@
             <h1>Approach</h1>
             <ol>
               <li class="fragment highlight-red">Overview</li>
+              <li>Readability Lab</li>
               <li>Corpus creation</li>
               <li>Simplifications scoring</li>
               <li>Fine-grained readability measure</li>
@@ -378,13 +373,34 @@
             </ol>
           </section>
           <section>
-            <h2>Subtasks</h2>
+            <h2>Overview</h2>
             <img src="img/overview.svg" class="stretch">
           </section>
           <section>
             <h1>Approach</h1>
             <ol>
               <li>Overview</li>
+              <li class="red">Readability Lab</li>
+              <li>Corpus creation</li>
+              <li>Simplifications scoring</li>
+              <li>Fine-grained readability measure</li>
+              <li>Text rewriting</li>
+            </ol>
+          </section>
+          <section>
+            <h2>Readability Lab</h2>
+            <p><a href="#">http://readability.crydee.eu/</a></p>
+            <ul>
+              <li>experiment with our approach</li>
+              <li>publicly available</li>
+              <li>source code on Github</li>
+            </ul>
+          </section>
+          <section>
+            <h1>Approach</h1>
+            <ol>
+              <li>Overview</li>
+              <li>Readability Lab</li>
               <li class="red">Corpus creation</li>
               <li>Simplifications scoring</li>
               <li>Fine-grained readability measure</li>
@@ -418,9 +434,16 @@
               available</p>
           </section>
           <section>
+            <h2>Corpus metrics</h2>
+            ~36 000 entries. ~25 000 occur only once and
+            ~18 000 / ~21 000 originals have only one readable
+            equivalent.
+          </section>
+          <section>
             <h1>Approach</h1>
             <ol>
               <li>Overview</li>
+              <li>Readability Lab</li>
               <li>Corpus creation</li>
               <li class="red">Simplifications scoring</li>
               <li>Fine-grained readability measure</li>
@@ -428,26 +451,28 @@
             </ol>
           </section>
           <section>
-            <h2>Lexicon creation</h2>
-            <p>The objective is to score the translations in the
-              corpus we created: go from a corpus $\mathcal{C} \in
-              \mathcal{P} \times \mathcal{P}$ to a lexicon
-              $\mathcal{L} \in \mathcal{P} \times \mathcal{P} \times
-              \mathbb{R}$ ($\mathcal{P}$ is the set of English
-              phrases)</p>
+            <h2>Simplifications
+              <br>dictionary creation</h2>
+            <p>Objective is to score the translations in the corpus we
+              created: with $\mathcal{P}$ the set of English phrases,
+              go from a corpus $\mathcal{C} \subset \mathcal{P} \times
+              \mathcal{P}$ to a simplification dictionary $\mathcal{D}
+              \subset \mathcal{P} \times \mathcal{P} \times
+              \mathbb{R}$.</p>
             <br>
             <p>→ need to define score functions $\mathcal{P} \times \mathcal{P} \rightarrow \mathbb{R}$</p>
           </section>
           <section>
             <h2>Properties of good scores</h2>
-            <p>Since we are looking for good lexical simplifications:</p>
+            <p>We are looking for good lexical simplifications.  When
+            we score the simplification $(s, t)$:</p>
             <ul>
-              <li>the less common $s$ is, the higher $\mathcal{S}(s,
-                t)$ should be</li>
-              <li>the more common $t$ is, the higher $\mathcal{S}(s,
-                t)$ should be</li>
-              <li>the more common $(s, t)$ is in $\mathcal{D}$, the
-                higher $\mathcal{S}(s, t)$ should be</li>
+              <li>the less common $s$, the higher $\mathcal{S}(s, t)$
+                <br><span class="text-success">marvelous → good</span> <strong>></strong> <span class="text-danger">ok → good</span></li>
+              <li>the more common $t$, the higher $\mathcal{S}(s, t)$
+                <br><span class="text-success">marvelous → good</span> &gt; <span class="text-danger">marvelous → wonderful</span></li>
+              <li>the more common $(s, t)$ in $\mathcal{D}$, the
+                higher $\mathcal{S}(s, t)$</li>
             </ul>
           </section>
           <section>
@@ -499,6 +524,7 @@
             <h1>Approach</h1>
             <ol>
               <li>Overview</li>
+              <li>Readability Lab</li>
               <li>Corpus creation</li>
               <li>Simplifications scoring</li>
               <li class="red">Fine-grained readability measure</li>
@@ -514,7 +540,7 @@
               <li>$\theta$ to handle the sentences of a <strong>t</strong>ext</li>
             </ul>
             $\begin{align*}
-            f(t) = \theta\Bigg(& \Bigg\{ \sigma \left(\left\{ \pi(s)| x \subset sent \land (x, y, s) \in \mathcal{L}\right\}\right)
+            f(t) = \theta\Bigg(& \Bigg\{ \sigma \left(\left\{ \pi(s)| x \subset sent \land (x, y, s) \in \mathcal{D}\right\}\right)
              \\
             & \Bigg|\, \text{$sent$ is a sentence in $t$} \Bigg\}\Bigg)
             \end{align*}$
@@ -563,6 +589,7 @@
             <h1>Approach</h1>
             <ol>
               <li>Overview</li>
+              <li>Readability Lab</li>
               <li>Corpus creation</li>
               <li>Simplifications scoring</li>
               <li>Fine-grained readability measure</li>
@@ -628,13 +655,23 @@
             </ol>
           </section>
           <section>
-            <h2>Evaluation</h2>
+            <h2>Automatic evaluation</h2>
             <ul>
-              <li>manual evaluation, comparison between top rewritings
-                of this approach and other lexical approaches</li>
-              <li>automatic evaluation, with readability formulas or
-                machine learning approaches</li>
+              <li>evaluate simplification scoring by comparing
+                agreement of top simplifications with a gold</li>
+              <li>compare new readability measures with ML approaches
+                and readability formulas:
+                <ul>
+                  <li>compute their correlation</li>
+                  <li>compare them on a gold corpus</li>
+                </ul>
             </ul>
+          </section>
+          <section>
+            <h2>Manual evaluation</h2>
+            Randomize output of our top simplifications with a SotA
+            system and ask human judges to decide which make the most
+            sense.
           </section>
           <section>
             <h2>Syntactic rewriting</h2>
@@ -656,11 +693,10 @@
           </section>
           <section>
             <h1>Conclusion</h1>
-            What we have talked about today:
+            Contributions:
             <ul>
               <li>a new readability corpus and related tools</li>
-              <li>an adaptation of translation techniques to readability
-                (translation scoring)</li>
+              <li>a scoring method for simplifications</li>
               <li>a way to derive a fine-grained readability measure
                 from it</li>
               <li>how to also apply it to text rewriting</li>
