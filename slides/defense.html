@@ -469,10 +469,10 @@
             <ul>
               <li>the less common $s$, the higher $\mathcal{S}(s, t)$
                 <br><span class="text-success">marvelous → good</span> <strong>></strong> <span class="text-danger">ok → good</span></li>
+              <li>the more common $(s, t)$ in $\mathcal{C}$, the
+                higher $\mathcal{S}(s, t)$</li>
               <li>the more common $t$, the higher $\mathcal{S}(s, t)$
                 <br><span class="text-success">marvelous → good</span> &gt; <span class="text-danger">marvelous → wonderful</span></li>
-              <li>the more common $(s, t)$ in $\mathcal{D}$, the
-                higher $\mathcal{S}(s, t)$</li>
             </ul>
           </section>
           <section>
@@ -483,6 +483,27 @@
               <li>we want to rewrite “exhausted”, not “I am”</li>
             </ul>
             <p>→ average by $s$ length: $\sqrt[\lvert s \rvert]{P_{LM}\big(s\big)}$</p>
+          </section>
+          <section>
+            <h2>How common is
+              <br>$(s, t)$ in $\mathcal{C}$ ?
+            </h2>
+            <br>
+            <p>We can answer with two probabilities:</p>
+            <br>
+            <ol>
+              <li>$P_\mathcal{C}\big((s, t)\big) =
+                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
+                \mathcal{C}\right\}\rvert}{\lvert\mathcal{C}\rvert}$</li>
+              <li>$P_\mathcal{C}\big((s, t)\big|s\big) =
+                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
+                \mathcal{C}\right\}\rvert}{\lvert\left\{(s, t')
+                \,\middle|\, t' \in \mathcal{P} \land (s, t') \in
+                \mathcal{C}\right\}\rvert}$</li>
+            </ol>
+            <br>
+            <br>
+            Scores using (2.) have $c$ index, for $c$onditional.
           </section>
           <section>
             <h2>How common is $t$ ?</h2>
@@ -498,27 +519,6 @@
             <p>Scores using any of (1.) or (2.) have a $d$ index, for
             $d$ouble language model.</p>
             <p>Scores using (2.) have a $w$ index, for weighted</p>
-          </section>
-          <section>
-            <h2>How common is
-              <br>$(s, t)$ in $\mathcal{D}$ ?
-            </h2>
-            <br>
-            <p>We can answer with two probabilities:</p>
-            <br>
-            <ol>
-              <li>$P_\mathcal{C}\big((s, t)\big) =
-                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
-                \mathcal{D}\right\}\rvert}{\lvert\mathcal{C}\rvert}$</li>
-              <li>$P_\mathcal{C}\big((s, t)\big|s\big) =
-                \frac{\lvert\left\{(s, t) \,\middle|\, (s, t) \in
-                \mathcal{D}\right\}\rvert}{\lvert\left\{(s, t')
-                \,\middle|\, t' \in \mathcal{P} \land (s, t') \in
-                \mathcal{D}\right\}\rvert}$</li>
-            </ol>
-            <br>
-            <br>
-            Scores using (2.) have $c$ index, for $c$onditional.
           </section>
           <section>
             <h1>Approach</h1>
