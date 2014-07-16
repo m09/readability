@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.crydee.readability</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>corpus</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>Corpus</name>
+
+    <description>Parallel readability corpus extracted from Wikipedia</description>
+
+    <url>https://github.com/m09/readability</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/m09/readability</connection>
+        <developerConnection>scm:git:git://github.com/m09/readability</developerConnection>
+        <url>https://github.com/m09/readability</url>
+    </scm>
+
+</project>
