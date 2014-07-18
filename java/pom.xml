@@ -24,8 +24,8 @@
         <module>model-tokenizer</module>
         <module>uima-core</module>
         <module>uima-corpus-creator</module>
-        <module>uima-evaluator</module>
         <module>uima-server</module>
+        <module>uima-evaluator</module>
     </modules>
 
     <licenses>

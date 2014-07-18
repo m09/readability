@@ -33,68 +33,61 @@ public class EvaluationPipeline {
             IOException,
             SAXException {
         for (int fold = 0; fold < 1/* DictPartsCreationPipeline.nParts */; ++fold) {
-//            for (String corpus : new String[]{"full/", "filtered/"}) {
-            for (String corpus : new String[]{"filtered/"}) {
-                ExternalResourceDescription dictTest
-                        = createExternalResourceDescription(
-                                "dictTest",
-                                ReadabilityDict_Impl.class,
-                                "file:out/res/parts/"
-                                + "txt/"
-                                + corpus
-                                + DictSplitterAE.testNamer.apply(fold));
+            ExternalResourceDescription dictTest
+                    = createExternalResourceDescription(
+                            "dictTest",
+                            ReadabilityDict_Impl.class,
+                            "file:out/parts/"
+                            + DictSplitterAE.testNamer.apply(fold));
 
-                ExternalResourceDescription resultsAggregator
-                        = createExternalResourceDescription(
-                                "resultsAggregator",
-                                ResultsAggregator_Impl.class,
-                                "");
+            ExternalResourceDescription resultsAggregator
+                    = createExternalResourceDescription(
+                            "resultsAggregator",
+                            ResultsAggregator_Impl.class,
+                            "");
 
-                CollectionReader cr
-                        = CollectionReaderFactory.createReader(
-                                ReadabilityDictCR.class,
-                                ReadabilityDictCR.KEY_RES, dictTest,
-                                ReadabilityDictCR.PARAM_LIMIT, 200);
+            CollectionReader cr
+                    = CollectionReaderFactory.createReader(
+                            ReadabilityDictCR.class,
+                            ReadabilityDictCR.KEY_RES, dictTest,
+                            ReadabilityDictCR.PARAM_LIMIT, 200);
 
-                AnalysisEngineDescription usageAed
-                        = DictUsageAEBuilder.buildAed(
-                                "out/res/parts/"
-                                + "txt/"
-                                + corpus
-                                + DictSplitterAE.trainNamer.apply(fold),
-                                true);
+            AnalysisEngineDescription usageAed
+                    = DictUsageAEBuilder.buildAed(
+                            "out/parts/"
+                            + DictSplitterAE.trainNamer.apply(fold),
+                            true);
 
-                AnalysisEngineDescription sylAe = createEngineDescription(
-                        SyllableCounterAE.class,
-                        SyllableCounterAE.PARAM_TOKEN_TYPE,
-                        Token.class.getName(),
-                        SyllableCounterAE.PARAM_TOKEN_FEATURE,
-                        "syllablesNumber");
+            AnalysisEngineDescription sylAe = createEngineDescription(
+                    SyllableCounterAE.class,
+                    SyllableCounterAE.PARAM_TOKEN_TYPE,
+                    Token.class.getName(),
+                    SyllableCounterAE.PARAM_TOKEN_FEATURE,
+                    "syllablesNumber");
 
-                AnalysisEngineDescription fleschAe = createEngineDescription(
-                        FleschAE.class,
-                        FleschAE.RES_AGGREGATOR,
-                        resultsAggregator);
+            AnalysisEngineDescription fleschAe = createEngineDescription(
+                    FleschAE.class,
+                    FleschAE.RES_AGGREGATOR,
+                    resultsAggregator);
 
-                AnalysisEngineDescription consumerAe = createEngineDescription(
-                        XmiSerializerAE.class,
-                        XmiSerializerAE.PARAM_OUT_FOLDER,
-                        "out/cas-evaluation");
+            AnalysisEngineDescription consumerAe = createEngineDescription(
+                    XmiSerializerAE.class,
+                    XmiSerializerAE.PARAM_OUT_FOLDER,
+                    "out/cas");
 
-                AggregateBuilder b = new AggregateBuilder(
-                        null,
-                        TypePrioritiesFactory.createTypePriorities(
-                                Sentence.class,
-                                Token.class),
-                        null);
-                b.add(usageAed);
-                b.add(sylAe);
-                b.add(consumerAe);
+            AggregateBuilder b = new AggregateBuilder(
+                    null,
+                    TypePrioritiesFactory.createTypePriorities(
+                            Sentence.class,
+                            Token.class),
+                    null);
+            b.add(usageAed);
+            b.add(sylAe);
+            b.add(consumerAe);
 
-                AnalysisEngine aae = b.createAggregate();
+            AnalysisEngine aae = b.createAggregate();
 
-                SimplePipeline.runPipeline(cr, aae);
-            }
+            SimplePipeline.runPipeline(cr, aae);
         }
     }
 }
