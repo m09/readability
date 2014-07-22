@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -246,5 +247,10 @@ public class ReadabilityDict_Impl
     @Override
     public Set<Entry<Mapped, Map<Mapped, Metadata>>> entrySet() {
         return Collections.unmodifiableSet(dict.entrySet());
+    }
+
+    @Override
+    public Collection<Map<Mapped, Metadata>> values() {
+        return Collections.unmodifiableCollection(dict.values());
     }
 }

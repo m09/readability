@@ -2,6 +2,7 @@ package eu.crydee.readability.uima.core.res;
 
 import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.model.Metadata;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,4 +32,6 @@ public interface ReadabilityDict extends Saveable {
     public Set<Entry<Mapped, Map<Mapped, Metadata>>> entrySet();
 
     public int getTotalCount();
+
+    public Collection<Map<Mapped, Metadata>> values();
 }
