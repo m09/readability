@@ -1,12 +1,13 @@
 package eu.crydee.readability.uima.core.res;
 
-import eu.crydee.readability.utils.XMLUtils;
 import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.model.Metadata;
 import eu.crydee.readability.uima.core.model.Score;
+import eu.crydee.readability.utils.XMLUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +41,12 @@ public class ReadabilityDict_Impl
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
         XMLStreamReader xsr = null;
-        try (InputStream is = dr.getInputStream()) {
+        URL url = dr.getUrl();
+        if (url == null) {
+            logger.log(Level.INFO, "no file to load");
+            return;
+        }
+        try (InputStream is = url.openStream()) {
             xsr = XMLInputFactory.newInstance()
                     .createXMLStreamReader(is, "UTF8");
             int mappings = 0;
@@ -55,8 +61,6 @@ public class ReadabilityDict_Impl
                 }
             }
             logger.log(Level.INFO, "loaded " + mappings + " revisions");
-        } catch (NullPointerException ex) {
-            logger.log(Level.INFO, "no file to load");
         } catch (IOException | XMLStreamException ex) {
             throw new ResourceInitializationException(ex);
         } finally {

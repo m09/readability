@@ -31,6 +31,11 @@
         <!-- Our stuff -->
         <dependency>
             <groupId>eu.crydee.readability</groupId>
+            <artifactId>corpus</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.crydee.readability</groupId>
             <artifactId>uima-core</artifactId>
             <version>1.0.0</version>
         </dependency>
