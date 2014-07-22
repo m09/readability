@@ -83,7 +83,6 @@ public class DictSplitterAE extends JCasAnnotator_ImplBase {
                             new File(outDir, trainNamer.apply(i)), cs)) {
                 test.save(psTest);
                 train.save(psTrain);
-
             } catch (FileNotFoundException | UnsupportedEncodingException ex) {
                 logger.log(
                         Level.SEVERE,

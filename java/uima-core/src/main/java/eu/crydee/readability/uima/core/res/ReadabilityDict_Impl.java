@@ -76,22 +76,22 @@ public class ReadabilityDict_Impl
 
     private void addRevised(XMLStreamReader xsr, Mapped rev)
             throws XMLStreamException {
-        Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
-        Map<Score, Double> scores = new HashMap<>();
-        for (Score score : Score.values()) {
-            scores.put(
-                    score,
-                    Double.parseDouble(xsr.getAttributeValue(
-                                    null,
-                                    "score" + score.toString())));
-        }
         Mapped revised = parseRevision(xsr);
-        List<Pair<String, String>> contexts = parseContexts(xsr);
+        List<Pair<String, String>> contexts = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "context", "context-list")) {
+            XMLUtils.nextTag(xsr);
+            String originalContext = xsr.getElementText();
+            XMLUtils.nextTag(xsr);
+            String revisedContext = xsr.getElementText();
+            contexts.add(Pair.of(originalContext, revisedContext));
+        }
         add(rev, revised, contexts);
         Metadata m = dict.get(rev).get(revised);
         m.addContexts(contexts);
-        for (Entry<Score, Double> e : scores.entrySet()) {
-            m.setScore(e.getKey(), e.getValue());
+        while (XMLUtils.goToNextXBeforeY(xsr, "score", "score-list")) {
+            m.setScore(
+                    Score.valueOf(xsr.getAttributeValue(null, "name")),
+                    Double.parseDouble(xsr.getElementText()));
         }
     }
 
@@ -111,19 +111,6 @@ public class ReadabilityDict_Impl
         return new Mapped(originalText, tokens, pos);
     }
 
-    private List<Pair<String, String>> parseContexts(XMLStreamReader xsr)
-            throws XMLStreamException {
-        List<Pair<String, String>> contexts = new ArrayList<>();
-        while (XMLUtils.goToNextXBeforeY(xsr, "context", "context-list")) {
-            XMLUtils.nextTag(xsr);
-            String originalContext = xsr.getElementText();
-            XMLUtils.nextTag(xsr);
-            String revisedContext = xsr.getElementText();
-            contexts.add(Pair.of(originalContext, revisedContext));
-        }
-        return contexts;
-    }
-
     @Override
     public void save(PrintStream ps) throws XMLStreamException {
         XMLStreamWriter xsw = XMLOutputFactory.newInstance()
@@ -141,14 +128,27 @@ public class ReadabilityDict_Impl
                 xsw.writeAttribute(
                         "count",
                         String.valueOf(m.getCount()));
-                Score[] scores = Score.values();
-                for (Score score : scores) {
-                    xsw.writeAttribute(
-                            "score" + score.toString(),
-                            String.valueOf(m.getScore(score)));
-                }
                 saveRevision(xsw, revised);
-                saveContextList(xsw, m.getContexts());
+                xsw.writeStartElement("context-list");
+                for (Pair<String, String> contexts : m.getContexts()) {
+                    xsw.writeStartElement("context");
+                    xsw.writeStartElement("original");
+                    xsw.writeCharacters(contexts.getLeft());
+                    xsw.writeEndElement();
+                    xsw.writeStartElement("revised");
+                    xsw.writeCharacters(contexts.getRight());
+                    xsw.writeEndElement();
+                    xsw.writeEndElement();
+                }
+                xsw.writeEndElement();
+                xsw.writeStartElement("score-list");
+                for (Entry<Score, Double> e : m.scoresEntrySet()) {
+                    xsw.writeStartElement("score");
+                    xsw.writeAttribute("name", e.getKey().toString());
+                    xsw.writeCharacters(e.getValue().toString());
+                    xsw.writeEndElement();
+                }
+                xsw.writeEndElement();
                 xsw.writeEndElement();
             }
             xsw.writeEndElement();
@@ -175,24 +175,6 @@ public class ReadabilityDict_Impl
         for (String token : revision.getPos()) {
             xsw.writeStartElement("pos");
             xsw.writeCharacters(token);
-            xsw.writeEndElement();
-        }
-        xsw.writeEndElement();
-    }
-
-    private void saveContextList(
-            XMLStreamWriter xsw,
-            List<Pair<String, String>> contextsList)
-            throws XMLStreamException {
-        xsw.writeStartElement("context-list");
-        for (Pair<String, String> contexts : contextsList) {
-            xsw.writeStartElement("context");
-            xsw.writeStartElement("original");
-            xsw.writeCharacters(contexts.getLeft());
-            xsw.writeEndElement();
-            xsw.writeStartElement("revised");
-            xsw.writeCharacters(contexts.getRight());
-            xsw.writeEndElement();
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
