@@ -8,6 +8,7 @@ import eu.crydee.readability.uima.models.TaggerModelPath;
 import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.scorer.ae.LanguageModelMakerAE;
 import eu.crydee.readability.uima.scorer.cr.CurrentCR;
+import java.io.File;
 import java.util.Optional;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
@@ -27,8 +28,9 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.fit.factory.AggregateBuilder;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
-import org.apache.uima.fit.factory.ExternalResourceFactory;
+import static org.apache.uima.fit.factory.ExternalResourceFactory.createExternalResourceDescription;
 import org.apache.uima.fit.factory.TypePrioritiesFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.resource.ExternalResourceDescription;
@@ -46,6 +48,9 @@ public class FrequencyCreationPipeline {
     public static void main(String[] args) throws Exception {
         parseArguments(args);
 
+        /* Create output dirs */
+        new File("out/lm/tmp/").mkdirs();
+
         if (SKIP) {
             AnalysisEngineFactory.createEngine(
                     LanguageModelMakerAE.class,
@@ -53,12 +58,9 @@ public class FrequencyCreationPipeline {
                     TypePrioritiesFactory.createTypePriorities(
                             Sentence.class,
                             Token.class),
-                    LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                    lmTmpFolder,
-                    LanguageModelMakerAE.PARAM_OUT_FILE,
-                    lmFile,
-                    LanguageModelMakerAE.PARAM_SKIP_EXTRACTION,
-                    true)
+                    LanguageModelMakerAE.PARAM_TMP_FOLDER, lmTmpFolder,
+                    LanguageModelMakerAE.PARAM_OUT_FILE, lmFile,
+                    LanguageModelMakerAE.PARAM_SKIP_EXTRACTION, true)
                     .collectionProcessComplete();
             return;
         }
@@ -68,20 +70,17 @@ public class FrequencyCreationPipeline {
                 html = "html";
 
         /* Resources descriptions */
-        ExternalResourceDescription tokenModel
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        TokenizerModelResourceImpl.class,
-                        "file:" + TokenizerModelPath.path);
+        ExternalResourceDescription tokenM = createExternalResourceDescription(
+                TokenizerModelResourceImpl.class,
+                "file:" + TokenizerModelPath.path);
 
-        ExternalResourceDescription sentenceModel
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        SentenceModelResourceImpl.class,
-                        "file:" + SentenceSplitterModelPath.path);
+        ExternalResourceDescription sentM = createExternalResourceDescription(
+                SentenceModelResourceImpl.class,
+                "file:" + SentenceSplitterModelPath.path);
 
-        ExternalResourceDescription taggerModel
-                = ExternalResourceFactory.createExternalResourceDescription(
-                        POSModelResourceImpl.class,
-                        "file:" + TaggerModelPath.path);
+        ExternalResourceDescription taggerM = createExternalResourceDescription(
+                POSModelResourceImpl.class,
+                "file:" + TaggerModelPath.path);
 
         /* Collection reader */
         CollectionReaderDescription crd;
@@ -101,66 +100,48 @@ public class FrequencyCreationPipeline {
         }
 
         /* Analysis engines */
-        AnalysisEngineDescription mw2txt
-                = AnalysisEngineFactory.createEngineDescription(
-                        MediaWikiConverterAE.class,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_TXT,
-                        text,
-                        MediaWikiConverterAE.PARAM_OUT_VIEW_HTML,
-                        html);
+        AnalysisEngineDescription mw2txt = createEngineDescription(
+                MediaWikiConverterAE.class,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_TXT, text,
+                MediaWikiConverterAE.PARAM_OUT_VIEW_HTML, html);
 
-        AnalysisEngineDescription sentenceDetector
-                = AnalysisEngineFactory.createEngineDescription(
-                        SentenceDetector.class,
-                        UimaUtil.MODEL_PARAMETER,
-                        sentenceModel,
-                        UimaUtil.SENTENCE_TYPE_PARAMETER,
-                        Sentence.class.getCanonicalName());
+        AnalysisEngineDescription sentenceDetector = createEngineDescription(
+                SentenceDetector.class,
+                UimaUtil.MODEL_PARAMETER, sentM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getName());
 
-        AnalysisEngineDescription tokenizer
-                = AnalysisEngineFactory.createEngineDescription(
-                        Tokenizer.class,
-                        UimaUtil.MODEL_PARAMETER,
-                        tokenModel,
-                        UimaUtil.SENTENCE_TYPE_PARAMETER,
-                        Sentence.class.getCanonicalName(),
-                        UimaUtil.TOKEN_TYPE_PARAMETER,
-                        Token.class.getCanonicalName());
+        AnalysisEngineDescription tokenizer = createEngineDescription(
+                Tokenizer.class,
+                UimaUtil.MODEL_PARAMETER, tokenM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName());
 
-        AnalysisEngineDescription tagger
-                = AnalysisEngineFactory.createEngineDescription(
-                        POSTagger.class,
-                        UimaUtil.MODEL_PARAMETER, taggerModel,
-                        UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getName(),
-                        UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
-                        UimaUtil.POS_FEATURE_PARAMETER, "POS");
+        AnalysisEngineDescription tagger = createEngineDescription(
+                POSTagger.class,
+                UimaUtil.MODEL_PARAMETER, taggerM,
+                UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getName(),
+                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                UimaUtil.POS_FEATURE_PARAMETER, "POS");
 
-        AnalysisEngineDescription lmMakerTxt
-                = AnalysisEngineFactory.createEngineDescription(
-                        LanguageModelMakerAE.class,
-                        LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                        lmTmpFolder,
-                        LanguageModelMakerAE.PARAM_OUT_FILE,
-                        lmFile);
+        AnalysisEngineDescription lmMakerTxt = createEngineDescription(
+                LanguageModelMakerAE.class,
+                LanguageModelMakerAE.PARAM_TMP_FOLDER, lmTmpFolder,
+                LanguageModelMakerAE.PARAM_OUT_FILE, lmFile);
 
-        AggregateBuilder builder = new AggregateBuilder(
+        AggregateBuilder b = new AggregateBuilder(
                 null,
                 TypePrioritiesFactory.createTypePriorities(
                         Sentence.class,
                         Token.class),
                 null);
 
-        builder.add(mw2txt);
-        builder.add(sentenceDetector,
-                CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(tokenizer,
-                CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(tagger,
-                CAS.NAME_DEFAULT_SOFA, text);
-        builder.add(lmMakerTxt,
-                CAS.NAME_DEFAULT_SOFA, text);
+        b.add(mw2txt);
+        b.add(sentenceDetector, CAS.NAME_DEFAULT_SOFA, text);
+        b.add(tokenizer, CAS.NAME_DEFAULT_SOFA, text);
+        b.add(tagger, CAS.NAME_DEFAULT_SOFA, text);
+        b.add(lmMakerTxt, CAS.NAME_DEFAULT_SOFA, text);
 
-        SimplePipeline.runPipeline(crd, builder.createAggregateDescription());
+        SimplePipeline.runPipeline(crd, b.createAggregateDescription());
     }
 
     static private void parseArguments(String[] args) {
