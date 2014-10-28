@@ -21,7 +21,6 @@
         <module>utils</module>
         <module>mediawiki-importer</module>
         <module>corpus</module>
-        <module>model-parser</module>
         <module>model-sentence-splitter</module>
         <module>model-tagger</module>
         <module>model-tokenizer</module>

@@ -1,6 +1,5 @@
 package eu.crydee.readability.uima.corpuscreator;
 
-import eu.crydee.readability.uima.corpuscreator.ae.CoveredCopierAE;
 import eu.crydee.readability.uima.corpuscreator.ae.FilterDictAE;
 import eu.crydee.readability.uima.core.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.corpuscreator.ae.ResourcePopulatorAE;
@@ -11,23 +10,18 @@ import eu.crydee.readability.uima.corpuscreator.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.WordDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.corpuscreator.cr.RevisionsCR;
-import eu.crydee.readability.uima.models.ParserModelPath;
 import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
 import eu.crydee.readability.uima.models.TaggerModelPath;
 import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.core.res.ReadabilityDict_Impl;
-import eu.crydee.readability.uima.core.ts.Chunk;
-import eu.crydee.readability.uima.corpuscreator.ts.OriginalSentence;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalSentences;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalWords;
-import eu.crydee.readability.uima.corpuscreator.ts.RevisedSentence;
 import eu.crydee.readability.uima.corpuscreator.ts.RevisedSentences;
 import eu.crydee.readability.uima.corpuscreator.ts.RevisedWords;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
+import java.io.File;
 import java.util.Optional;
-import opennlp.uima.parser.Parser;
-import opennlp.uima.parser.ParserModelResourceImpl;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
@@ -64,6 +58,10 @@ public class DictCreationPipeline {
     public static void main(String[] args) throws Exception {
         parseArguments(args);
 
+        /* Create output dirs */
+        new File("out/cas").mkdirs();
+        new File("out/res").mkdirs();
+
         /* View names */
         final String txtRevised = "txtRevised",
                 txtOriginal = "txtOriginal",
@@ -82,9 +80,6 @@ public class DictCreationPipeline {
                 posM = createExternalResourceDescription(
                         POSModelResourceImpl.class,
                         "file:" + TaggerModelPath.path),
-                parserM = createExternalResourceDescription(
-                        ParserModelResourceImpl.class,
-                        "file:" + ParserModelPath.path),
                 fullTxt = createExternalResourceDescription(
                         ReadabilityDict_Impl.class, ""),
                 filteredTxt = createExternalResourceDescription(
@@ -169,42 +164,6 @@ public class DictCreationPipeline {
                 UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
                 UimaUtil.POS_FEATURE_PARAMETER, "POS");
 
-        AnalysisEngineDescription copierRevised = createEngineDescription(
-                CoveredCopierAE.class,
-                CoveredCopierAE.PARAM_CONTAINER_TYPE,
-                RevisedSentences.class.getName(),
-                CoveredCopierAE.PARAM_CHILD_TYPE,
-                Sentence.class.getCanonicalName(),
-                CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
-                RevisedSentence.class.getName());
-
-        AnalysisEngineDescription copierOriginal = createEngineDescription(
-                CoveredCopierAE.class,
-                CoveredCopierAE.PARAM_CONTAINER_TYPE,
-                OriginalSentences.class.getCanonicalName(),
-                CoveredCopierAE.PARAM_CHILD_TYPE,
-                Sentence.class.getCanonicalName(),
-                CoveredCopierAE.PARAM_NEW_CHILD_TYPE,
-                OriginalSentence.class.getCanonicalName());
-
-        AnalysisEngineDescription parserRevised = createEngineDescription(
-                Parser.class,
-                UimaUtil.MODEL_PARAMETER, parserM,
-                UimaUtil.SENTENCE_TYPE_PARAMETER, RevisedSentence.class.getName(),
-                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
-                Parser.PARSE_TYPE_PARAMETER, Chunk.class.getName(),
-                Parser.TYPE_FEATURE_PARAMETER, "label",
-                Parser.CHILDREN_FEATURE_PARAMETER, "children");
-
-        AnalysisEngineDescription parserOriginal = createEngineDescription(
-                Parser.class,
-                UimaUtil.MODEL_PARAMETER, parserM,
-                UimaUtil.SENTENCE_TYPE_PARAMETER, OriginalSentence.class.getName(),
-                UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
-                Parser.PARSE_TYPE_PARAMETER, Chunk.class.getName(),
-                Parser.TYPE_FEATURE_PARAMETER, "label",
-                Parser.CHILDREN_FEATURE_PARAMETER, "children");
-
         AnalysisEngineDescription wordDiffer = createEngineDescription(
                 WordDiffAE.class,
                 WordDiffAE.PARAM_SENTENCE_TYPE, Sentence.class.getName(),
@@ -231,14 +190,9 @@ public class DictCreationPipeline {
                 FilterDictAE.RES_INPUT_KEY, fullTxt,
                 FilterDictAE.RES_OUTPUT_KEY, filteredTxt);
 
-        AnalysisEngineDescription fullWriter = createEngineDescription(
+        AnalysisEngineDescription writer = createEngineDescription(
                 SaveableWriterAE.class,
-                SaveableWriterAE.PARAM_FILENAME, "out/res/fullTxt.xml",
-                SaveableWriterAE.RES_KEY, fullTxt);
-
-        AnalysisEngineDescription filteredWriter = createEngineDescription(
-                SaveableWriterAE.class,
-                SaveableWriterAE.PARAM_FILENAME, "out/res/filteredTxt.xml",
+                SaveableWriterAE.PARAM_FILENAME, "out/res/corpus.xml",
                 SaveableWriterAE.RES_KEY, filteredTxt);
 
         /* The type priority is important especially to retrieve tokens. The
@@ -247,10 +201,8 @@ public class DictCreationPipeline {
                 null,
                 TypePrioritiesFactory.createTypePriorities(
                         OriginalSentences.class,
-                        OriginalSentence.class,
                         OriginalWords.class,
                         RevisedSentences.class,
-                        RevisedSentence.class,
                         RevisedWords.class,
                         Sentence.class,
                         Token.class),
@@ -270,18 +222,13 @@ public class DictCreationPipeline {
                 SentenceDiffAE.REVISED_VIEW, txtRevised);
         b.add(taggerRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
         b.add(taggerOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-        b.add(copierRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
-        b.add(copierOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
-//        b.add(parserRevised, CAS.NAME_DEFAULT_SOFA, txtRevised);
-//        b.add(parserOriginal, CAS.NAME_DEFAULT_SOFA, txtOriginal);
         b.add(wordDiffer, WordDiffAE.ORIGINAL_VIEW, txtOriginal,
                 WordDiffAE.REVISED_VIEW, txtRevised);
         b.add(consumerXmi);
         b.add(resourcePopulator, ResourcePopulatorAE.ORIGINAL_VIEW, txtOriginal,
                 ResourcePopulatorAE.REVISED_VIEW, txtRevised);
         b.add(filterer);
-        b.add(fullWriter);
-        b.add(filteredWriter);
+        b.add(writer);
         SimplePipeline.runPipeline(crd, b.createAggregateDescription());
     }
 

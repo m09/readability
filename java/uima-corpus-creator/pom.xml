@@ -47,11 +47,6 @@
             <artifactId>model-sentence-splitter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.crydee.readability</groupId>
-            <artifactId>model-parser</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- UIMA -->
         <dependency>
             <groupId>org.apache.uima</groupId>

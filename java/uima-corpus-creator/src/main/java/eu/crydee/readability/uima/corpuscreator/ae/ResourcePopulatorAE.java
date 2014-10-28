@@ -2,10 +2,9 @@ package eu.crydee.readability.uima.corpuscreator.ae;
 
 import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.res.ReadabilityDict;
-import eu.crydee.readability.uima.corpuscreator.ts.OriginalSentence;
+import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalSentences;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalWords;
-import eu.crydee.readability.uima.corpuscreator.ts.RevisedSentence;
 import eu.crydee.readability.uima.corpuscreator.ts.RevisedSentences;
 import eu.crydee.readability.uima.corpuscreator.ts.RevisedWords;
 import eu.crydee.readability.uima.core.ts.Token;
@@ -53,29 +52,29 @@ public class ResourcePopulatorAE extends JCasAnnotator_ImplBase {
                         revised,
                         RevisedSentences.class,
                         RevisedWords.class);
-        Map<RevisedSentences, Collection<RevisedSentence>> indexRevSentence
+        Map<RevisedSentences, Collection<Sentence>> indexRevSentence
                 = JCasUtil.indexCovered(
                         revised,
                         RevisedSentences.class,
-                        RevisedSentence.class);
-        Map<OriginalSentences, Collection<OriginalSentence>> indexOriSentence
+                        Sentence.class);
+        Map<OriginalSentences, Collection<Sentence>> indexOriSentence
                 = JCasUtil.indexCovered(
                         original,
                         OriginalSentences.class,
-                        OriginalSentence.class);
+                        Sentence.class);
         for (Entry<RevisedSentences, Collection<RevisedWords>> e
                 : indexWords.entrySet()) {
-            Collection<RevisedSentence> allSentsRev
+            Collection<Sentence> allSentsRev
                     = indexRevSentence.get(e.getKey());
-            Collection<OriginalSentence> allSentsOri
+            Collection<Sentence> allSentsOri
                     = indexOriSentence.get(
                             e.getKey().getOriginalSentences());
             for (RevisedWords rw : e.getValue()) {
                 OriginalWords ow = rw.getOriginalWords();
-                List<RevisedSentence> sentsRev = allSentsRev.stream()
+                List<Sentence> sentsRev = allSentsRev.stream()
                         .filter(rs -> overlap(rs, rw))
-                        .collect(Collectors.toList());
-                List<OriginalSentence> sentsOri = allSentsOri.stream()
+                        .collect(Collectors.toList()),
+                        sentsOri = allSentsOri.stream()
                         .filter(s -> overlap(s, ow))
                         .collect(Collectors.toList());
                 String sentRev = txtRev.substring(
