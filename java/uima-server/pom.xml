@@ -61,37 +61,34 @@
         <dependency>
             <groupId>org.apache.uima</groupId>
             <artifactId>uimafit-core</artifactId>
-            <version>2.1.0</version>
+            <version>${uimafit.version}</version>
         </dependency>
         <!-- NLP -->
         <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-uima</artifactId>
-            <version>1.6.0-SNAPSHOT</version>
+            <version>${opennlp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-tools</artifactId>
-            <version>1.6.0-SNAPSHOT</version>
+            <version>${opennlp.version}</version>
         </dependency>
         <!-- COMMONS -->
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
-            <type>jar</type>
+            <version>${commons-cli.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>16.0.1</version>
-            <type>jar</type>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.3</version>
-            <type>jar</type>
+            <version>${commons-lang3.version}</version>
         </dependency>
     </dependencies>
 

@@ -50,7 +50,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <readability.version>1.0.0-SNAPSHOT</readability.version>
+        <opennlp.version>1.6.0-SNAPSHOT</opennlp.version>
+        <uimafit.version>2.1.0</uimafit.version>
+        <guava.version>18.0</guava.version>
+        <commons-cli.version>1.2</commons-cli.version>
+        <commons-lang3.version>3.3.2</commons-lang3.version>
+        <pgsql.version>9.3-1102-jdbc41</pgsql.version>
     </properties>
 
     <profiles>

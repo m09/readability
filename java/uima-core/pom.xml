@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.apache.uima</groupId>
             <artifactId>uimafit-core</artifactId>
-            <version>2.1.0</version>
+            <version>${uimafit.version}</version>
         </dependency>
         <!-- Commons -->
         <dependency>
@@ -70,14 +70,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>16.0.1</version>
-            <type>jar</type>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.3</version>
-            <type>jar</type>
+            <version>${commons-lang3.version}</version>
         </dependency>
     </dependencies>
 
