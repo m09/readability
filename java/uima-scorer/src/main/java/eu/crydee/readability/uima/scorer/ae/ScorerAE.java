@@ -1,4 +1,4 @@
-package eu.crydee.readability.uima.corpuscreator.ae;
+package eu.crydee.readability.uima.scorer.ae;
 
 import edu.berkeley.nlp.lm.NgramLanguageModel;
 import edu.berkeley.nlp.lm.io.LmReaders;
@@ -6,9 +6,11 @@ import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.model.Metadata;
 import eu.crydee.readability.uima.core.model.Score;
 import eu.crydee.readability.uima.core.res.ReadabilityDict;
-import java.util.ArrayList;
+import eu.crydee.readability.uima.scorer.ae.LanguageModelMakerAE.LmFormatter;
+import eu.crydee.readability.utils.FunctionUtils;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -20,6 +22,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Logger;
 
 public class ScorerAE extends JCasAnnotator_ImplBase {
+
+    private static final Logger logger = UIMAFramework.getLogger(
+            ScorerAE.class);
 
     public static final String PARAM_LM_FILENAME = "LM_FILENAME_TXT";
     @ConfigurationParameter(name = PARAM_LM_FILENAME, mandatory = true)
@@ -38,9 +43,6 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
         nlm = LmReaders.readLmBinary(lmFilename);
     }
 
-    private static final Logger logger = UIMAFramework.getLogger(
-            ScorerAE.class);
-
     @Override
     public void process(JCas jcas) throws AnalysisEngineProcessException {
     }
@@ -51,25 +53,26 @@ public class ScorerAE extends JCasAnnotator_ImplBase {
         double minLMProba = Double.POSITIVE_INFINITY;
         double minLMWProba = Double.POSITIVE_INFINITY;
         double logTotalCount = Math.log(dict.getTotalCount());
+        LmFormatter<Pair<String, String>> lf = new LmFormatter<>(
+                Pair::getLeft,
+                Pair::getRight);
         for (Mapped original : dict.keySet()) {
             Map<Mapped, Metadata> revs = dict.getRevisions(original).get();
             int originalCount
                     = revs.values().stream().mapToInt(Metadata::getCount).sum();
-            List<String> originalTokens = new ArrayList<>();
-            originalTokens.add("<s>");
-            originalTokens.addAll(original.getTokens());
-            originalTokens.add("</s>");
-            float originalLmProba = nlm.scoreSentence(originalTokens),
+            List<Pair<String, String>> oriTokens = FunctionUtils.zip(
+                    original.getTokens(),
+                    original.getPos());
+            float originalLmProba = nlm.scoreSentence(lf.apply(oriTokens)),
                     originalLmWProba = originalLmProba
                     / original.getTokens().size();
             minLMProba = Math.min(minLMProba, originalLmProba);
             minLMWProba = Math.min(minLMWProba, originalLmWProba);
             for (Mapped rev : revs.keySet()) {
-                List<String> revisedTokens = new ArrayList<>();
-                revisedTokens.add("<s>");
-                revisedTokens.addAll(rev.getTokens());
-                revisedTokens.add("</s>");
-                float revisedLmProba = nlm.scoreSentence(revisedTokens),
+                List<Pair<String, String>> revTokens = FunctionUtils.zip(
+                        rev.getTokens(),
+                        rev.getPos());
+                float revisedLmProba = nlm.scoreSentence(lf.apply(revTokens)),
                         revisedLmWProba = revisedLmProba
                         / rev.getTokens().size();
                 Metadata metric = revs.get(rev);

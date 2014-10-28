@@ -1,13 +1,15 @@
 package eu.crydee.readability.uima.core.res;
 
-import eu.crydee.readability.utils.XMLUtils;
 import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.model.Metadata;
 import eu.crydee.readability.uima.core.model.Score;
+import eu.crydee.readability.utils.XMLUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +42,12 @@ public class ReadabilityDict_Impl
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
         XMLStreamReader xsr = null;
-        try (InputStream is = dr.getInputStream()) {
+        URL url = dr.getUrl();
+        if (url == null) {
+            logger.log(Level.INFO, "no file to load");
+            return;
+        }
+        try (InputStream is = url.openStream()) {
             xsr = XMLInputFactory.newInstance()
                     .createXMLStreamReader(is, "UTF8");
             int mappings = 0;
@@ -55,8 +62,6 @@ public class ReadabilityDict_Impl
                 }
             }
             logger.log(Level.INFO, "loaded " + mappings + " revisions");
-        } catch (NullPointerException ex) {
-            logger.log(Level.INFO, "no file to load");
         } catch (IOException | XMLStreamException ex) {
             throw new ResourceInitializationException(ex);
         } finally {
@@ -72,22 +77,22 @@ public class ReadabilityDict_Impl
 
     private void addRevised(XMLStreamReader xsr, Mapped rev)
             throws XMLStreamException {
-        Integer count = Integer.parseInt(xsr.getAttributeValue(null, "count"));
-        Map<Score, Double> scores = new HashMap<>();
-        for (Score score : Score.values()) {
-            scores.put(
-                    score,
-                    Double.parseDouble(xsr.getAttributeValue(
-                                    null,
-                                    "score" + score.toString())));
-        }
         Mapped revised = parseRevision(xsr);
-        List<Pair<String, String>> contexts = parseContexts(xsr);
+        List<Pair<String, String>> contexts = new ArrayList<>();
+        while (XMLUtils.goToNextXBeforeY(xsr, "context", "context-list")) {
+            XMLUtils.nextTag(xsr);
+            String originalContext = xsr.getElementText();
+            XMLUtils.nextTag(xsr);
+            String revisedContext = xsr.getElementText();
+            contexts.add(Pair.of(originalContext, revisedContext));
+        }
         add(rev, revised, contexts);
         Metadata m = dict.get(rev).get(revised);
         m.addContexts(contexts);
-        for (Entry<Score, Double> e : scores.entrySet()) {
-            m.setScore(e.getKey(), e.getValue());
+        while (XMLUtils.goToNextXBeforeY(xsr, "score", "score-list")) {
+            m.setScore(
+                    Score.valueOf(xsr.getAttributeValue(null, "name")),
+                    Double.parseDouble(xsr.getElementText()));
         }
     }
 
@@ -107,19 +112,6 @@ public class ReadabilityDict_Impl
         return new Mapped(originalText, tokens, pos);
     }
 
-    private List<Pair<String, String>> parseContexts(XMLStreamReader xsr)
-            throws XMLStreamException {
-        List<Pair<String, String>> contexts = new ArrayList<>();
-        while (XMLUtils.goToNextXBeforeY(xsr, "context", "context-list")) {
-            XMLUtils.nextTag(xsr);
-            String originalContext = xsr.getElementText();
-            XMLUtils.nextTag(xsr);
-            String revisedContext = xsr.getElementText();
-            contexts.add(Pair.of(originalContext, revisedContext));
-        }
-        return contexts;
-    }
-
     @Override
     public void save(PrintStream ps) throws XMLStreamException {
         XMLStreamWriter xsw = XMLOutputFactory.newInstance()
@@ -137,14 +129,27 @@ public class ReadabilityDict_Impl
                 xsw.writeAttribute(
                         "count",
                         String.valueOf(m.getCount()));
-                Score[] scores = Score.values();
-                for (Score score : scores) {
-                    xsw.writeAttribute(
-                            "score" + score.toString(),
-                            String.valueOf(m.getScore(score)));
-                }
                 saveRevision(xsw, revised);
-                saveContextList(xsw, m.getContexts());
+                xsw.writeStartElement("context-list");
+                for (Pair<String, String> contexts : m.getContexts()) {
+                    xsw.writeStartElement("context");
+                    xsw.writeStartElement("original");
+                    xsw.writeCharacters(contexts.getLeft());
+                    xsw.writeEndElement();
+                    xsw.writeStartElement("revised");
+                    xsw.writeCharacters(contexts.getRight());
+                    xsw.writeEndElement();
+                    xsw.writeEndElement();
+                }
+                xsw.writeEndElement();
+                xsw.writeStartElement("score-list");
+                for (Entry<Score, Double> e : m.scoresEntrySet()) {
+                    xsw.writeStartElement("score");
+                    xsw.writeAttribute("name", e.getKey().toString());
+                    xsw.writeCharacters(e.getValue().toString());
+                    xsw.writeEndElement();
+                }
+                xsw.writeEndElement();
                 xsw.writeEndElement();
             }
             xsw.writeEndElement();
@@ -171,24 +176,6 @@ public class ReadabilityDict_Impl
         for (String token : revision.getPos()) {
             xsw.writeStartElement("pos");
             xsw.writeCharacters(token);
-            xsw.writeEndElement();
-        }
-        xsw.writeEndElement();
-    }
-
-    private void saveContextList(
-            XMLStreamWriter xsw,
-            List<Pair<String, String>> contextsList)
-            throws XMLStreamException {
-        xsw.writeStartElement("context-list");
-        for (Pair<String, String> contexts : contextsList) {
-            xsw.writeStartElement("context");
-            xsw.writeStartElement("original");
-            xsw.writeCharacters(contexts.getLeft());
-            xsw.writeEndElement();
-            xsw.writeStartElement("revised");
-            xsw.writeCharacters(contexts.getRight());
-            xsw.writeEndElement();
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
@@ -260,5 +247,10 @@ public class ReadabilityDict_Impl
     @Override
     public Set<Entry<Mapped, Map<Mapped, Metadata>>> entrySet() {
         return Collections.unmodifiableSet(dict.entrySet());
+    }
+
+    @Override
+    public Collection<Map<Mapped, Metadata>> values() {
+        return Collections.unmodifiableCollection(dict.values());
     }
 }

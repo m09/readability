@@ -1,10 +1,12 @@
-package eu.crydee.readability.uima.corpuscreator.ae;
+package eu.crydee.readability.uima.scorer.ae;
 
 import edu.berkeley.nlp.lm.ConfigOptions;
 import edu.berkeley.nlp.lm.NgramLanguageModel;
 import edu.berkeley.nlp.lm.StringWordIndexer;
 import edu.berkeley.nlp.lm.WordIndexer;
 import edu.berkeley.nlp.lm.io.LmReaders;
+import eu.crydee.readability.uima.core.ts.Sentence;
+import eu.crydee.readability.uima.core.ts.Token;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,37 +16,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
-import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.Type;
-import org.apache.uima.cas.TypeSystem;
-import org.apache.uima.cas.text.AnnotationFS;
-import org.apache.uima.fit.component.CasAnnotator_ImplBase;
+import org.apache.uima.fit.component.JCasAnnotator_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
-import org.apache.uima.fit.util.CasUtil;
+import org.apache.uima.fit.util.JCasUtil;
+import org.apache.uima.jcas.JCas;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 
-public class LanguageModelMakerAE extends CasAnnotator_ImplBase {
+public class LanguageModelMakerAE extends JCasAnnotator_ImplBase {
 
     private static final Logger logger = UIMAFramework.getLogger(
             LanguageModelMakerAE.class);
-
-    public static final String PARAM_TOKEN_TYPE = "TOKEN_TYPE";
-    @ConfigurationParameter(name = PARAM_TOKEN_TYPE, mandatory = false)
-    private String tokenTName;
-
-    public static final String PARAM_TOKEN_FEATURE = "TOKEN_FEATURE";
-    @ConfigurationParameter(name = PARAM_TOKEN_FEATURE, mandatory = false)
-    private String tokenFName;
-
-    public static final String PARAM_SENTENCE_TYPE = "SENTENCE_TYPE";
-    @ConfigurationParameter(name = PARAM_SENTENCE_TYPE, mandatory = false)
-    private String sentenceTName;
 
     public static final String PARAM_TMP_FOLDER = "TMP_FOLDER";
     @ConfigurationParameter(name = PARAM_TMP_FOLDER, mandatory = true)
@@ -61,27 +48,32 @@ public class LanguageModelMakerAE extends CasAnnotator_ImplBase {
             defaultValue = "false")
     private boolean skip;
 
-    private Type tokenT = null,
-            sentenceT = null;
+    public static class LmFormatter<T> {
 
-    private Feature tokenF = null;
+        private final Pattern spaces = Pattern.compile(" "),
+                newLines = Pattern.compile("\n");
+        private final Function<T, String> posGetter;
+        private final Function<T, String> textGetter;
 
-    private final Pattern spaces = Pattern.compile(" "),
-            newLines = Pattern.compile("\n");
-
-    @Override
-    public void typeSystemInit(TypeSystem aTypeSystem)
-            throws AnalysisEngineProcessException {
-        super.typeSystemInit(aTypeSystem);
-        tokenT = aTypeSystem.getType(tokenTName);
-        if (tokenFName != null) {
-            tokenF = tokenT.getFeatureByBaseName(tokenFName);
+        public LmFormatter(
+                Function<T, String> textGetter,
+                Function<T, String> posGetter) {
+            this.posGetter = posGetter;
+            this.textGetter = textGetter;
         }
-        sentenceT = aTypeSystem.getType(sentenceTName);
+
+        public List<String> apply(Collection<T> tokens) {
+            return tokens.stream()
+                    .map(t -> textGetter.apply(t) + "/" + posGetter.apply(t))
+                    .map(s -> s.toLowerCase(Locale.ENGLISH))
+                    .map(s -> spaces.matcher(s).replaceAll("<spc>"))
+                    .map(s -> newLines.matcher(s).replaceAll("<nl>"))
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
-    public void process(CAS aCas) throws AnalysisEngineProcessException {
+    public void process(JCas jcas) throws AnalysisEngineProcessException {
         if (skip) {
             return;
         }
@@ -96,22 +88,15 @@ public class LanguageModelMakerAE extends CasAnnotator_ImplBase {
             throw new AnalysisEngineProcessException(ex);
         }
         try (PrintWriter pw = new PrintWriter(tmp)) {
-            Map<AnnotationFS, Collection<AnnotationFS>> index
-                    = CasUtil.indexCovered(aCas, sentenceT, tokenT);
-            for (AnnotationFS sentence : index.keySet()) {
-                pw.println("<s> "
-                        + index.get(sentence).stream()
-                        .map(t -> {
-                            return tokenF == null
-                            ? t.getCoveredText()
-                            : t.getFeatureValueAsString(tokenF);
-                        })
-                        .map(s -> s.toLowerCase(Locale.ENGLISH))
-                        .map(s -> spaces.matcher(s).replaceAll("<spc>"))
-                        .map(s -> newLines.matcher(s).replaceAll("<nl>"))
-                        .collect(Collectors.joining(" "))
-                        + " </s>");
-            }
+            Map<Sentence, Collection<Token>> m
+                    = JCasUtil.indexCovered(jcas, Sentence.class, Token.class);
+            LmFormatter<Token> lf = new LmFormatter<>(
+                    Token::getCoveredText,
+                    Token::getPOS);
+            m.values().forEach(v -> pw.println(
+                    "<s> "
+                    + lf.apply(v).stream().collect(Collectors.joining(" "))
+                    + " </s>"));
         } catch (FileNotFoundException ex) {
             logger.log(
                     Level.SEVERE,

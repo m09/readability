@@ -2,12 +2,11 @@ package eu.crydee.readability.uima.corpuscreator;
 
 import eu.crydee.readability.uima.corpuscreator.ae.CoveredCopierAE;
 import eu.crydee.readability.uima.corpuscreator.ae.FilterDictAE;
-import eu.crydee.readability.uima.corpuscreator.ae.MediaWikiConverterAE;
+import eu.crydee.readability.uima.core.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.corpuscreator.ae.ResourcePopulatorAE;
 import eu.crydee.readability.uima.core.ae.SaveableWriterAE;
 import eu.crydee.readability.uima.corpuscreator.ae.RevisionsFilterAE;
 import eu.crydee.readability.uima.corpuscreator.ae.RevisionsGetterAE;
-import eu.crydee.readability.uima.corpuscreator.ae.ScorerAE;
 import eu.crydee.readability.uima.corpuscreator.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.WordDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.XmiSerializerCreationAE;
@@ -232,16 +231,6 @@ public class DictCreationPipeline {
                 FilterDictAE.RES_INPUT_KEY, fullTxt,
                 FilterDictAE.RES_OUTPUT_KEY, filteredTxt);
 
-        AnalysisEngineDescription fullScorer = createEngineDescription(
-                ScorerAE.class,
-                ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
-                ScorerAE.RES_KEY, fullTxt);
-
-        AnalysisEngineDescription filteredScorer = createEngineDescription(
-                ScorerAE.class,
-                ScorerAE.PARAM_LM_FILENAME, "out/lm/txt",
-                ScorerAE.RES_KEY, filteredTxt);
-
         AnalysisEngineDescription fullWriter = createEngineDescription(
                 SaveableWriterAE.class,
                 SaveableWriterAE.PARAM_FILENAME, "out/res/fullTxt.xml",
@@ -291,8 +280,6 @@ public class DictCreationPipeline {
         b.add(resourcePopulator, ResourcePopulatorAE.ORIGINAL_VIEW, txtOriginal,
                 ResourcePopulatorAE.REVISED_VIEW, txtRevised);
         b.add(filterer);
-        b.add(fullScorer);
-        b.add(filteredScorer);
         b.add(fullWriter);
         b.add(filteredWriter);
         SimplePipeline.runPipeline(crd, b.createAggregateDescription());

@@ -1,13 +1,16 @@
-package eu.crydee.readability.uima.corpuscreator;
+package eu.crydee.readability.uima.scorer;
 
-import eu.crydee.readability.uima.corpuscreator.ae.LanguageModelMakerAE;
-import eu.crydee.readability.uima.corpuscreator.ae.MediaWikiConverterAE;
-import eu.crydee.readability.uima.corpuscreator.cr.CurrentCR;
-import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
-import eu.crydee.readability.uima.models.TokenizerModelPath;
+import eu.crydee.readability.uima.core.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
+import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
+import eu.crydee.readability.uima.models.TaggerModelPath;
+import eu.crydee.readability.uima.models.TokenizerModelPath;
+import eu.crydee.readability.uima.scorer.ae.LanguageModelMakerAE;
+import eu.crydee.readability.uima.scorer.cr.CurrentCR;
 import java.util.Optional;
+import opennlp.uima.postag.POSModelResourceImpl;
+import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
 import opennlp.uima.sentdetect.SentenceModelResourceImpl;
 import opennlp.uima.tokenize.Tokenizer;
@@ -32,6 +35,8 @@ import org.apache.uima.resource.ExternalResourceDescription;
 
 public class FrequencyCreationPipeline {
 
+    final static public String lmFile = "out/lm/lm.bin",
+            lmTmpFolder = "out/lm/tmp";
     static private String DB_URL = null,
             DB_USR = null,
             DB_PW = null;
@@ -49,9 +54,9 @@ public class FrequencyCreationPipeline {
                             Sentence.class,
                             Token.class),
                     LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                    "out/lm/tmp",
+                    lmTmpFolder,
                     LanguageModelMakerAE.PARAM_OUT_FILE,
-                    "out/lm/txt",
+                    lmFile,
                     LanguageModelMakerAE.PARAM_SKIP_EXTRACTION,
                     true)
                     .collectionProcessComplete();
@@ -72,6 +77,11 @@ public class FrequencyCreationPipeline {
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
                         "file:" + SentenceSplitterModelPath.path);
+
+        ExternalResourceDescription taggerModel
+                = ExternalResourceFactory.createExternalResourceDescription(
+                        POSModelResourceImpl.class,
+                        "file:" + TaggerModelPath.path);
 
         /* Collection reader */
         CollectionReaderDescription crd;
@@ -117,17 +127,21 @@ public class FrequencyCreationPipeline {
                         UimaUtil.TOKEN_TYPE_PARAMETER,
                         Token.class.getCanonicalName());
 
+        AnalysisEngineDescription tagger
+                = AnalysisEngineFactory.createEngineDescription(
+                        POSTagger.class,
+                        UimaUtil.MODEL_PARAMETER, taggerModel,
+                        UimaUtil.SENTENCE_TYPE_PARAMETER, Sentence.class.getName(),
+                        UimaUtil.TOKEN_TYPE_PARAMETER, Token.class.getName(),
+                        UimaUtil.POS_FEATURE_PARAMETER, "POS");
+
         AnalysisEngineDescription lmMakerTxt
                 = AnalysisEngineFactory.createEngineDescription(
                         LanguageModelMakerAE.class,
-                        LanguageModelMakerAE.PARAM_SENTENCE_TYPE,
-                        Sentence.class.getCanonicalName(),
-                        LanguageModelMakerAE.PARAM_TOKEN_TYPE,
-                        Token.class.getCanonicalName(),
                         LanguageModelMakerAE.PARAM_TMP_FOLDER,
-                        "out/lm/tmp",
+                        lmTmpFolder,
                         LanguageModelMakerAE.PARAM_OUT_FILE,
-                        "out/lm/txt");
+                        lmFile);
 
         AggregateBuilder builder = new AggregateBuilder(
                 null,
@@ -140,6 +154,8 @@ public class FrequencyCreationPipeline {
         builder.add(sentenceDetector,
                 CAS.NAME_DEFAULT_SOFA, text);
         builder.add(tokenizer,
+                CAS.NAME_DEFAULT_SOFA, text);
+        builder.add(tagger,
                 CAS.NAME_DEFAULT_SOFA, text);
         builder.add(lmMakerTxt,
                 CAS.NAME_DEFAULT_SOFA, text);

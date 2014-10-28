@@ -25,6 +25,7 @@
         <module>uima-core</module>
         <module>uima-corpus-creator</module>
         <module>uima-server</module>
+        <module>uima-scorer</module>
         <module>uima-evaluator</module>
     </modules>
 

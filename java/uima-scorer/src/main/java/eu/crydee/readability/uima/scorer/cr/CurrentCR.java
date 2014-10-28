@@ -1,4 +1,4 @@
-package eu.crydee.readability.uima.corpuscreator.cr;
+package eu.crydee.readability.uima.scorer.cr;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,7 +22,7 @@ import org.apache.uima.util.ProgressImpl;
 public class CurrentCR extends JCasCollectionReader_ImplBase {
 
     private static final Logger logger = UIMAFramework.getLogger(
-            RevisionsCR.class);
+            CurrentCR.class);
 
     public static final String PARAM_DB_URL = "REVISIONSCR_DB_URL";
     @ConfigurationParameter(name = PARAM_DB_URL, mandatory = true)

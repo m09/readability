@@ -13,12 +13,12 @@ indented.xml
 /client/dist
 /client/node_modules
 /java/uima-corpus-creator/out/cas/
-/java/uima-corpus-creator/out/lm/
 /java/uima-corpus-creator/out/res/fullTxt.xml
 /java/uima-corpus-creator/out/res/filteredTxt.xml
 /java/uima-corpus-creator/out/res/processed/
 /java/uima-corpus-creator/out/res/tops/
 /java/uima-evaluator/out
+/java/uima-scorer/out
 /server/conf/application.conf
 /server/data/
 /server/logs
