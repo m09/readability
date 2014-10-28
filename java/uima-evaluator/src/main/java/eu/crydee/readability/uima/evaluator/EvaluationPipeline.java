@@ -11,6 +11,7 @@ import eu.crydee.readability.uima.evaluator.cr.ReadabilityDictCR;
 import eu.crydee.readability.uima.evaluator.res.ResultsAggregator_Impl;
 import eu.crydee.readability.uima.server.DictUsageAEBuilder;
 import java.io.IOException;
+import java.net.URL;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -53,9 +54,9 @@ public class EvaluationPipeline {
                             ReadabilityDictCR.PARAM_LIMIT, 200);
 
             AnalysisEngineDescription usageAed
-                    = DictUsageAEBuilder.buildAed(
-                            "out/parts/"
-                            + DictSplitterAE.trainNamer.apply(fold),
+                    = DictUsageAEBuilder.buildAed(new URL(
+                            "file:out/parts/"
+                            + DictSplitterAE.trainNamer.apply(fold)),
                             true);
 
             AnalysisEngineDescription sylAe = createEngineDescription(

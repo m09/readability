@@ -9,6 +9,7 @@ import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.core.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
+import java.net.URL;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
 import opennlp.uima.sentdetect.SentenceDetector;
@@ -28,15 +29,15 @@ import org.apache.uima.resource.ResourceInitializationException;
 public class DictUsageAEBuilder {
 
     public static AnalysisEngine buildAe(
-            String corpusPath,
+            URL corpusURL,
             boolean serialize)
             throws ResourceInitializationException {
         return AnalysisEngineFactory.createEngine(
-                buildAed(corpusPath, serialize));
+                buildAed(corpusURL, serialize));
     }
 
     public static AnalysisEngineDescription buildAed(
-            String corpusPath,
+            URL corpusURL,
             boolean serialize)
             throws ResourceInitializationException {
         /* Resources descriptions */
@@ -58,7 +59,7 @@ public class DictUsageAEBuilder {
         ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(
                         ReadabilityDict_Impl.class,
-                        "file:" + corpusPath);
+                        corpusURL);
 
         /* Analysis engines */
         AnalysisEngineDescription sentenceDetector

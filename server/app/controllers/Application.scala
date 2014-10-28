@@ -1,8 +1,7 @@
 package controllers
 
 import com.google.common.collect.TreeMultimap
-import eu.crydee.readability.corpus.FilteredCorpusPath
-import eu.crydee.readability.corpus.FullCorpusPath
+import eu.crydee.readability.corpus.Corpus
 import eu.crydee.readability.uima.server.DictUsageAEBuilder
 import eu.crydee.readability.uima.core.model.Score
 import eu.crydee.readability.uima.core.ts.Token
@@ -33,25 +32,10 @@ import play.api.mvc._
 import scala.collection.Iterable
 import scala.collection.JavaConversions._
 
-case class Input(data: String, dict: Dict)
-
-sealed abstract class Dict
-case object Normal extends Dict
-case object Filtered extends Dict
-
 object Application extends Controller {
 
-  private val aeN = DictUsageAEBuilder buildAe(FullCorpusPath.path, false)
-  private val aeF = DictUsageAEBuilder buildAe(FilteredCorpusPath.path, false)
+  private val ae = DictUsageAEBuilder buildAe(Corpus.url, false)
 
-  implicit val inputReads: Reads[Input] = (
-    (JsPath \ "data").read[String] and
-    (JsPath \ "dict").read[String].map {
-      case "filtered" => Filtered
-      case _ => Normal
-    }
-  )(Input.apply _)
-  
   implicit val tokenWrites = new Writes[Token] {
     def writes(token: Token): JsValue = Json.obj(
       "pos"   -> token.getPOS(),
@@ -141,7 +125,7 @@ object Application extends Controller {
   }
 
   def annotate = Action(parse.json) { request =>
-    def work(data: String, ae: AnalysisEngine) = {
+    def work(data: String) = {
       val jcas = ae.newJCas()
       jcas.setDocumentText(data)
       ae.process(jcas)
@@ -173,13 +157,8 @@ object Application extends Controller {
         )
       ).withHeaders(headers : _*)
     }
-    request.body.validate[Input].map {
-      case input => {
-        input.dict match {
-          case Normal => work(input.data, aeN)
-          case Filtered => work(input.data, aeF)
-        }
-      }
+    request.body.validate[String].map {
+      case input => work(input)
     }.recoverTotal {
       e => BadRequest("JSON parsing impossible: " + JsError.toFlatJson(e))
     }

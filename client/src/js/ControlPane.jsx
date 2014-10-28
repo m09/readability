@@ -10,23 +10,16 @@ var ControlPane = React.createClass({
     return (
         <section className="settings">
         <div className="row">
-        <div className="col-sm-3">
+        <div className="col-sm-4">
         Settings:
       </div>
-        <div className="col-sm-3">
-        Corpus:&nbsp;
-        <select onChange={this.props.callbackCorpus} autocomplete="off">
-        <option value="filtered">Filtered</option>
-        <option value="noisy">Noisy</option>
-        </select>
-        </div>
-        <div className="col-sm-3">
+        <div className="col-sm-4">
         Weight:
         <select onChange={this.props.callbackWeight} autocomplete="off">
         {optionsWeight}
       </select>
         </div>
-        <div className="col-sm-3">
+        <div className="col-sm-4">
         Monoid:
         <select onChange={this.props.callbackMonoid} autocomplete="off">
         {optionsSR}
