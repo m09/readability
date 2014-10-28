@@ -3,6 +3,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <build-shaded>true</build-shaded>
+    </properties>
+
     <parent>
         <groupId>eu.crydee.readability</groupId>
         <artifactId>parent</artifactId>
@@ -24,7 +28,7 @@
         <developerConnection>scm:git:git://github.com/m09/readability</developerConnection>
         <url>https://github.com/m09/readability</url>
     </scm>
-
+    
     <dependencies>
         <!-- Our stuff -->
         <dependency>
@@ -93,96 +97,5 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathLayoutType>repository</classpathLayoutType>
-                                    <classpathPrefix>${settings.localRepository}</classpathPrefix>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.2</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <filters>
-                                        <filter>
-                                            <artifact>*:*</artifact>
-                                            <excludes>
-                                                <exclude>META-INF/*.SF</exclude>
-                                                <exclude>META-INF/*.DSA</exclude>
-                                                <exclude>META-INF/*.RSA</exclude>
-                                            </excludes>
-                                        </filter>
-                                    </filters>
-                                    <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                            <resource>META-INF/org.apache.uima.fit/types.txt</resource>
-                                        </transformer>
-                                    </transformers>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <configuration>
-                            <excludePackageNames>eu.crydee.readability.uima.corpuscreator.ts</excludePackageNames>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>javadoc</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                    <goal>javadoc</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    
 </project>

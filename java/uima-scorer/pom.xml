@@ -3,6 +3,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <build-shaded>true</build-shaded>
+    </properties>
+
     <parent>
         <groupId>eu.crydee.readability</groupId>
         <artifactId>parent</artifactId>
@@ -92,45 +96,5 @@
             <version>${commons-lang3.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathLayoutType>repository</classpathLayoutType>
-                                    <classpathPrefix>${settings.localRepository}</classpathPrefix>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
