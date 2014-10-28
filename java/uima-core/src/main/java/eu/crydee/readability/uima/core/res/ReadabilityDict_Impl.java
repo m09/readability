@@ -39,6 +39,8 @@ public class ReadabilityDict_Impl
     final private Map<Mapped, Map<Mapped, Metadata>> dict = new HashMap<>();
     private int totalCount = 0;
 
+    private ReadabilityDict_Impl inverseDict = null;
+
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
         XMLStreamReader xsr = null;
@@ -252,5 +254,26 @@ public class ReadabilityDict_Impl
     @Override
     public Collection<Map<Mapped, Metadata>> values() {
         return Collections.unmodifiableCollection(dict.values());
+    }
+
+    @Override
+    public ReadabilityDict getInverseDict() {
+        if (inverseDict != null) {
+            return inverseDict;
+        }
+        ReadabilityDict_Impl newDict = new ReadabilityDict_Impl();
+        for (Entry<Mapped, Map<Mapped, Metadata>> e1 : dict.entrySet()) {
+            for (Entry<Mapped, Metadata> e2
+                    : e1.getValue().entrySet()) {
+                newDict.add(
+                        e2.getKey(),
+                        e1.getKey(),
+                        e2.getValue().getContexts());
+
+            }
+        }
+        inverseDict = newDict;
+        newDict.inverseDict = this;
+        return newDict;
     }
 }
