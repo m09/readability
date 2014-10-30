@@ -7,5 +7,6 @@ public enum Score {
     Sd,
     Sdc,
     Swd,
-    Swdc
+    Swdc,
+    Sall
 }

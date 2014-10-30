@@ -1,5 +1,6 @@
 package eu.crydee.readability.uima.core.res;
 
+import com.google.common.collect.Maps;
 import eu.crydee.readability.uima.core.model.Mapped;
 import eu.crydee.readability.uima.core.model.Metadata;
 import eu.crydee.readability.uima.core.model.Score;
@@ -39,7 +40,7 @@ public class ReadabilityDict_Impl
     final private Map<Mapped, Map<Mapped, Metadata>> dict = new HashMap<>();
     private int totalCount = 0;
 
-    private ReadabilityDict_Impl inverseDict = null;
+    private Map<Mapped, Double> inverseCounts = null;
 
     @Override
     public void load(DataResource dr) throws ResourceInitializationException {
@@ -90,7 +91,6 @@ public class ReadabilityDict_Impl
         }
         add(rev, revised, contexts);
         Metadata m = dict.get(rev).get(revised);
-        m.addContexts(contexts);
         while (XMLUtils.goToNextXBeforeY(xsr, "score", "score-list")) {
             m.setScore(
                     Score.valueOf(xsr.getAttributeValue(null, "name")),
@@ -257,23 +257,15 @@ public class ReadabilityDict_Impl
     }
 
     @Override
-    public ReadabilityDict getInverseDict() {
-        if (inverseDict != null) {
-            return inverseDict;
+    public Map<Mapped, Double> getInverseCounts() {
+        if (inverseCounts != null) {
+            return inverseCounts;
         }
-        ReadabilityDict_Impl newDict = new ReadabilityDict_Impl();
-        for (Entry<Mapped, Map<Mapped, Metadata>> e1 : dict.entrySet()) {
-            for (Entry<Mapped, Metadata> e2
-                    : e1.getValue().entrySet()) {
-                newDict.add(
-                        e2.getKey(),
-                        e1.getKey(),
-                        e2.getValue().getContexts());
-
-            }
-        }
-        inverseDict = newDict;
-        newDict.inverseDict = this;
-        return newDict;
+        Map<Mapped, Integer> d = new HashMap<>();
+        dict.values().forEach(
+                v -> v.keySet().forEach(
+                        m -> d.merge(m, v.get(m).getCount(), Integer::sum)));
+        inverseCounts = Maps.transformValues(d, i -> Math.log(i));
+        return inverseCounts;
     }
 }

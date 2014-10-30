@@ -35,5 +35,5 @@ public interface ReadabilityDict extends Saveable {
 
     public Collection<Map<Mapped, Metadata>> values();
 
-    public ReadabilityDict getInverseDict();
+    public Map<Mapped, Double> getInverseCounts();
 }
