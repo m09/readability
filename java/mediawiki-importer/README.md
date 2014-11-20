@@ -12,7 +12,7 @@ The SQL script `create-db.sql` allows you to easily create a database with the r
 Dump import
 -----------
 
-First, build the software with the dev flag on:
+First, build the software with Maven:
 
     mog@becca:~/work/readability/java$ mvn install
 Then you can use the importer. Usage is as follows:
