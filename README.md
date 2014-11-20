@@ -1,9 +1,8 @@
 Learning how to write through Simple Wikipedia contributors
 ===========================================================
 
-The aim of this project is to investigate whether or not
-[Simple English Wikipedia][sw] is an interesting resource to learn
-readability guidelines.
+The aim of this project is to investigate how to use
+[Simple English Wikipedia][sw] to learn readability guidelines.
 
 The idea used is to retrieve revision changes where contributors
 expressed explicitly in the revision comment their intent to improve
@@ -16,22 +15,42 @@ Resource creation and usage pipelines
 -------------------------------------
 
 The `java` folder contains a Maven 3 compliant program to build and
-use such a resource.
+use such a resource. The program is split into many sub-modules. Here
+is a fast description so that you can get around more easily:
 
-Simple server & client
-----------------------
+- uima-core, utils, corpus and model-* folders are just internal
+  dependencies to make the Maven build smooth. They are not really
+  applications;
 
-The `server` folder contains a [Play Framework][play] webservice and a
-client using it.
+- mediawiki-importer allows to import a mediawiki dump into a
+  PostgreSQL database that is usable by the other programs;
 
-Presentations
--------------
+- uima-corpus-creator creates a corpus from the database data;
 
-A bibliography introduction is available in the `slides` folder as a
-[reveal.js][reveal] presentation.
+- uima-scorer allows to score this corpus. At this point the scoring
+  is not good;
+
+- uima-server is a way to expose the corpus to other applications;
+
+- uima-evaluator is work in progress.
+
+Play server
+-----------
+
+The `server` folder contains a [Play Framework][play] webservice that
+exposes the corpus throught JSON requests to other applications
+
+Web client
+----------
+
+The `client` folder contains a [React][react] application to test the
+system on the web.
+
+A demo is running at http://readability.crydee.eu (first run is very
+slow, it's hosted on Heroku and the application needs to start).
 
 [play]: http://www.playframework.com/
 
-[reveal]: https://github.com/hakimel/reveal.js/
+[react]: https://facebook.github.io/react/
 
 [sw]: https://simple.wikipedia.org/wiki/Main_Page
