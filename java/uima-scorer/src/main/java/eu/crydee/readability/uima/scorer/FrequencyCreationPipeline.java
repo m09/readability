@@ -72,15 +72,15 @@ public class FrequencyCreationPipeline {
         /* Resources descriptions */
         ExternalResourceDescription tokenM = createExternalResourceDescription(
                 TokenizerModelResourceImpl.class,
-                "file:" + EnTokenModel.path);
+                EnTokenModel.url);
 
         ExternalResourceDescription sentM = createExternalResourceDescription(
                 SentenceModelResourceImpl.class,
-                "file:" + EnSentModel.path);
+                EnSentModel.url);
 
         ExternalResourceDescription taggerM = createExternalResourceDescription(
                 POSModelResourceImpl.class,
-                "file:" + EnPosMaxentModel.path);
+                EnPosMaxentModel.url);
 
         /* Collection reader */
         CollectionReaderDescription crd;

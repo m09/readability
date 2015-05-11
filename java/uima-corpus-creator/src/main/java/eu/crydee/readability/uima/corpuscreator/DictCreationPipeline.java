@@ -73,13 +73,13 @@ public class DictCreationPipeline {
         /* Resources descriptions */
         ExternalResourceDescription tokenM = createExternalResourceDescription(
                 TokenizerModelResourceImpl.class,
-                "file:" + EnTokenModel.path),
+                EnTokenModel.url),
                 sentenceM = createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:" + EnSentModel.path),
+                        EnSentModel.url),
                 posM = createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:" + EnPosMaxentModel.path),
+                        EnPosMaxentModel.url),
                 fullTxt = createExternalResourceDescription(
                         ReadabilityDict_Impl.class, ""),
                 filteredTxt = createExternalResourceDescription(

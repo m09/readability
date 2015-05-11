@@ -44,17 +44,17 @@ public class DictUsageAEBuilder {
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         TokenizerModelResourceImpl.class,
-                        "file:" + EnTokenModel.path);
+                        EnTokenModel.url);
 
         ExternalResourceDescription sentenceModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:" + EnSentModel.path);
+                        EnSentModel.url);
 
         ExternalResourceDescription posModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:" + EnPosMaxentModel.path);
+                        EnPosMaxentModel.url);
 
         ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(
