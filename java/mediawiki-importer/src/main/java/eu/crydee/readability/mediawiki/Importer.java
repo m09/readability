@@ -26,8 +26,22 @@ import org.apache.commons.cli.PosixParser;
 
 public class Importer {
 
+    static private class Params {
+
+        public static int batchSizeDefault = 5000;
+
+        public String dbUrl = null,
+                dbPw = null,
+                dbUser = null,
+                dumpFilepath = null;
+        public int batchSize = batchSizeDefault,
+                from = 0,
+                to = Integer.MAX_VALUE;
+    }
+
     public static void main(String[] args)
             throws FileNotFoundException, XMLStreamException {
+        Params params = new Params();
         Options options = new Options();
         options.addOption("h", "help", false, "Print this message.");
         options.addOption(OptionBuilder
@@ -56,20 +70,23 @@ public class Importer {
                 .hasArg()
                 .withArgName("revisions")
                 .withDescription("Number of revisions to group before sending "
-                        + "them to the database.")
+                        + "them to the database. Defaults to "
+                        + Params.batchSizeDefault
+                        + ".")
                 .create("b"));
         options.addOption(OptionBuilder
                 .withLongOpt("from")
                 .hasArg()
                 .withArgName("i")
                 .withDescription("From which page we should import "
-                        + "(inclusive).")
+                        + "(inclusive). Defaults to the first page.")
                 .create("f"));
         options.addOption(OptionBuilder
                 .withLongOpt("to")
                 .hasArg()
                 .withArgName("i")
-                .withDescription("To which page we should import (inclusive).")
+                .withDescription("To which page we should import (inclusive). "
+                        + "Defaults to the last page.")
                 .create("t"));
         CommandLineParser parser = new PosixParser();
         @SuppressWarnings("UnusedAssignment")
@@ -78,18 +95,38 @@ public class Importer {
             cmd = parser.parse(options, args);
             if (cmd.hasOption('h')) {
                 HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("importer", options);
+                formatter.printHelp("importer [OPTIONS] DUMP_FILE", options);
                 System.exit(0);
             } else {
                 if (!cmd.hasOption('d')
                         || !cmd.hasOption('u')
                         || !cmd.hasOption('p')
-                        || !cmd.hasOption('b')) {
-                    throw new ParseException("Argument missing among the "
-                            + "required arguments d, u, p and b.\n"
+                        || cmd.getArgList().isEmpty()) {
+                    throw new ParseException("Option d, u or p missing, or "
+                            + "input mediawiki dump not specified.\n"
                             + "Please use -h to learn more about the expected "
                             + "arguments.");
                 }
+            }
+            params.dbUrl = cmd.getOptionValue('d');
+            params.dbPw = cmd.getOptionValue('p');
+            params.dbUser = cmd.getOptionValue('u');
+            params.dumpFilepath = (String) cmd.getArgList().get(0);
+            try {
+                if (cmd.hasOption('f')) {
+                    params.from = Integer.parseInt(cmd.getOptionValue('f'));
+                }
+                if (cmd.hasOption('t')) {
+                    params.to = Integer.parseInt(cmd.getOptionValue('t'));
+                }
+                if (cmd.hasOption('b')) {
+                    params.batchSize
+                            = Integer.parseInt(cmd.getOptionValue('b'));
+                }
+            } catch (NumberFormatException e) {
+                throw new ParseException("Couldn't parse one of f, t or b "
+                        + "as integers. Please check your command or see "
+                        + "the help (-h).");
             }
         } catch (ParseException ex) {
             System.err.println("The CLI args could not be parsed.");
@@ -98,28 +135,11 @@ public class Importer {
             System.exit(1);
         }
 
-        final String DB_URL = cmd.getOptionValue('d'),
-                DB_USER = cmd.getOptionValue('u'),
-                DB_PW = cmd.getOptionValue('p');
-        final int FROM;
-        if (cmd.hasOption('f')) {
-            FROM = Integer.parseInt(cmd.getOptionValue('f'));
-        } else {
-            FROM = 0;
-        }
-        final int TO;
-        if (cmd.hasOption('t')) {
-            TO = Integer.parseInt(cmd.getOptionValue('t'));
-        } else {
-            TO = Integer.MAX_VALUE;
-        }
-        final int BATCH_SIZE = Integer.parseInt(cmd.getOptionValue('b'));
-
         XMLInputFactory factory = XMLInputFactory.newInstance();
         try (Connection connection = DriverManager.getConnection(
-                DB_URL,
-                DB_USER,
-                DB_PW)) {
+                params.dbUrl,
+                params.dbUser,
+                params.dbPw)) {
             PreparedStatement psRevisionsInfo = connection.prepareStatement(
                     "INSERT INTO rev ("
                     + "id, parent_id, comment, minor, timestamp, text, page_id"
@@ -128,13 +148,12 @@ public class Importer {
                     + "?, ?, ?, ?, ?, ?, ?"
                     + ")");
             XMLStreamReader reader = factory.createXMLStreamReader(
-                    new FileInputStream(
-                            "dump.xml"),
+                    new FileInputStream(params.dumpFilepath),
                     "utf8");
             int i = 0, k = 0;
             while (XMLUtils.goToNextXBeforeY(reader, "page", "mediawiki")
-                    && i < TO) {
-                if (i++ < FROM) {
+                    && i < params.to) {
+                if (i++ < params.from) {
                     continue;
                 }
                 System.out.print("\r" + i);
@@ -172,7 +191,7 @@ public class Importer {
                                     DateTimeFormatter.ISO_DATE_TIME));
                     psRevisionsInfo.setString(6, revisionInfo.getText());
                     psRevisionsInfo.addBatch();
-                    if (++k % BATCH_SIZE == 0) {
+                    if (++k % params.batchSize == 0) {
                         psRevisionsInfo.executeBatch();
                     }
                 }
@@ -208,13 +227,16 @@ public class Importer {
             }
             final boolean minor = tag.equals("minor");
             if (minor) {
-                tag = XMLUtils.nextTag(reader).get();
+                do {
+                    tag = XMLUtils.nextTag(reader).get();
+                } while (!tag.equals("comment")
+                        && !tag.equals("text"));
             }
             final Optional<String> comment = tag.equals("comment")
                     ? Optional.of(reader.getElementText())
                     : Optional.empty();
             if (comment.isPresent()) {
-                XMLUtils.nextTag(reader);
+                XMLUtils.goToNextXBeforeY(reader, "text", "revision");
             }
             final String text = reader.getElementText();
             result.add(new Revision(
