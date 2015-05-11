@@ -97,5 +97,27 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.uima</groupId>
+                <artifactId>jcasgen-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <configuration>
+                    <typeSystemIncludes>
+                        <include>src/main/resources/eu/crydee/readability/uima/corpuscreator/ts/corpuscreator.xml</include>
+                    </typeSystemIncludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
