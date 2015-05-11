@@ -59,7 +59,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.3</version>
                 <configuration>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
                     <source>8</source>
@@ -79,7 +79,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.5</version>
+                        <version>2.6</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -92,7 +92,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>        
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -111,10 +111,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <configuration>
-                            <keyname>4DABBDA8</keyname>
-                        </configuration>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -127,10 +124,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.1</version>
-                        <configuration>
-                            <excludePackageNames>eu.crydee.readability.uima.*.ts</excludePackageNames>
-                        </configuration>                        
+                        <version>2.10.3</version>
                         <executions>
                             <execution>
                                 <id>javadoc</id>
@@ -146,12 +140,6 @@
         </profile>
         <profile>
             <id>fatjar</id>
-            <activation>
-                <property>
-                    <name>fatjar</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
