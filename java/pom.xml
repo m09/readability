@@ -21,9 +21,6 @@
         <module>utils</module>
         <module>mediawiki-importer</module>
         <module>corpus</module>
-        <module>model-sentence-splitter</module>
-        <module>model-tagger</module>
-        <module>model-tokenizer</module>
         <module>uima-core</module>
         <module>uima-corpus-creator</module>
         <module>uima-server</module>
@@ -50,6 +47,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opennlp.version>1.6.0-SNAPSHOT</opennlp.version>
+        <opennlp.resources.version>1.5</opennlp.resources.version>
         <uimafit.version>2.1.0</uimafit.version>
         <guava.version>18.0</guava.version>
         <commons-cli.version>1.2</commons-cli.version>

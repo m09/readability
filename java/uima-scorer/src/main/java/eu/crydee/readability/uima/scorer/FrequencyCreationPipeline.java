@@ -3,11 +3,11 @@ package eu.crydee.readability.uima.scorer;
 import eu.crydee.readability.uima.core.ae.MediaWikiConverterAE;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
-import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
-import eu.crydee.readability.uima.models.TaggerModelPath;
-import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.scorer.ae.LanguageModelMakerAE;
 import eu.crydee.readability.uima.scorer.cr.CurrentCR;
+import eu.crydee.uima.opennlp.resources.EnPosMaxentModel;
+import eu.crydee.uima.opennlp.resources.EnSentModel;
+import eu.crydee.uima.opennlp.resources.EnTokenModel;
 import java.io.File;
 import java.util.Optional;
 import opennlp.uima.postag.POSModelResourceImpl;
@@ -72,15 +72,15 @@ public class FrequencyCreationPipeline {
         /* Resources descriptions */
         ExternalResourceDescription tokenM = createExternalResourceDescription(
                 TokenizerModelResourceImpl.class,
-                "file:" + TokenizerModelPath.path);
+                "file:" + EnTokenModel.path);
 
         ExternalResourceDescription sentM = createExternalResourceDescription(
                 SentenceModelResourceImpl.class,
-                "file:" + SentenceSplitterModelPath.path);
+                "file:" + EnSentModel.path);
 
         ExternalResourceDescription taggerM = createExternalResourceDescription(
                 POSModelResourceImpl.class,
-                "file:" + TaggerModelPath.path);
+                "file:" + EnPosMaxentModel.path);
 
         /* Collection reader */
         CollectionReaderDescription crd;

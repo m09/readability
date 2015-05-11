@@ -3,12 +3,12 @@ package eu.crydee.readability.uima.server;
 import eu.crydee.readability.uima.server.ae.MapperAE;
 import eu.crydee.readability.uima.server.ae.RewriterAE;
 import eu.crydee.readability.uima.core.ae.XmiSerializerAE;
-import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
-import eu.crydee.readability.uima.models.TaggerModelPath;
-import eu.crydee.readability.uima.models.TokenizerModelPath;
 import eu.crydee.readability.uima.core.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.core.ts.Sentence;
 import eu.crydee.readability.uima.core.ts.Token;
+import eu.crydee.uima.opennlp.resources.EnPosMaxentModel;
+import eu.crydee.uima.opennlp.resources.EnSentModel;
+import eu.crydee.uima.opennlp.resources.EnTokenModel;
 import java.net.URL;
 import opennlp.uima.postag.POSModelResourceImpl;
 import opennlp.uima.postag.POSTagger;
@@ -44,17 +44,17 @@ public class DictUsageAEBuilder {
         ExternalResourceDescription tokenModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         TokenizerModelResourceImpl.class,
-                        "file:" + TokenizerModelPath.path);
+                        "file:" + EnTokenModel.path);
 
         ExternalResourceDescription sentenceModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:" + SentenceSplitterModelPath.path);
+                        "file:" + EnSentModel.path);
 
         ExternalResourceDescription posModel
                 = ExternalResourceFactory.createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:" + TaggerModelPath.path);
+                        "file:" + EnPosMaxentModel.path);
 
         ExternalResourceDescription dictTxt
                 = ExternalResourceFactory.createExternalResourceDescription(

@@ -10,9 +10,9 @@ import eu.crydee.readability.uima.corpuscreator.ae.SentenceDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.WordDiffAE;
 import eu.crydee.readability.uima.corpuscreator.ae.XmiSerializerCreationAE;
 import eu.crydee.readability.uima.corpuscreator.cr.RevisionsCR;
-import eu.crydee.readability.uima.models.SentenceSplitterModelPath;
-import eu.crydee.readability.uima.models.TaggerModelPath;
-import eu.crydee.readability.uima.models.TokenizerModelPath;
+import eu.crydee.uima.opennlp.resources.EnTokenModel;
+import eu.crydee.uima.opennlp.resources.EnPosMaxentModel;
+import eu.crydee.uima.opennlp.resources.EnSentModel;
 import eu.crydee.readability.uima.core.res.ReadabilityDict_Impl;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalSentences;
 import eu.crydee.readability.uima.corpuscreator.ts.OriginalWords;
@@ -73,13 +73,13 @@ public class DictCreationPipeline {
         /* Resources descriptions */
         ExternalResourceDescription tokenM = createExternalResourceDescription(
                 TokenizerModelResourceImpl.class,
-                "file:" + TokenizerModelPath.path),
+                "file:" + EnTokenModel.path),
                 sentenceM = createExternalResourceDescription(
                         SentenceModelResourceImpl.class,
-                        "file:" + SentenceSplitterModelPath.path),
+                        "file:" + EnSentModel.path),
                 posM = createExternalResourceDescription(
                         POSModelResourceImpl.class,
-                        "file:" + TaggerModelPath.path),
+                        "file:" + EnPosMaxentModel.path),
                 fullTxt = createExternalResourceDescription(
                         ReadabilityDict_Impl.class, ""),
                 filteredTxt = createExternalResourceDescription(
