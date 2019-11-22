@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.3.2.201404171909-r</version>
+            <version>5.5.0.201909110433-r</version>
         </dependency>
         <!-- DATABASE -->
         <dependency>
@@ -102,7 +102,7 @@
             <plugin>
                 <groupId>org.apache.uima</groupId>
                 <artifactId>jcasgen-maven-plugin</artifactId>
-                <version>2.7.0</version>
+                <version>2.10.4</version>
                 <configuration>
                     <typeSystemIncludes>
                         <include>src/main/resources/eu/crydee/readability/uima/corpuscreator/ts/corpuscreator.xml</include>

@@ -50,9 +50,9 @@
         <opennlp.resources.version>1.5.0</opennlp.resources.version>
         <uimafit.version>2.1.0</uimafit.version>
         <guava.version>28.1-jre</guava.version>
-        <commons-cli.version>1.2</commons-cli.version>
-        <commons-lang3.version>3.3.2</commons-lang3.version>
-        <pgsql.version>9.3-1102-jdbc41</pgsql.version>
+        <commons-cli.version>1.4</commons-cli.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <pgsql.version>42.2.8</pgsql.version>
     </properties>
 
     <build>
@@ -79,7 +79,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.6</version>
+                        <version>3.1.2</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -99,7 +99,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -124,7 +124,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
+                        <version>3.1.1</version>
                         <executions>
                             <execution>
                                 <id>javadoc</id>
@@ -144,7 +144,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.3</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
