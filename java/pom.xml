@@ -46,7 +46,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opennlp.version>1.6.1-SNAPSHOT</opennlp.version>
+        <opennlp.version>1.7.0</opennlp.version>
         <opennlp.resources.version>1.5.0</opennlp.resources.version>
         <uimafit.version>2.1.0</uimafit.version>
         <guava.version>18.0</guava.version>

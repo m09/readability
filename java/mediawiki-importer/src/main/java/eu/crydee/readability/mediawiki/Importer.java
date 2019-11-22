@@ -1,21 +1,28 @@
 package eu.crydee.readability.mediawiki;
 
-import eu.crydee.readability.utils.XMLUtils;
+import eu.crydee.readability.mediawiki.xjb.MediaWikiType;
+import eu.crydee.readability.mediawiki.xjb.PageType;
+import eu.crydee.readability.mediawiki.xjb.RevisionType;
+import eu.crydee.readability.mediawiki.xjb.UploadType;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -23,6 +30,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 public class Importer {
 
@@ -142,41 +151,55 @@ public class Importer {
                 params.dbPw)) {
             PreparedStatement psRevisionsInfo = connection.prepareStatement(
                     "INSERT INTO rev ("
-                    + "id, parent_id, comment, minor, timestamp, text, page_id"
-                    + ") "
-                    + "VALUES ("
-                    + "?, ?, ?, ?, ?, ?, ?"
-                    + ")");
+                            + "id, parent_id, comment, minor, timestamp, text, page_id"
+                            + ") "
+                            + "VALUES ("
+                            + "?, ?, ?, ?, ?, ?, ?"
+                            + ")");
+            InputStream is = new FileInputStream(params.dumpFilepath);
+            if (params.dumpFilepath.endsWith(".bz2")) {
+                is = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, is);
+            }
             XMLStreamReader reader = factory.createXMLStreamReader(
-                    new FileInputStream(params.dumpFilepath),
+                    is,
                     "utf8");
+            JAXBContext context = JAXBContext.newInstance(MediaWikiType.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             int i = 0, k = 0;
-            while (XMLUtils.goToNextXBeforeY(reader, "page", "mediawiki")
-                    && i < params.to) {
+            while (reader.hasNext() && i < params.to) {
+                if (reader.getEventType() != XMLStreamReader.START_ELEMENT || reader.getLocalName() != "page") {
+                    reader.next();
+                    continue;
+                }
                 if (i++ < params.from) {
                     continue;
                 }
-                System.out.print("\r" + i);
-                Page page = parsePageInfo(reader);
-                if (page.isRedirect() || page.getNs() != 0) {
+                PageType page = unmarshaller.unmarshal(reader, PageType.class).getValue();
+                System.out.print("\rParsing page " + i);
+                if (page.getRedirect() != null || !page.getNs().equals(BigInteger.ZERO)) {
                     continue;
                 }
-                psRevisionsInfo.setLong(7, page.getId());
-                for (Revision revisionInfo : parseRevisions(reader)) {
-                    psRevisionsInfo.setLong(1, revisionInfo.getId());
-                    if (revisionInfo.getParentId().isPresent()) {
+                psRevisionsInfo.setLong(7, page.getId().longValue());
+                for (Object o : page.getRevisionOrUpload()) {
+                    if (o instanceof UploadType) {
+                        continue;
+                    }
+                    RevisionType revisionInfo = (RevisionType) o;
+                    psRevisionsInfo.setLong(1, revisionInfo.getId().longValue());
+                    if (revisionInfo.getParentid() != null) {
                         psRevisionsInfo.setLong(
                                 2,
-                                revisionInfo.getParentId().get());
+                                revisionInfo.getParentid().longValue());
                     } else {
                         psRevisionsInfo.setNull(
                                 2,
                                 Types.BIGINT);
                     }
-                    if (revisionInfo.getComment().isPresent()) {
+                    if (revisionInfo.getComment() != null) {
                         psRevisionsInfo.setString(
                                 3,
-                                revisionInfo.getComment().get());
+                                revisionInfo.getComment().getValue());
                     } else {
                         psRevisionsInfo.setNull(
                                 3,
@@ -184,12 +207,11 @@ public class Importer {
                     }
                     psRevisionsInfo.setBoolean(
                             4,
-                            revisionInfo.isMinor());
+                            revisionInfo.getMinor() != null);
                     psRevisionsInfo.setString(
                             5,
-                            revisionInfo.getTimeStamp().format(
-                                    DateTimeFormatter.ISO_DATE_TIME));
-                    psRevisionsInfo.setString(6, revisionInfo.getText());
+                            dateFormat.format(revisionInfo.getTimestamp().toGregorianCalendar().getTime()));
+                    psRevisionsInfo.setString(6, revisionInfo.getText().getValue());
                     psRevisionsInfo.addBatch();
                     if (++k % params.batchSize == 0) {
                         psRevisionsInfo.executeBatch();
@@ -198,72 +220,8 @@ public class Importer {
             }
             psRevisionsInfo.executeBatch();
             System.out.println();
-        } catch (SQLException ex) {
+        } catch (SQLException | CompressorException | JAXBException ex) {
             ex.printStackTrace(System.err);
         }
-    }
-
-    static private List<Revision> parseRevisions(XMLStreamReader reader)
-            throws XMLStreamException {
-        List<Revision> result = new ArrayList<>();
-        while (reader.getEventType() == XMLStreamReader.START_ELEMENT
-                && reader.getName().getLocalPart().equals("revision")) {
-            XMLUtils.goToNextXBeforeY(reader, "id", "revision");
-            final long id = Long.parseLong(reader.getElementText());
-            final Optional<Long> parentId;
-            if (XMLUtils.nextTag(reader).get().equals("parentid")) {
-                parentId = Optional.of(Long.parseLong(reader.getElementText()));
-                XMLUtils.goToNextXBeforeY(reader, "timestamp", "revision");
-            } else {
-                parentId = Optional.empty();
-            }
-            final ZonedDateTime timeStamp
-                    = ZonedDateTime.parse(reader.getElementText());
-            String tag = XMLUtils.nextTag(reader).get();
-            while (!tag.equals("minor")
-                    && !tag.equals("comment")
-                    && !tag.equals("text")) {
-                tag = XMLUtils.nextTag(reader).get();
-            }
-            final boolean minor = tag.equals("minor");
-            if (minor) {
-                do {
-                    tag = XMLUtils.nextTag(reader).get();
-                } while (!tag.equals("comment")
-                        && !tag.equals("text"));
-            }
-            final Optional<String> comment = tag.equals("comment")
-                    ? Optional.of(reader.getElementText())
-                    : Optional.empty();
-            if (comment.isPresent()) {
-                XMLUtils.goToNextXBeforeY(reader, "text", "revision");
-            }
-            final String text = reader.getElementText();
-            result.add(new Revision(
-                    parentId,
-                    id,
-                    timeStamp,
-                    minor,
-                    comment,
-                    text));
-            XMLUtils.goToNextXBeforeY(reader, "revision", "page");
-        }
-        return result;
-    }
-
-    static private Page parsePageInfo(XMLStreamReader reader)
-            throws XMLStreamException {
-        Page result = new Page();
-        XMLUtils.nextTag(reader);
-        result.setTitle(reader.getElementText());
-        XMLUtils.nextTag(reader);
-        result.setNs(Integer.parseInt(reader.getElementText()));
-        XMLUtils.nextTag(reader);
-        result.setId(Long.parseLong(reader.getElementText()));
-        result.setRedirect(XMLUtils.nextTag(reader).get().equals("redirect"));
-        if (result.isRedirect()) {
-            XMLUtils.nextTag(reader);
-        }
-        return result;
     }
 }
